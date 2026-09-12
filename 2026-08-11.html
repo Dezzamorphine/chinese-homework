@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Китайский · ДЗ">
+<meta name="theme-color" content="#c0392b">
+<title>Урок (11 августа): Телефонные диалоги и культура WeChat</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --muted:#6b7280;
+    --line:#e3e7ef; --accent:#c0392b; --accent-soft:#fdecea;
+    --ok:#1e8e4f; --ok-soft:#e6f4ea; --bad:#c0392b; --bad-soft:#fdecea;
+    --chip:#eef1f7; --chip-active:#fff3cd; --radius:14px;
+    --cn:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;padding:0 16px 90px}
+  .wrap{max-width:820px;margin:0 auto}
+  header.hd{padding:28px 0 18px;border-bottom:2px solid var(--line);margin-bottom:8px}
+  .titlecn{font-family:var(--cn);font-size:30px;font-weight:700;letter-spacing:1px}
+  .titleru{font-size:17px;color:var(--muted);margin-top:4px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tag{background:var(--accent-soft);color:var(--accent);font-size:13px;
+    padding:4px 11px;border-radius:999px;font-weight:600}
+  .tag.alt{background:#eef2ff;color:#3b50c4}
+  .hint-tip{font-size:13px;color:var(--muted);margin-top:10px}
+  .nav{padding:14px 0 0}
+  .nav a{color:var(--accent);text-decoration:none;font-weight:600;font-size:15px}
+  .nav a:hover{text-decoration:underline}
+
+  /* ruby pinyin */
+  ruby{ruby-position:over;-webkit-ruby-position:before}
+  rt{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:.56em;color:var(--accent);font-weight:600;line-height:1.1;letter-spacing:0}
+  .word{cursor:help;border-bottom:1.5px dotted var(--accent);padding-bottom:0}
+  .word:hover{background:var(--accent-soft);border-radius:4px}
+
+  /* popover */
+  .pop{position:absolute;z-index:100;max-width:300px;background:#fff;color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(20,30,60,.18);
+    padding:12px 14px;font-size:14px;display:none}
+  .pop.show{display:block}
+  .pop .pw{font-family:var(--cn);font-size:22px;font-weight:700}
+  .pop .ppy{color:var(--accent);font-weight:600;font-size:13px;margin-top:2px}
+  .pop .pru{margin-top:6px;font-size:15px}
+  .pop .pex{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--muted)}
+  .pop .pex .excn{font-family:var(--cn);color:var(--ink);display:block;margin-bottom:2px}
+
+  /* vocab study card */
+  .vocab{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .vocab h2{margin:0 0 4px;font-size:19px}
+  .vocab .cnt{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .vlist{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+  .vrow{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);align-items:flex-start}
+  .vrow .spk{flex:none;width:34px;height:34px;border:none;border-radius:8px;background:var(--accent-soft);
+    color:var(--accent);font-size:16px;cursor:pointer;margin-top:2px}
+  .vrow .spk:hover{background:#fbdcd8}
+  .vrow .body{flex:1;min-width:0}
+  .vrow .hz{font-family:var(--cn);font-size:20px}
+  .vrow .tr{font-size:14px;color:var(--ink)}
+  .vrow .ex{font-size:13px;color:var(--muted);margin-top:2px}
+  .vrow .ex .excn{font-family:var(--cn);color:var(--ink)}
+  @media(max-width:560px){.vlist{grid-template-columns:1fr}}
+
+  /* score bar */
+  .scorebar{position:sticky;top:0;z-index:30;background:rgba(244,246,251,.94);
+    backdrop-filter:blur(6px);padding:12px 0;margin:0 -16px;border-bottom:1px solid var(--line)}
+  .scorebar .inner{max-width:820px;margin:0 auto;padding:0 16px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap}
+  .progress{flex:1;min-width:140px;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e8e4f,#36c46f);
+    border-radius:999px;transition:width .35s ease}
+  .scoretxt{font-weight:700;font-size:15px;white-space:nowrap}
+  .btn{border:none;cursor:pointer;font-size:14px;font-weight:600;border-radius:10px;
+    padding:8px 14px;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.07)}
+  .btn.ghost{background:var(--chip);color:var(--ink)}
+  .btn.ghost:hover{background:#e3e7ef}
+
+  section.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .ex h2{margin:0 0 2px;font-size:19px}
+  .ex .subcn{font-family:var(--cn);color:var(--accent);font-size:15px;font-weight:600}
+  .ex .instr{color:var(--muted);font-size:14px;margin:6px 0 16px}
+  .item{padding:16px 0;border-top:1px dashed var(--line)}
+  .item:first-of-type{border-top:none;padding-top:4px}
+  .qhead{display:flex;gap:10px;align-items:baseline}
+  .qnum{font-weight:700;color:var(--muted);font-size:14px;min-width:22px}
+  .qcn{font-family:var(--cn);font-size:20px}
+  .qru{color:var(--muted);font-size:14px;margin:6px 0 10px 32px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-left:32px}
+  .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1.5px solid var(--line);
+    border-radius:10px;cursor:pointer;font-size:16px;transition:.12s;background:#fff}
+  .opt:hover{border-color:#c7cede}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt .cn{font-family:var(--cn)}
+  .opt .mark{margin-left:auto;font-weight:700}
+
+  .inpwrap{margin-left:32px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input.fill{font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:var(--cn);min-width:120px}
+  input.fill:focus{outline:none;border-color:var(--accent)}
+  input.fill.correct{border-color:var(--ok);background:var(--ok-soft)}
+  input.fill.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .prompt{font-family:var(--cn);font-size:20px;margin-left:32px;margin-bottom:10px;line-height:2.1}
+  .prompt .blank,.fb .blank{display:inline-block;min-width:46px;border-bottom:2px solid var(--accent);
+    text-align:center;color:var(--accent);font-weight:700}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-left:32px;margin-bottom:8px}
+  .chip{font-family:var(--cn);font-size:18px;padding:10px 14px;background:var(--chip);
+    border:1.5px solid var(--line);border-radius:10px;cursor:pointer;user-select:none;transition:.12s;line-height:1.9}
+  .chip:hover{background:#e3e7ef}
+  .chip.used{opacity:.35;pointer-events:none}
+  .answerline{min-height:52px;margin-left:32px;border:1.5px dashed var(--line);border-radius:10px;
+    padding:8px;display:flex;flex-wrap:wrap;gap:8px;background:#fafbfe}
+  .answerline.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .answerline.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .answerline .chip{background:#fff}
+
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-left:32px}
+  .match .col{display:flex;flex-direction:column;gap:8px}
+  .mtile{padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;
+    font-size:16px;transition:.12s;background:#fff;line-height:1.9}
+  .mtile.cn{font-family:var(--cn)}
+  .mtile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .mtile.matched{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+  .mtile.wrongflash{border-color:var(--bad);background:var(--bad-soft)}
+
+  .tf{display:flex;gap:10px;margin-left:32px}
+  .tf .opt{flex:1;justify-content:center;font-weight:600}
+
+  .speakbtn{margin-left:32px;font-size:22px;width:54px;height:54px;border-radius:50%;
+    border:none;background:var(--accent);color:#fff;cursor:pointer;margin-bottom:10px}
+  .speakbtn:hover{filter:brightness(1.08)}
+  .speakhint{margin-left:10px;color:var(--muted);font-size:13px}
+
+  .row-actions{margin-left:32px;margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fb{margin-left:32px;margin-top:8px;font-size:14px;padding:8px 12px;border-radius:9px;display:none}
+  .fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+  .fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+  .fb .ans{font-family:var(--cn);font-weight:700}
+
+  .done{text-align:center;padding:30px;margin:20px 0;border-radius:var(--radius);
+    background:linear-gradient(135deg,#1e8e4f,#36c46f);color:#fff;display:none}
+  .done.show{display:block}
+  .done .big{font-size:40px;font-weight:800}
+  footer.ft{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  @media(max-width:560px){.match{grid-template-columns:1fr}.qru,.opts,.inpwrap,.chips,.answerline,.match,.tf,.row-actions,.fb,.prompt{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="scorebar"><div class="inner">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="scoretxt" id="score">0 / 0</div>
+  <button class="btn primary" id="checkAll">Проверить всё · 全部检查</button>
+  <button class="btn ghost" id="reset">Сброс · 重置</button>
+</div></div>
+
+<div class="wrap">
+  <div class="nav"><a href="./index.html">← Все уроки</a></div>
+  <header class="hd">
+    <div class="titlecn" id="tcn"></div>
+    <div class="titleru" id="tru"></div>
+    <div class="meta" id="meta"></div>
+    <div class="hint-tip">💡 Пиньинь стоит над иероглифами. Подведи курсор или нажми на <span style="border-bottom:1.5px dotted var(--accent)">подчёркнутое слово</span>, чтобы увидеть перевод и пример.</div>
+  </header>
+  <main id="app"></main>
+  <div class="done" id="done"><div class="big" id="doneScore"></div><div id="doneMsg"></div></div>
+  <footer class="ft">Сгенерировано из видеоурока · 自动生成的作业 · автопроверка работает офлайн</footer>
+</div>
+<div class="pop" id="pop"></div>
+
+<script>
+const HW = {"lesson": {"title_cn": "电话对话和微信文化", "title_ru": "Урок (11 августа): Телефонные диалоги и культура WeChat", "topic_cn": "打电话、留言、送货", "topic_ru": "Звонок в офис, ошибся номером, доставка", "level": "HSK 2", "source": "Screen Recording 2026-08-11 at 20.08.48.mov"}, "vocab": [{"hanzi": "喂", "ru": "алло (по телефону)", "ex_cn": "喂，请问王先生在吗？", "ex_ru": "Алло, скажите, господин Ван на месте?"}, {"hanzi": "请问…在吗", "ru": "скажите, … на месте?", "ex_cn": "请问王先生在吗？", "ex_ru": "Скажите, господин Ван на месте?"}, {"hanzi": "您是哪位", "ru": "кто вы? (вежливо, по телефону)", "ex_cn": "您是哪位？", "ex_ru": "Простите, кто вы?"}, {"hanzi": "正在开会", "ru": "сейчас на совещании", "ex_cn": "他正在开会呢。", "ex_ru": "Он сейчас на совещании."}, {"hanzi": "老顾客", "ru": "постоянный клиент", "ex_cn": "我是亿万市场的老顾客。", "ex_ru": "Я постоянный клиент рынка Ивань."}, {"hanzi": "有件事情", "ru": "есть одно дело", "ex_cn": "有件事情想跟他说。", "ex_ru": "Есть одно дело, хочу с ним поговорить."}, {"hanzi": "留言", "ru": "оставить сообщение", "ex_cn": "要不要给他留言？", "ex_ru": "Оставите ему сообщение?"}, {"hanzi": "麻烦您", "ru": "будьте добры (букв. побеспокою вас)", "ex_cn": "麻烦您让他给我回电话。", "ex_ru": "Будьте добры, пусть он мне перезвонит."}, {"hanzi": "回电话", "ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}, {"hanzi": "号码", "ru": "номер", "ex_cn": "我的号码他有。", "ex_ru": "Мой номер у него есть."}, {"hanzi": "一…就…", "ru": "как только…, сразу…", "ex_cn": "他一开完会，我就告诉他。", "ex_ru": "Как только совещание закончится, сразу ему передам."}, {"hanzi": "打错了", "ru": "ошибся номером", "ex_cn": "对不起，打错了。", "ex_ru": "Извините, ошибся номером."}, {"hanzi": "这里没有", "ru": "здесь нет (такого)", "ex_cn": "这里没有王先生。", "ex_ru": "Здесь нет господина Вана."}, {"hanzi": "打扰", "ru": "беспокоить, мешать", "ex_cn": "对不起，打扰了。", "ex_ru": "Извините за беспокойство."}, {"hanzi": "加微信", "ru": "добавить в WeChat", "ex_cn": "我们加个微信吧。", "ex_ru": "Давай добавимся в WeChat."}, {"hanzi": "扫", "ru": "сканировать (QR-код)", "ex_cn": "我扫你还是你扫我？", "ex_ru": "Я сканирую тебя или ты меня?"}, {"hanzi": "二维码", "ru": "QR-код", "ex_cn": "这是我的二维码。", "ex_ru": "Вот мой QR-код."}, {"hanzi": "加上了", "ru": "добавил(ся) (в контакты)", "ex_cn": "好了，加上了。", "ex_ru": "Готово, добавил."}, {"hanzi": "直接找我", "ru": "обращайся прямо ко мне", "ex_cn": "以后有事直接找我。", "ex_ru": "Если что — обращайся прямо ко мне."}, {"hanzi": "送货", "ru": "доставка товара", "ex_cn": "明天可以送货吗？", "ex_ru": "Завтра можете доставить?"}, {"hanzi": "送到", "ru": "доставить (до места)", "ex_cn": "明天上午十点送到。", "ex_ru": "Доставят завтра в 10 утра."}, {"hanzi": "什么时候", "ru": "когда", "ex_cn": "什么时候送到？", "ex_ru": "Когда доставят?"}, {"hanzi": "收到", "ru": "получил, принято", "ex_cn": "收到，谢谢。", "ex_ru": "Принято, спасибо."}, {"hanzi": "几乎", "ru": "почти", "ex_cn": "在中国几乎每个人都用微信。", "ex_ru": "В Китае почти все пользуются WeChat."}, {"hanzi": "不只是…还…", "ru": "не только…, но и…", "ex_cn": "微信不只是聊天，还可以付钱。", "ex_ru": "WeChat — не только чат, но и оплата."}, {"hanzi": "付钱", "ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}, {"hanzi": "打车", "ru": "вызывать такси", "ex_cn": "用微信打车。", "ex_ru": "Вызвать такси через WeChat."}, {"hanzi": "点外卖", "ru": "заказывать доставку еды", "ex_cn": "用微信点外卖。", "ex_ru": "Заказать еду через WeChat."}, {"hanzi": "谈生意", "ru": "вести переговоры о делах", "ex_cn": "还可以谈生意。", "ex_ru": "А ещё можно обсуждать дела."}, {"hanzi": "一定要", "ru": "обязательно нужно", "ex_cn": "一定要有微信。", "ex_ru": "Обязательно нужен WeChat."}], "sections": [{"type": "mcq", "title_ru": "Выбери правильный перевод", "title_cn": "选择正确的翻译", "instructions_ru": "Отметь верный вариант и нажми «Проверить».", "items": [{"q_cn": "您是哪位？", "q_ru": "Что спрашивают по телефону?", "options": ["Где вы?", "Кто вы?", "Когда вы придёте?"], "answer": 1, "explain_ru": "哪位 — вежливое «кто» (какой человек)."}, {"q_cn": "要不要给他留言？", "q_ru": "Что предлагает секретарь?", "options": ["Перезвонить позже.", "Оставить ему сообщение.", "Подождать на линии."], "answer": 1, "explain_ru": "留言 — оставить сообщение."}, {"q_cn": "他一开完会，我就告诉他。", "q_ru": "Что это значит?", "options": ["Как только совещание закончится, сразу ему передам.", "Он на совещании, не передам.", "Он уже знает."], "answer": 0, "explain_ru": "一…就… — «как только…, сразу…»."}, {"q_cn": "对不起，打扰了。", "q_ru": "Что говорят, если ошиблись номером?", "options": ["Извините за беспокойство.", "Перезвоните мне.", "Кто это?"], "answer": 0, "explain_ru": "打扰 — побеспокоить."}, {"q_cn": "在中国几乎每个人都用微信。", "q_ru": "Что значит 几乎?", "options": ["почти", "только", "иногда"], "answer": 0, "explain_ru": "几乎 (jīhū) — почти."}]}, {"type": "fill", "title_ru": "Вставь пропущенное слово", "title_cn": "填空", "instructions_ru": "Впиши иероглиф. Где просят пиньинь — тоны можно не ставить.", "items": [{"prompt_cn": "喂，请问王先生___吗？", "prompt_ru": "Алло, господин Ван на месте?", "accept": ["在"], "mode": "hanzi", "hint_ru": "быть на месте"}, {"prompt_cn": "他正在___呢。", "prompt_ru": "Он сейчас на совещании.", "accept": ["开会"], "mode": "hanzi", "hint_ru": "совещание"}, {"prompt_cn": "麻烦您让他给我___电话。", "prompt_ru": "Будьте добры, пусть он мне перезвонит.", "accept": ["回"], "mode": "hanzi", "hint_ru": "回电话 — перезвонить"}, {"prompt_cn": "对不起，打___了。", "prompt_ru": "Извините, ошибся номером.", "accept": ["错"], "mode": "hanzi", "hint_ru": "глагол + 错"}, {"prompt_cn": "微信不只是聊天，___可以付钱。", "prompt_ru": "WeChat — не только чат, но и оплата.", "accept": ["还"], "mode": "hanzi", "hint_ru": "不只是…还…"}, {"prompt_cn": "这是我的___。", "prompt_ru": "Вот мой QR-код. (впиши пиньинь)", "accept": ["èrwéimǎ", "er wei ma"], "mode": "pinyin", "hint_ru": "二维码"}]}, {"type": "match", "title_ru": "Соедини слово с переводом", "title_cn": "连线", "items": [{"left": "留言", "right": "оставить сообщение"}, {"left": "回电话", "right": "перезвонить"}, {"left": "打错了", "right": "ошибся номером"}, {"left": "打扰", "right": "беспокоить"}, {"left": "送货", "right": "доставка"}, {"left": "几乎", "right": "почти"}, {"left": "点外卖", "right": "заказать еду"}, {"left": "谈生意", "right": "вести переговоры"}]}, {"type": "order", "title_ru": "Собери предложение", "title_cn": "连词成句", "items": [{"chips": ["请问", "王先生", "在", "吗"], "answer": ["请问", "王先生", "在", "吗"], "translation_ru": "Скажите, господин Ван на месте?"}, {"chips": ["麻烦您", "让", "他", "给我", "回电话"], "answer": ["麻烦您", "让", "他", "给我", "回电话"], "translation_ru": "Будьте добры, пусть он мне перезвонит.", "explain_ru": "让 + кто + действие — «пусть кто-то сделает»."}, {"chips": ["明天", "上午", "十点", "送到"], "answer": ["明天", "上午", "十点", "送到"], "translation_ru": "Доставят завтра в десять утра.", "explain_ru": "Время ставится перед глаголом."}, {"chips": ["我", "扫", "你", "还是", "你", "扫", "我"], "answer": ["我", "扫", "你", "还是", "你", "扫", "我"], "translation_ru": "Я сканирую тебя или ты меня?", "explain_ru": "A 还是 B — выбор «или»."}]}, {"type": "truefalse", "title_ru": "Верно или неверно", "title_cn": "判断对错", "items": [{"statement_cn": "「您是哪位」是问对方是谁。", "statement_ru": "«您是哪位» — вопрос «кто вы?».", "answer": true, "explain_ru": "Вежливый вопрос по телефону."}, {"statement_cn": "打错电话的时候应该说「对不起」。", "statement_ru": "Ошибившись номером, нужно сказать «对不起».", "answer": true, "explain_ru": "对不起，打错了 / 打扰了."}, {"statement_cn": "「几乎」的意思是「никогда」。", "statement_ru": "«几乎» означает «никогда».", "answer": false, "explain_ru": "几乎 — почти."}, {"statement_cn": "「一…就…」表示两个动作紧接着发生。", "statement_ru": "«一…就…» означает, что одно действие следует сразу за другим.", "answer": true, "explain_ru": "«Как только…, сразу…»."}, {"statement_cn": "微信只能聊天，不能付钱。", "statement_ru": "В WeChat можно только общаться, платить нельзя.", "answer": false, "explain_ru": "微信不只是聊天，还可以付钱、打车、点外卖."}]}, {"type": "listen", "title_ru": "Аудирование", "title_cn": "听力", "instructions_ru": "Нажми 🔊, прослушай и выбери, что ты услышал.", "items": [{"audio_text": "他正在开会呢，您是哪位？", "q_ru": "Что вы услышали?", "options": ["他正在开会呢，您是哪位？", "他不在，请留言。", "他马上给您回电话。"], "answer": 0, "explain_ru": "«Он на совещании, кто вы?»"}, {"audio_text": "对不起，打错了。", "q_ru": "Что вы услышали?", "options": ["对不起，打错了。", "对不起，打扰了。", "对不起，他不在。"], "answer": 0, "explain_ru": "«Извините, ошибся номером.»"}, {"audio_text": "什么时候送到？", "q_ru": "Что вы услышали?", "options": ["什么时候送到？", "什么时候开会？", "什么时候回电话？"], "answer": 0, "explain_ru": "«Когда доставят?»"}]}]};
+const ANNO = {"请问": [{"w": "请", "h": true, "p": ["qǐng"]}, {"w": "问", "h": true, "p": ["wèn"]}], "回电话": [{"w": "回电话", "h": true, "p": ["huí", "diàn", "huà"], "g": {"ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}}], "什么时候": [{"w": "什么时候", "h": true, "p": ["shén", "me", "shí", "hòu"], "g": {"ru": "когда", "ex_cn": "什么时候送到？", "ex_ru": "Когда доставят?"}}], "什么时候回电话？": [{"w": "什么时候", "h": true, "p": ["shén", "me", "shí", "hòu"], "g": {"ru": "когда", "ex_cn": "什么时候送到？", "ex_ru": "Когда доставят?"}}, {"w": "回电话", "h": true, "p": ["huí", "diàn", "huà"], "g": {"ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}}, {"w": "？"}], "一定要有微信。": [{"w": "一定要", "h": true, "p": ["yí", "dìng", "yào"], "g": {"ru": "обязательно нужно", "ex_cn": "一定要有微信。", "ex_ru": "Обязательно нужен WeChat."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "。"}], "点外卖": [{"w": "点外卖", "h": true, "p": ["diǎn", "wài", "mài"], "g": {"ru": "заказывать доставку еды", "ex_cn": "用微信点外卖。", "ex_ru": "Заказать еду через WeChat."}}], "麻烦您让他给我___电话。": [{"w": "麻烦您", "h": true, "p": ["má", "fán", "nín"], "g": {"ru": "будьте добры (букв. побеспокою вас)", "ex_cn": "麻烦您让他给我回电话。", "ex_ru": "Будьте добры, пусть он мне перезвонит."}}, {"w": "让", "h": true, "p": ["ràng"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "___"}, {"w": "电", "h": true, "p": ["diàn"]}, {"w": "话", "h": true, "p": ["huà"]}, {"w": "。"}], "要不要给他留言？": [{"w": "要", "h": true, "p": ["yào"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "要", "h": true, "p": ["yào"]}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "留言", "h": true, "p": ["liú", "yán"], "g": {"ru": "оставить сообщение", "ex_cn": "要不要给他留言？", "ex_ru": "Оставите ему сообщение?"}}, {"w": "？"}], "送到": [{"w": "送到", "h": true, "p": ["sòng", "dào"], "g": {"ru": "доставить (до места)", "ex_cn": "明天上午十点送到。", "ex_ru": "Доставят завтра в 10 утра."}}], "吗": [{"w": "吗", "h": true, "p": ["ma"]}], "我扫你还是你扫我？": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "扫", "h": true, "p": ["sǎo"], "g": {"ru": "сканировать (QR-код)", "ex_cn": "我扫你还是你扫我？", "ex_ru": "Я сканирую тебя или ты меня?"}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "还", "h": true, "p": ["hái"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "扫", "h": true, "p": ["sǎo"], "g": {"ru": "сканировать (QR-код)", "ex_cn": "我扫你还是你扫我？", "ex_ru": "Я сканирую тебя или ты меня?"}}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "？"}], "微信不只是聊天，___可以付钱。": [{"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "只", "h": true, "p": ["zhǐ"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "聊", "h": true, "p": ["liáo"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "，___"}, {"w": "可", "h": true, "p": ["kě"]}, {"w": "以", "h": true, "p": ["yǐ"]}, {"w": "付钱", "h": true, "p": ["fù", "qián"], "g": {"ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}}, {"w": "。"}], "送货": [{"w": "送货", "h": true, "p": ["sòng", "huò"], "g": {"ru": "доставка товара", "ex_cn": "明天可以送货吗？", "ex_ru": "Завтра можете доставить?"}}], "他正在___呢。": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "正", "h": true, "p": ["zhèng"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "___"}, {"w": "呢", "h": true, "p": ["ne"]}, {"w": "。"}], "老顾客": [{"w": "老顾客", "h": true, "p": ["lǎo", "gù", "kè"], "g": {"ru": "постоянный клиент", "ex_cn": "我是亿万市场的老顾客。", "ex_ru": "Я постоянный клиент рынка Ивань."}}], "「几乎」的意思是「никогда」。": [{"w": "「"}, {"w": "几乎", "h": true, "p": ["jī", "hū"], "g": {"ru": "почти", "ex_cn": "在中国几乎每个人都用微信。", "ex_ru": "В Китае почти все пользуются WeChat."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「никогда」。"}], "谈生意": [{"w": "谈生意", "h": true, "p": ["tán", "shēng", "yì"], "g": {"ru": "вести переговоры о делах", "ex_cn": "还可以谈生意。", "ex_ru": "А ещё можно обсуждать дела."}}], "开会": [{"w": "开", "h": true, "p": ["kāi"]}, {"w": "会", "h": true, "p": ["huì"]}], "号码": [{"w": "号码", "h": true, "p": ["hào", "mǎ"], "g": {"ru": "номер", "ex_cn": "我的号码他有。", "ex_ru": "Мой номер у него есть."}}], "打扰": [{"w": "打扰", "h": true, "p": ["dǎ", "rǎo"], "g": {"ru": "беспокоить, мешать", "ex_cn": "对不起，打扰了。", "ex_ru": "Извините за беспокойство."}}], "他一开完会，我就告诉他。": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "一", "h": true, "p": ["yī"]}, {"w": "开", "h": true, "p": ["kāi"]}, {"w": "完", "h": true, "p": ["wán"]}, {"w": "会", "h": true, "p": ["huì"]}, {"w": "，"}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "就", "h": true, "p": ["jiù"]}, {"w": "告", "h": true, "p": ["gào"]}, {"w": "诉", "h": true, "p": ["sù"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "。"}], "在中国几乎每个人都用微信。": [{"w": "在", "h": true, "p": ["zài"]}, {"w": "中", "h": true, "p": ["zhōng"]}, {"w": "国", "h": true, "p": ["guó"]}, {"w": "几乎", "h": true, "p": ["jī", "hū"], "g": {"ru": "почти", "ex_cn": "在中国几乎每个人都用微信。", "ex_ru": "В Китае почти все пользуются WeChat."}}, {"w": "每", "h": true, "p": ["měi"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "人", "h": true, "p": ["rén"]}, {"w": "都", "h": true, "p": ["dōu"]}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "。"}], "对不起，他不在。": [{"w": "对", "h": true, "p": ["duì"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "起", "h": true, "p": ["qǐ"]}, {"w": "，"}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "。"}], "还是": [{"w": "还", "h": true, "p": ["hái"]}, {"w": "是", "h": true, "p": ["shì"]}], "明天上午十点送到。": [{"w": "明", "h": true, "p": ["míng"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "上", "h": true, "p": ["shàng"]}, {"w": "午", "h": true, "p": ["wǔ"]}, {"w": "十", "h": true, "p": ["shí"]}, {"w": "点", "h": true, "p": ["diǎn"]}, {"w": "送到", "h": true, "p": ["sòng", "dào"], "g": {"ru": "доставить (до места)", "ex_cn": "明天上午十点送到。", "ex_ru": "Доставят завтра в 10 утра."}}, {"w": "。"}], "给我": [{"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}], "一定要": [{"w": "一定要", "h": true, "p": ["yí", "dìng", "yào"], "g": {"ru": "обязательно нужно", "ex_cn": "一定要有微信。", "ex_ru": "Обязательно нужен WeChat."}}], "一…就…": [{"w": "一", "h": true, "p": ["yī"]}, {"w": "…"}, {"w": "就", "h": true, "p": ["jiù"]}, {"w": "…"}], "喂，请问王先生___吗？": [{"w": "喂", "h": true, "p": ["wèi"], "g": {"ru": "алло (по телефону)", "ex_cn": "喂，请问王先生在吗？", "ex_ru": "Алло, скажите, господин Ван на месте?"}}, {"w": "，"}, {"w": "请", "h": true, "p": ["qǐng"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "王", "h": true, "p": ["wáng"]}, {"w": "先", "h": true, "p": ["xiān"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "___"}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "有件事情想跟他说。": [{"w": "有件事情", "h": true, "p": ["yǒu", "jiàn", "shì", "qíng"], "g": {"ru": "есть одно дело", "ex_cn": "有件事情想跟他说。", "ex_ru": "Есть одно дело, хочу с ним поговорить."}}, {"w": "想", "h": true, "p": ["xiǎng"]}, {"w": "跟", "h": true, "p": ["gēn"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "说", "h": true, "p": ["shuō"]}, {"w": "。"}], "对不起，打扰了。": [{"w": "对", "h": true, "p": ["duì"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "起", "h": true, "p": ["qǐ"]}, {"w": "，"}, {"w": "打扰", "h": true, "p": ["dǎ", "rǎo"], "g": {"ru": "беспокоить, мешать", "ex_cn": "对不起，打扰了。", "ex_ru": "Извините за беспокойство."}}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "请问王先生在吗？": [{"w": "请", "h": true, "p": ["qǐng"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "王", "h": true, "p": ["wáng"]}, {"w": "先", "h": true, "p": ["xiān"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "上午": [{"w": "上", "h": true, "p": ["shàng"]}, {"w": "午", "h": true, "p": ["wǔ"]}], "打错了": [{"w": "打错了", "h": true, "p": ["dǎ", "cuò", "le"], "g": {"ru": "ошибся номером", "ex_cn": "对不起，打错了。", "ex_ru": "Извините, ошибся номером."}}], "我是亿万市场的老顾客。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "亿", "h": true, "p": ["yì"]}, {"w": "万", "h": true, "p": ["wàn"]}, {"w": "市", "h": true, "p": ["shì"]}, {"w": "场", "h": true, "p": ["chǎng"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "老顾客", "h": true, "p": ["lǎo", "gù", "kè"], "g": {"ru": "постоянный клиент", "ex_cn": "我是亿万市场的老顾客。", "ex_ru": "Я постоянный клиент рынка Ивань."}}, {"w": "。"}], "你": [{"w": "你", "h": true, "p": ["nǐ"]}], "付钱": [{"w": "付钱", "h": true, "p": ["fù", "qián"], "g": {"ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}}], "几乎": [{"w": "几乎", "h": true, "p": ["jī", "hū"], "g": {"ru": "почти", "ex_cn": "在中国几乎每个人都用微信。", "ex_ru": "В Китае почти все пользуются WeChat."}}], "我的号码他有。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "号码", "h": true, "p": ["hào", "mǎ"], "g": {"ru": "номер", "ex_cn": "我的号码他有。", "ex_ru": "Мой номер у него есть."}}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "。"}], "他": [{"w": "他", "h": true, "p": ["tā"]}], "打车": [{"w": "打车", "h": true, "p": ["dǎ", "chē"], "g": {"ru": "вызывать такси", "ex_cn": "用微信打车。", "ex_ru": "Вызвать такси через WeChat."}}], "「您是哪位」是问对方是谁。": [{"w": "「"}, {"w": "您是哪位", "h": true, "p": ["nín", "shì", "nǎ", "wèi"], "g": {"ru": "кто вы? (вежливо, по телефону)", "ex_cn": "您是哪位？", "ex_ru": "Простите, кто вы?"}}, {"w": "」"}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "对", "h": true, "p": ["duì"]}, {"w": "方", "h": true, "p": ["fāng"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "谁", "h": true, "p": ["shuí"]}, {"w": "。"}], "喂": [{"w": "喂", "h": true, "p": ["wèi"], "g": {"ru": "алло (по телефону)", "ex_cn": "喂，请问王先生在吗？", "ex_ru": "Алло, скажите, господин Ван на месте?"}}], "我们加个微信吧。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "们", "h": true, "p": ["men"]}, {"w": "加", "h": true, "p": ["jiā"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "吧", "h": true, "p": ["ba"]}, {"w": "。"}], "这里没有": [{"w": "这里没有", "h": true, "p": ["zhè", "lǐ", "méi", "yǒu"], "g": {"ru": "здесь нет (такого)", "ex_cn": "这里没有王先生。", "ex_ru": "Здесь нет господина Вана."}}], "电话对话和微信文化": [{"w": "电", "h": true, "p": ["diàn"]}, {"w": "话", "h": true, "p": ["huà"]}, {"w": "对", "h": true, "p": ["duì"]}, {"w": "话", "h": true, "p": ["huà"]}, {"w": "和", "h": true, "p": ["hé"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "文", "h": true, "p": ["wén"]}, {"w": "化", "h": true, "p": ["huà"]}], "这是我的二维码。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "二维码", "h": true, "p": ["èr", "wéi", "mǎ"], "g": {"ru": "QR-код", "ex_cn": "这是我的二维码。", "ex_ru": "Вот мой QR-код."}}, {"w": "。"}], "对不起，打错了。": [{"w": "对", "h": true, "p": ["duì"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "起", "h": true, "p": ["qǐ"]}, {"w": "，"}, {"w": "打错了", "h": true, "p": ["dǎ", "cuò", "le"], "g": {"ru": "ошибся номером", "ex_cn": "对不起，打错了。", "ex_ru": "Извините, ошибся номером."}}, {"w": "。"}], "用微信付钱。": [{"w": "用", "h": true, "p": ["yòng"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "付钱", "h": true, "p": ["fù", "qián"], "g": {"ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}}, {"w": "。"}], "喂，请问王先生在吗？": [{"w": "喂", "h": true, "p": ["wèi"], "g": {"ru": "алло (по телефону)", "ex_cn": "喂，请问王先生在吗？", "ex_ru": "Алло, скажите, господин Ван на месте?"}}, {"w": "，"}, {"w": "请", "h": true, "p": ["qǐng"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "王", "h": true, "p": ["wáng"]}, {"w": "先", "h": true, "p": ["xiān"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "错": [{"w": "错", "h": true, "p": ["cuò"]}], "让": [{"w": "让", "h": true, "p": ["ràng"]}], "加微信": [{"w": "加微信", "h": true, "p": ["jiā", "wēi", "xìn"], "g": {"ru": "добавить в WeChat", "ex_cn": "我们加个微信吧。", "ex_ru": "Давай добавимся в WeChat."}}], "收到，谢谢。": [{"w": "收到", "h": true, "p": ["shōu", "dào"], "g": {"ru": "получил, принято", "ex_cn": "收到，谢谢。", "ex_ru": "Принято, спасибо."}}, {"w": "，"}, {"w": "谢", "h": true, "p": ["xiè"]}, {"w": "谢", "h": true, "p": ["xiè"]}, {"w": "。"}], "什么时候开会？": [{"w": "什么时候", "h": true, "p": ["shén", "me", "shí", "hòu"], "g": {"ru": "когда", "ex_cn": "什么时候送到？", "ex_ru": "Когда доставят?"}}, {"w": "开", "h": true, "p": ["kāi"]}, {"w": "会", "h": true, "p": ["huì"]}, {"w": "？"}], "留言": [{"w": "留言", "h": true, "p": ["liú", "yán"], "g": {"ru": "оставить сообщение", "ex_cn": "要不要给他留言？", "ex_ru": "Оставите ему сообщение?"}}], "用微信打车。": [{"w": "用", "h": true, "p": ["yòng"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "打车", "h": true, "p": ["dǎ", "chē"], "g": {"ru": "вызывать такси", "ex_cn": "用微信打车。", "ex_ru": "Вызвать такси через WeChat."}}, {"w": "。"}], "收到": [{"w": "收到", "h": true, "p": ["shōu", "dào"], "g": {"ru": "получил, принято", "ex_cn": "收到，谢谢。", "ex_ru": "Принято, спасибо."}}], "请问…在吗": [{"w": "请", "h": true, "p": ["qǐng"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "…"}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "吗", "h": true, "p": ["ma"]}], "微信只能聊天，不能付钱。": [{"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "只", "h": true, "p": ["zhǐ"]}, {"w": "能", "h": true, "p": ["néng"]}, {"w": "聊", "h": true, "p": ["liáo"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "，"}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "能", "h": true, "p": ["néng"]}, {"w": "付钱", "h": true, "p": ["fù", "qián"], "g": {"ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}}, {"w": "。"}], "「一…就…」表示两个动作紧接着发生。": [{"w": "「"}, {"w": "一", "h": true, "p": ["yī"]}, {"w": "…"}, {"w": "就", "h": true, "p": ["jiù"]}, {"w": "…」"}, {"w": "表", "h": true, "p": ["biǎo"]}, {"w": "示", "h": true, "p": ["shì"]}, {"w": "两", "h": true, "p": ["liǎng"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "动", "h": true, "p": ["dòng"]}, {"w": "作", "h": true, "p": ["zuò"]}, {"w": "紧", "h": true, "p": ["jǐn"]}, {"w": "接", "h": true, "p": ["jiē"]}, {"w": "着", "h": true, "p": ["zhe"]}, {"w": "发", "h": true, "p": ["fā"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "。"}], "他马上给您回电话。": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "马", "h": true, "p": ["mǎ"]}, {"w": "上", "h": true, "p": ["shàng"]}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "您", "h": true, "p": ["nín"]}, {"w": "回电话", "h": true, "p": ["huí", "diàn", "huà"], "g": {"ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}}, {"w": "。"}], "他正在开会呢，您是哪位？": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "正在开会", "h": true, "p": ["zhèng", "zài", "kāi", "huì"], "g": {"ru": "сейчас на совещании", "ex_cn": "他正在开会呢。", "ex_ru": "Он сейчас на совещании."}}, {"w": "呢", "h": true, "p": ["ne"]}, {"w": "，"}, {"w": "您是哪位", "h": true, "p": ["nín", "shì", "nǎ", "wèi"], "g": {"ru": "кто вы? (вежливо, по телефону)", "ex_cn": "您是哪位？", "ex_ru": "Простите, кто вы?"}}, {"w": "？"}], "这里没有王先生。": [{"w": "这里没有", "h": true, "p": ["zhè", "lǐ", "méi", "yǒu"], "g": {"ru": "здесь нет (такого)", "ex_cn": "这里没有王先生。", "ex_ru": "Здесь нет господина Вана."}}, {"w": "王", "h": true, "p": ["wáng"]}, {"w": "先", "h": true, "p": ["xiān"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "。"}], "什么时候送到？": [{"w": "什么时候", "h": true, "p": ["shén", "me", "shí", "hòu"], "g": {"ru": "когда", "ex_cn": "什么时候送到？", "ex_ru": "Когда доставят?"}}, {"w": "送到", "h": true, "p": ["sòng", "dào"], "g": {"ru": "доставить (до места)", "ex_cn": "明天上午十点送到。", "ex_ru": "Доставят завтра в 10 утра."}}, {"w": "？"}], "回": [{"w": "回", "h": true, "p": ["huí"]}], "王先生": [{"w": "王", "h": true, "p": ["wáng"]}, {"w": "先", "h": true, "p": ["xiān"]}, {"w": "生", "h": true, "p": ["shēng"]}], "他正在开会呢。": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "正在开会", "h": true, "p": ["zhèng", "zài", "kāi", "huì"], "g": {"ru": "сейчас на совещании", "ex_cn": "他正在开会呢。", "ex_ru": "Он сейчас на совещании."}}, {"w": "呢", "h": true, "p": ["ne"]}, {"w": "。"}], "正在开会": [{"w": "正在开会", "h": true, "p": ["zhèng", "zài", "kāi", "huì"], "g": {"ru": "сейчас на совещании", "ex_cn": "他正在开会呢。", "ex_ru": "Он сейчас на совещании."}}], "直接找我": [{"w": "直接找我", "h": true, "p": ["zhí", "jiē", "zhǎo", "wǒ"], "g": {"ru": "обращайся прямо ко мне", "ex_cn": "以后有事直接找我。", "ex_ru": "Если что — обращайся прямо ко мне."}}], "在": [{"w": "在", "h": true, "p": ["zài"]}], "十点": [{"w": "十", "h": true, "p": ["shí"]}, {"w": "点", "h": true, "p": ["diǎn"]}], "让他给我回电话。": [{"w": "让", "h": true, "p": ["ràng"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "回电话", "h": true, "p": ["huí", "diàn", "huà"], "g": {"ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}}, {"w": "。"}], "他不在，请留言。": [{"w": "他", "h": true, "p": ["tā"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "，"}, {"w": "请", "h": true, "p": ["qǐng"]}, {"w": "留言", "h": true, "p": ["liú", "yán"], "g": {"ru": "оставить сообщение", "ex_cn": "要不要给他留言？", "ex_ru": "Оставите ему сообщение?"}}, {"w": "。"}], "微信不只是聊天，还可以付钱。": [{"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "只", "h": true, "p": ["zhǐ"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "聊", "h": true, "p": ["liáo"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "，"}, {"w": "还", "h": true, "p": ["hái"]}, {"w": "可", "h": true, "p": ["kě"]}, {"w": "以", "h": true, "p": ["yǐ"]}, {"w": "付钱", "h": true, "p": ["fù", "qián"], "g": {"ru": "платить", "ex_cn": "用微信付钱。", "ex_ru": "Платить через WeChat."}}, {"w": "。"}], "不只是…还…": [{"w": "不", "h": true, "p": ["bù"]}, {"w": "只", "h": true, "p": ["zhǐ"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "…"}, {"w": "还", "h": true, "p": ["hái"]}, {"w": "…"}], "有件事情": [{"w": "有件事情", "h": true, "p": ["yǒu", "jiàn", "shì", "qíng"], "g": {"ru": "есть одно дело", "ex_cn": "有件事情想跟他说。", "ex_ru": "Есть одно дело, хочу с ним поговорить."}}], "您是哪位": [{"w": "您是哪位", "h": true, "p": ["nín", "shì", "nǎ", "wèi"], "g": {"ru": "кто вы? (вежливо, по телефону)", "ex_cn": "您是哪位？", "ex_ru": "Простите, кто вы?"}}], "好了，加上了。": [{"w": "好", "h": true, "p": ["hǎo"]}, {"w": "了", "h": true, "p": ["le"]}, {"w": "，"}, {"w": "加上了", "h": true, "p": ["jiā", "shàng", "le"], "g": {"ru": "добавил(ся) (в контакты)", "ex_cn": "好了，加上了。", "ex_ru": "Готово, добавил."}}, {"w": "。"}], "对不起，打___了。": [{"w": "对", "h": true, "p": ["duì"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "起", "h": true, "p": ["qǐ"]}, {"w": "，"}, {"w": "打", "h": true, "p": ["dǎ"]}, {"w": "___"}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "打错电话的时候应该说「对不起」。": [{"w": "打", "h": true, "p": ["dǎ"]}, {"w": "错", "h": true, "p": ["cuò"]}, {"w": "电", "h": true, "p": ["diàn"]}, {"w": "话", "h": true, "p": ["huà"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "时", "h": true, "p": ["shí"]}, {"w": "候", "h": true, "p": ["hòu"]}, {"w": "应", "h": true, "p": ["yīng"]}, {"w": "该", "h": true, "p": ["gāi"]}, {"w": "说", "h": true, "p": ["shuō"]}, {"w": "「"}, {"w": "对", "h": true, "p": ["duì"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "起", "h": true, "p": ["qǐ"]}, {"w": "」。"}], "我": [{"w": "我", "h": true, "p": ["wǒ"]}], "明天可以送货吗？": [{"w": "明", "h": true, "p": ["míng"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "可", "h": true, "p": ["kě"]}, {"w": "以", "h": true, "p": ["yǐ"]}, {"w": "送货", "h": true, "p": ["sòng", "huò"], "g": {"ru": "доставка товара", "ex_cn": "明天可以送货吗？", "ex_ru": "Завтра можете доставить?"}}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "二维码": [{"w": "二维码", "h": true, "p": ["èr", "wéi", "mǎ"], "g": {"ru": "QR-код", "ex_cn": "这是我的二维码。", "ex_ru": "Вот мой QR-код."}}], "这是我的___。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "___。"}], "加上了": [{"w": "加上了", "h": true, "p": ["jiā", "shàng", "le"], "g": {"ru": "добавил(ся) (в контакты)", "ex_cn": "好了，加上了。", "ex_ru": "Готово, добавил."}}], "您是哪位？": [{"w": "您是哪位", "h": true, "p": ["nín", "shì", "nǎ", "wèi"], "g": {"ru": "кто вы? (вежливо, по телефону)", "ex_cn": "您是哪位？", "ex_ru": "Простите, кто вы?"}}, {"w": "？"}], "麻烦您": [{"w": "麻烦您", "h": true, "p": ["má", "fán", "nín"], "g": {"ru": "будьте добры (букв. побеспокою вас)", "ex_cn": "麻烦您让他给我回电话。", "ex_ru": "Будьте добры, пусть он мне перезвонит."}}], "以后有事直接找我。": [{"w": "以", "h": true, "p": ["yǐ"]}, {"w": "后", "h": true, "p": ["hòu"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "事", "h": true, "p": ["shì"]}, {"w": "直接找我", "h": true, "p": ["zhí", "jiē", "zhǎo", "wǒ"], "g": {"ru": "обращайся прямо ко мне", "ex_cn": "以后有事直接找我。", "ex_ru": "Если что — обращайся прямо ко мне."}}, {"w": "。"}], "还": [{"w": "还", "h": true, "p": ["hái"]}], "用微信点外卖。": [{"w": "用", "h": true, "p": ["yòng"]}, {"w": "微", "h": true, "p": ["wēi"]}, {"w": "信", "h": true, "p": ["xìn"]}, {"w": "点外卖", "h": true, "p": ["diǎn", "wài", "mài"], "g": {"ru": "заказывать доставку еды", "ex_cn": "用微信点外卖。", "ex_ru": "Заказать еду через WeChat."}}, {"w": "。"}], "麻烦您让他给我回电话。": [{"w": "麻烦您", "h": true, "p": ["má", "fán", "nín"], "g": {"ru": "будьте добры (букв. побеспокою вас)", "ex_cn": "麻烦您让他给我回电话。", "ex_ru": "Будьте добры, пусть он мне перезвонит."}}, {"w": "让", "h": true, "p": ["ràng"]}, {"w": "他", "h": true, "p": ["tā"]}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "回电话", "h": true, "p": ["huí", "diàn", "huà"], "g": {"ru": "перезвонить", "ex_cn": "让他给我回电话。", "ex_ru": "Пусть мне перезвонит."}}, {"w": "。"}], "扫": [{"w": "扫", "h": true, "p": ["sǎo"], "g": {"ru": "сканировать (QR-код)", "ex_cn": "我扫你还是你扫我？", "ex_ru": "Я сканирую тебя или ты меня?"}}], "还可以谈生意。": [{"w": "还", "h": true, "p": ["hái"]}, {"w": "可", "h": true, "p": ["kě"]}, {"w": "以", "h": true, "p": ["yǐ"]}, {"w": "谈生意", "h": true, "p": ["tán", "shēng", "yì"], "g": {"ru": "вести переговоры о делах", "ex_cn": "还可以谈生意。", "ex_ru": "А ещё можно обсуждать дела."}}, {"w": "。"}], "明天": [{"w": "明", "h": true, "p": ["míng"]}, {"w": "天", "h": true, "p": ["tiān"]}]};   // строка → массив сегментов {w, h, p?, g?}
+
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+
+/* ---------- рендер китайского с пиньинем + подсказками ---------- */
+function cn(s){
+  const segs = ANNO[s];
+  if(!segs) return esc(s);              // не-китайский текст (русский, латиница) — как есть
+  let html='';
+  for(const seg of segs){
+    if(seg.h){                          // китайское слово/иероглиф
+      const chars=[...seg.w];
+      let inner='';
+      for(let i=0;i<chars.length;i++){
+        const py=seg.p?seg.p[i]:'';
+        inner += py ? `<ruby>${esc(chars[i])}<rt>${esc(py)}</rt></ruby>` : esc(chars[i]);
+      }
+      if(seg.g){
+        const py=seg.p?seg.p.join(' '):'';
+        html += `<span class="word" data-w="${esc(seg.w)}" data-py="${esc(py)}" data-ru="${esc(seg.g.ru||'')}" data-excn="${esc(seg.g.ex_cn||'')}" data-exru="${esc(seg.g.ex_ru||'')}">${inner}</span>`;
+      } else html += inner;
+    } else if(/^[_＿]{2,}$/.test(seg.w)){
+      html += '<span class="blank">?</span>';
+    } else html += esc(seg.w);
+  }
+  return html;
+}
+
+/* ---------- popover ---------- */
+const pop=document.getElementById('pop');
+let popPinned=false;
+function showPop(w){
+  const ex = w.dataset.excn ? `<div class="pex"><span class="excn">${cn(w.dataset.excn)}</span>${esc(w.dataset.exru||'')}</div>` : '';
+  pop.innerHTML = `<div class="pw">${cn(w.dataset.w)}</div>`+
+    (w.dataset.py?`<div class="ppy">${esc(w.dataset.py)}</div>`:'')+
+    `<div class="pru">${esc(w.dataset.ru)}</div>`+ex;
+  pop.classList.add('show');
+  const r=w.getBoundingClientRect();
+  const pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left+window.scrollX;
+  left=Math.min(left, window.scrollX+document.documentElement.clientWidth-pw-10);
+  left=Math.max(left, window.scrollX+8);
+  let top=r.bottom+window.scrollY+6;
+  if(r.bottom+ph+10>document.documentElement.clientHeight) top=r.top+window.scrollY-ph-6;
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hidePop(){ pop.classList.remove('show'); popPinned=false; }
+document.body.addEventListener('mouseover',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) showPop(w); });
+document.body.addEventListener('mouseout',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) hidePop(); });
+document.body.addEventListener('click',e=>{
+  const w=e.target.closest('.word');
+  if(w){ e.stopPropagation(); if(popPinned&&pop._for===w){hidePop();} else {showPop(w);popPinned=true;pop._for=w;} return; }
+  if(!e.target.closest('.pop')) hidePop();
+});
+
+/* ---------- pinyin / text normalization (проверка ответов) ---------- */
+const TONE_MAP={'ā':'a','á':'a','ǎ':'a','à':'a','ē':'e','é':'e','ě':'e','è':'e','ī':'i','í':'i','ǐ':'i','ì':'i','ō':'o','ó':'o','ǒ':'o','ò':'o','ū':'u','ú':'u','ǔ':'u','ù':'u','ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v'};
+function stripTones(s){let o='';for(const ch of s.toLowerCase())o+=(TONE_MAP[ch]!==undefined?TONE_MAP[ch]:ch);return o.replace(/[1-5]/g,'').replace(/\s+/g,'').replace(/[，。！？、,.!?'’\-]/g,'');}
+function normHanzi(s){return s.trim().replace(/\s+/g,'').replace(/[，。！？、,.!?\s]/g,'');}
+function eqv(a,b){return a.trim().toLowerCase()===b.trim().toLowerCase();}
+function matchAnswer(user,accept,mode){
+  user=(user||'').trim(); if(!user)return false;
+  for(const a of accept){
+    if(mode==='pinyin'){if(stripTones(user)===stripTones(a))return true;}
+    else if(mode==='hanzi'){if(normHanzi(user)===normHanzi(a))return true;}
+    else {if(eqv(user,a))return true;}
+  }
+  return false;
+}
+
+/* ---------- TTS ---------- */
+let zhVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh|chinese/i.test(v.lang+v.name))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function speak(text){
+  if(!('speechSynthesis' in window)){alert('Браузер не поддерживает озвучку.');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=0.85;if(zhVoice)u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- scoring ---------- */
+const graded={}; let totalItems=0;
+function setGraded(key,ok){graded[key]=ok;refreshScore();}
+function refreshScore(){
+  const keys=Object.keys(graded);
+  const correct=keys.filter(k=>graded[k]).length;
+  document.getElementById('score').textContent=correct+' / '+totalItems;
+  document.getElementById('bar').style.width=(totalItems?correct/totalItems*100:0)+'%';
+  const done=document.getElementById('done');
+  if(keys.length===totalItems&&totalItems>0){
+    done.classList.add('show');
+    const pct=Math.round(correct/totalItems*100);
+    document.getElementById('doneScore').textContent=correct+' / '+totalItems+'  ('+pct+'%)';
+    document.getElementById('doneMsg').textContent=pct>=90?'Отлично! 太棒了！':pct>=70?'Хорошо! 很好！':pct>=50?'Неплохо, повтори ошибки. 加油！':'Стоит повторить урок. 别灰心，再来一次！';
+  } else done.classList.remove('show');
+}
+
+function feedback(el,ok,answerHTML,explain){
+  el.className='fb '+(ok?'ok':'bad');
+  let h=ok?'✓ Верно · 正确':'✗ Неверно · 错误';
+  if(!ok&&answerHTML)h+=' — правильный ответ: <span class="ans">'+answerHTML+'</span>';
+  if(explain)h+='<br><span style="color:var(--muted)">'+esc(explain)+'</span>';
+  el.innerHTML=h;
+}
+
+/* ---------- renderers ---------- */
+function renderMCQ(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.q_cn||'')}</span></div>`+
+      (it.q_ru?`<div class="qru">${esc(it.q_ru)}</div>`:'');
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&sel>=0) b.onclick(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderFill(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`;
+    item.appendChild(el(`<div class="prompt">${cn(it.prompt_cn||'')}</div>`));
+    if(it.prompt_ru) item.appendChild(el(`<div class="qru">${esc(it.prompt_ru)}</div>`));
+    const inp=el(`<input class="fill" placeholder="${it.mode==='pinyin'?'pīnyīn / pinyin':it.mode==='ru'?'перевод':'汉字'}">`);
+    const fb=el('<div class="fb"></div>');
+    const wrap=el('<div class="inpwrap"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    const doCheck=()=>{ if(graded[key]!==undefined)return;
+      const ok=matchAnswer(inp.value,it.accept,it.mode||'hanzi');
+      inp.classList.add(ok?'correct':'wrong'); inp.disabled=true; b.disabled=true;
+      feedback(fb,ok,cn(it.accept[0]),it.explain_ru||it.hint_ru); setGraded(key,ok); };
+    b.onclick=doCheck; inp.addEventListener('keydown',e=>{if(e.key==='Enter')doCheck();});
+    wrap.appendChild(inp); wrap.appendChild(b);
+    item.appendChild(wrap); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&inp.value.trim()) doCheck(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderTrueFalse(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.statement_cn||'')}</span></div>`+
+      (it.statement_ru?`<div class="qru">${esc(it.statement_ru)}</div>`:'');
+    const tf=el('<div class="tf"></div>'); const fb=el('<div class="fb"></div>');
+    [['Верно · 对',true],['Неверно · 错',false]].forEach(([label,val])=>{
+      const op=el(`<div class="opt">${label}</div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return;
+        [...tf.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel');
+        const ok=val===it.answer; [...tf.children].forEach(c=>c.style.pointerEvents='none');
+        op.classList.add(ok?'correct':'wrong');
+        feedback(fb,ok,(it.answer?'Верно · 对':'Неверно · 错'),it.explain_ru); setGraded(key,ok); };
+      tf.appendChild(op);
+    });
+    item.appendChild(tf); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderOrder(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`+
+      (it.translation_ru?`<div class="qru">Собери предложение: «${esc(it.translation_ru)}»</div>`:'<div class="qru">Собери предложение из слов</div>');
+    const answer=el('<div class="answerline"></div>');
+    const pool=el('<div class="chips"></div>');
+    const current=[];
+    const shuffled=[...it.chips].map((c,idx)=>({c,idx})).sort(()=>Math.random()-0.5);
+    shuffled.forEach(({c})=>{
+      const chip=el(`<div class="chip">${cn(c)}</div>`);
+      chip.onclick=()=>{ if(graded[key]!==undefined)return;
+        chip.classList.add('used'); current.push({c,chip});
+        const a=el(`<div class="chip">${cn(c)}</div>`);
+        a.onclick=()=>{ if(graded[key]!==undefined)return; chip.classList.remove('used');
+          const p=current.findIndex(x=>x.chip===chip); if(p>=0)current.splice(p,1); a.remove(); };
+        answer.appendChild(a); };
+      pool.appendChild(chip);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(graded[key]!==undefined)return;
+      const got=current.map(x=>x.c); const ok=JSON.stringify(got)===JSON.stringify(it.answer);
+      answer.classList.add(ok?'correct':'wrong'); b.disabled=true;
+      feedback(fb,ok,it.answer.map(cn).join(' '),it.explain_ru); setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(answer); item.appendChild(pool); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderMatch(sec,sIdx){
+  const key='s'+sIdx; totalItems++;
+  const item=el('<div class="item"></div>');
+  const grid=el('<div class="match"></div>');
+  const colL=el('<div class="col"></div>'), colR=el('<div class="col"></div>');
+  const left=sec.items.map((it,idx)=>({t:it.left,idx}));
+  const right=sec.items.map((it,idx)=>({t:it.right,idx})).sort(()=>Math.random()-0.5);
+  let selL=null; let solved=0;
+  left.forEach(o=>{ const tile=el(`<div class="mtile cn">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(tile.classList.contains('matched'))return;
+      [...colL.children].forEach(c=>c.classList.remove('sel')); tile.classList.add('sel'); selL=tile; };
+    colL.appendChild(tile); });
+  right.forEach(o=>{ const tile=el(`<div class="mtile">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(!selL||tile.classList.contains('matched'))return;
+      if(selL._idx===o.idx){ selL.classList.remove('sel'); selL.classList.add('matched');
+        tile.classList.add('matched'); selL=null; solved++; if(solved===left.length) setGraded(key,true); }
+      else { const bad=selL; bad.classList.add('wrongflash'); tile.classList.add('wrongflash');
+        setTimeout(()=>{bad.classList.remove('wrongflash','sel');tile.classList.remove('wrongflash');},500);
+        if(graded[key]===undefined) graded[key]=false; selL=null; } };
+    colR.appendChild(tile); });
+  grid.appendChild(colL); grid.appendChild(colR);
+  item.appendChild(el('<div class="qru">Нажми слово слева, затем его пару справа · 连线</div>'));
+  item.appendChild(grid);
+  sec._el.appendChild(item);
+}
+
+function renderListen(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qru" style="margin:0">${esc(it.q_ru||'Что вы услышали?')}</span></div>`;
+    const sb=el('<button class="speakbtn" title="Прослушать">🔊</button>');
+    sb.onclick=()=>speak(it.audio_text);
+    item.appendChild(sb);
+    item.appendChild(el('<span class="speakhint">нажми, чтобы прослушать · 点击播放</span>'));
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+const RENDERERS={mcq:renderMCQ,fill:renderFill,truefalse:renderTrueFalse,order:renderOrder,match:renderMatch,listen:renderListen};
+
+/* ---------- словарь урока (все новые слова) ---------- */
+function renderVocabCard(app){
+  const vocab = HW.vocab || [];
+  if(!vocab.length) return;
+  const sec=el('<section class="vocab"></section>');
+  sec.appendChild(el('<h2>Словарь урока <span class="subcn">生词</span></h2>'));
+  sec.appendChild(el(`<div class="cnt">Все новые слова урока (${vocab.length}). Нажми 🔊, чтобы прослушать. Слова из этого списка подсвечены в заданиях.</div>`));
+  const list=el('<div class="vlist"></div>');
+  vocab.forEach(v=>{
+    const row=el('<div class="vrow"></div>');
+    const b=el('<button class="spk" title="Прослушать">🔊</button>');
+    b.onclick=()=>speak(v.hanzi);
+    const body=el('<div class="body"></div>');
+    body.appendChild(el(`<div class="hz">${cn(v.hanzi)}</div>`));
+    body.appendChild(el(`<div class="tr">${esc(v.ru||'')}</div>`));
+    const ex = v.ex_cn||v.example_cn;
+    if(ex) body.appendChild(el(`<div class="ex"><span class="excn">${cn(ex)}</span>${(v.ex_ru||v.example_ru)?' — '+esc(v.ex_ru||v.example_ru):''}</div>`));
+    row.appendChild(b); row.appendChild(body); list.appendChild(row);
+  });
+  sec.appendChild(list);
+  app.appendChild(sec);
+}
+
+function build(){
+  document.title=(HW.lesson.title_ru||HW.lesson.title_cn||'Домашнее задание');
+  document.getElementById('tcn').innerHTML=cn(HW.lesson.title_cn||'');
+  document.getElementById('tru').textContent=HW.lesson.title_ru||'';
+  const meta=document.getElementById('meta');
+  if(HW.lesson.topic_cn||HW.lesson.topic_ru) meta.appendChild(el(`<span class="tag">${esc((HW.lesson.topic_cn||'')+(HW.lesson.topic_ru?' · '+HW.lesson.topic_ru:''))}</span>`));
+  if(HW.lesson.level) meta.appendChild(el(`<span class="tag alt">${esc(HW.lesson.level)}</span>`));
+  const app=document.getElementById('app');
+  renderVocabCard(app);
+  (HW.sections||[]).forEach((sec,sIdx)=>{
+    const s=el('<section class="ex"></section>');
+    s.appendChild(el(`<h2>${esc(sec.title_ru||'Задание')}${sec.title_cn?` <span class="subcn">${esc(sec.title_cn)}</span>`:''}</h2>`));
+    if(sec.instructions_ru||sec.instructions_cn)
+      s.appendChild(el(`<div class="instr">${esc(sec.instructions_ru||'')}${sec.instructions_cn?' · '+esc(sec.instructions_cn):''}</div>`));
+    sec._el=s;
+    const r=RENDERERS[sec.type];
+    if(r) r(sec,sIdx); else s.appendChild(el('<div class="instr">Неизвестный тип задания: '+esc(sec.type)+'</div>'));
+    app.appendChild(s);
+  });
+  refreshScore();
+}
+
+document.getElementById('checkAll').onclick=()=>{ document.querySelectorAll('.item').forEach(it=>{ if(it._check) it._check(); }); };
+document.getElementById('reset').onclick=()=>{ location.reload(); };
+
+build();
+</script>
+</body>
+</html>
