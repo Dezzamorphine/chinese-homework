@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Китайский · ДЗ">
+<meta name="theme-color" content="#c0392b">
+<title>Урок (9 июня): Места в городе и где что находится</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --muted:#6b7280;
+    --line:#e3e7ef; --accent:#c0392b; --accent-soft:#fdecea;
+    --ok:#1e8e4f; --ok-soft:#e6f4ea; --bad:#c0392b; --bad-soft:#fdecea;
+    --chip:#eef1f7; --chip-active:#fff3cd; --radius:14px;
+    --cn:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;padding:0 16px 90px}
+  .wrap{max-width:820px;margin:0 auto}
+  header.hd{padding:28px 0 18px;border-bottom:2px solid var(--line);margin-bottom:8px}
+  .titlecn{font-family:var(--cn);font-size:30px;font-weight:700;letter-spacing:1px}
+  .titleru{font-size:17px;color:var(--muted);margin-top:4px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tag{background:var(--accent-soft);color:var(--accent);font-size:13px;
+    padding:4px 11px;border-radius:999px;font-weight:600}
+  .tag.alt{background:#eef2ff;color:#3b50c4}
+  .hint-tip{font-size:13px;color:var(--muted);margin-top:10px}
+  .nav{padding:14px 0 0}
+  .nav a{color:var(--accent);text-decoration:none;font-weight:600;font-size:15px}
+  .nav a:hover{text-decoration:underline}
+
+  /* ruby pinyin */
+  ruby{ruby-position:over;-webkit-ruby-position:before}
+  rt{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:.56em;color:var(--accent);font-weight:600;line-height:1.1;letter-spacing:0}
+  .word{cursor:help;border-bottom:1.5px dotted var(--accent);padding-bottom:0}
+  .word:hover{background:var(--accent-soft);border-radius:4px}
+
+  /* popover */
+  .pop{position:absolute;z-index:100;max-width:300px;background:#fff;color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(20,30,60,.18);
+    padding:12px 14px;font-size:14px;display:none}
+  .pop.show{display:block}
+  .pop .pw{font-family:var(--cn);font-size:22px;font-weight:700}
+  .pop .ppy{color:var(--accent);font-weight:600;font-size:13px;margin-top:2px}
+  .pop .pru{margin-top:6px;font-size:15px}
+  .pop .pex{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--muted)}
+  .pop .pex .excn{font-family:var(--cn);color:var(--ink);display:block;margin-bottom:2px}
+
+  /* vocab study card */
+  .vocab{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .vocab h2{margin:0 0 4px;font-size:19px}
+  .vocab .cnt{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .vlist{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+  .vrow{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);align-items:flex-start}
+  .vrow .spk{flex:none;width:34px;height:34px;border:none;border-radius:8px;background:var(--accent-soft);
+    color:var(--accent);font-size:16px;cursor:pointer;margin-top:2px}
+  .vrow .spk:hover{background:#fbdcd8}
+  .vrow .body{flex:1;min-width:0}
+  .vrow .hz{font-family:var(--cn);font-size:20px}
+  .vrow .tr{font-size:14px;color:var(--ink)}
+  .vrow .ex{font-size:13px;color:var(--muted);margin-top:2px}
+  .vrow .ex .excn{font-family:var(--cn);color:var(--ink)}
+  @media(max-width:560px){.vlist{grid-template-columns:1fr}}
+
+  /* score bar */
+  .scorebar{position:sticky;top:0;z-index:30;background:rgba(244,246,251,.94);
+    backdrop-filter:blur(6px);padding:12px 0;margin:0 -16px;border-bottom:1px solid var(--line)}
+  .scorebar .inner{max-width:820px;margin:0 auto;padding:0 16px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap}
+  .progress{flex:1;min-width:140px;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e8e4f,#36c46f);
+    border-radius:999px;transition:width .35s ease}
+  .scoretxt{font-weight:700;font-size:15px;white-space:nowrap}
+  .btn{border:none;cursor:pointer;font-size:14px;font-weight:600;border-radius:10px;
+    padding:8px 14px;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.07)}
+  .btn.ghost{background:var(--chip);color:var(--ink)}
+  .btn.ghost:hover{background:#e3e7ef}
+
+  section.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .ex h2{margin:0 0 2px;font-size:19px}
+  .ex .subcn{font-family:var(--cn);color:var(--accent);font-size:15px;font-weight:600}
+  .ex .instr{color:var(--muted);font-size:14px;margin:6px 0 16px}
+  .item{padding:16px 0;border-top:1px dashed var(--line)}
+  .item:first-of-type{border-top:none;padding-top:4px}
+  .qhead{display:flex;gap:10px;align-items:baseline}
+  .qnum{font-weight:700;color:var(--muted);font-size:14px;min-width:22px}
+  .qcn{font-family:var(--cn);font-size:20px}
+  .qru{color:var(--muted);font-size:14px;margin:6px 0 10px 32px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-left:32px}
+  .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1.5px solid var(--line);
+    border-radius:10px;cursor:pointer;font-size:16px;transition:.12s;background:#fff}
+  .opt:hover{border-color:#c7cede}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt .cn{font-family:var(--cn)}
+  .opt .mark{margin-left:auto;font-weight:700}
+
+  .inpwrap{margin-left:32px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input.fill{font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:var(--cn);min-width:120px}
+  input.fill:focus{outline:none;border-color:var(--accent)}
+  input.fill.correct{border-color:var(--ok);background:var(--ok-soft)}
+  input.fill.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .prompt{font-family:var(--cn);font-size:20px;margin-left:32px;margin-bottom:10px;line-height:2.1}
+  .prompt .blank,.fb .blank{display:inline-block;min-width:46px;border-bottom:2px solid var(--accent);
+    text-align:center;color:var(--accent);font-weight:700}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-left:32px;margin-bottom:8px}
+  .chip{font-family:var(--cn);font-size:18px;padding:10px 14px;background:var(--chip);
+    border:1.5px solid var(--line);border-radius:10px;cursor:pointer;user-select:none;transition:.12s;line-height:1.9}
+  .chip:hover{background:#e3e7ef}
+  .chip.used{opacity:.35;pointer-events:none}
+  .answerline{min-height:52px;margin-left:32px;border:1.5px dashed var(--line);border-radius:10px;
+    padding:8px;display:flex;flex-wrap:wrap;gap:8px;background:#fafbfe}
+  .answerline.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .answerline.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .answerline .chip{background:#fff}
+
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-left:32px}
+  .match .col{display:flex;flex-direction:column;gap:8px}
+  .mtile{padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;
+    font-size:16px;transition:.12s;background:#fff;line-height:1.9}
+  .mtile.cn{font-family:var(--cn)}
+  .mtile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .mtile.matched{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+  .mtile.wrongflash{border-color:var(--bad);background:var(--bad-soft)}
+
+  .tf{display:flex;gap:10px;margin-left:32px}
+  .tf .opt{flex:1;justify-content:center;font-weight:600}
+
+  .speakbtn{margin-left:32px;font-size:22px;width:54px;height:54px;border-radius:50%;
+    border:none;background:var(--accent);color:#fff;cursor:pointer;margin-bottom:10px}
+  .speakbtn:hover{filter:brightness(1.08)}
+  .speakhint{margin-left:10px;color:var(--muted);font-size:13px}
+
+  .row-actions{margin-left:32px;margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fb{margin-left:32px;margin-top:8px;font-size:14px;padding:8px 12px;border-radius:9px;display:none}
+  .fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+  .fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+  .fb .ans{font-family:var(--cn);font-weight:700}
+
+  .done{text-align:center;padding:30px;margin:20px 0;border-radius:var(--radius);
+    background:linear-gradient(135deg,#1e8e4f,#36c46f);color:#fff;display:none}
+  .done.show{display:block}
+  .done .big{font-size:40px;font-weight:800}
+  footer.ft{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  @media(max-width:560px){.match{grid-template-columns:1fr}.qru,.opts,.inpwrap,.chips,.answerline,.match,.tf,.row-actions,.fb,.prompt{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="scorebar"><div class="inner">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="scoretxt" id="score">0 / 0</div>
+  <button class="btn primary" id="checkAll">Проверить всё · 全部检查</button>
+  <button class="btn ghost" id="reset">Сброс · 重置</button>
+</div></div>
+
+<div class="wrap">
+  <div class="nav"><a href="./index.html">← Все уроки</a></div>
+  <header class="hd">
+    <div class="titlecn" id="tcn"></div>
+    <div class="titleru" id="tru"></div>
+    <div class="meta" id="meta"></div>
+    <div class="hint-tip">💡 Пиньинь стоит над иероглифами. Подведи курсор или нажми на <span style="border-bottom:1.5px dotted var(--accent)">подчёркнутое слово</span>, чтобы увидеть перевод и пример.</div>
+  </header>
+  <main id="app"></main>
+  <div class="done" id="done"><div class="big" id="doneScore"></div><div id="doneMsg"></div></div>
+  <footer class="ft">Сгенерировано из видеоурока · 自动生成的作业 · автопроверка работает офлайн</footer>
+</div>
+<div class="pop" id="pop"></div>
+
+<script>
+const HW = {"lesson": {"title_cn": "城市里的地方和位置", "title_ru": "Урок (9 июня): Места в городе и где что находится", "topic_cn": "地方和方位", "topic_ru": "Места в городе и расположение", "level": "HSK 1", "source": "Screen Recording 2026-06-09 at 20.06.02.mov"}, "vocab": [{"hanzi": "商店", "ru": "магазин", "ex_cn": "前面有个商店。", "ex_ru": "Впереди есть магазин."}, {"hanzi": "超市", "ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}, {"hanzi": "市场", "ru": "рынок", "ex_cn": "今天我去市场了。", "ex_ru": "Сегодня я ходил на рынок."}, {"hanzi": "公园", "ru": "парк", "ex_cn": "今天我没去公园。", "ex_ru": "Сегодня я не ходил в парк."}, {"hanzi": "书店", "ru": "книжный магазин", "ex_cn": "书店在银行旁边。", "ex_ru": "Книжный рядом с банком."}, {"hanzi": "图书馆", "ru": "библиотека", "ex_cn": "图书馆在学校里。", "ex_ru": "Библиотека находится в школе."}, {"hanzi": "银行", "ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}, {"hanzi": "医院", "ru": "больница", "ex_cn": "我妈妈在医院工作。", "ex_ru": "Моя мама работает в больнице."}, {"hanzi": "酒吧", "ru": "бар", "ex_cn": "校园里有酒吧。", "ex_ru": "В кампусе есть бар."}, {"hanzi": "后面", "ru": "позади, сзади", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}, {"hanzi": "前面", "ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}, {"hanzi": "对面", "ru": "напротив", "ex_cn": "商店在对面。", "ex_ru": "Магазин напротив."}, {"hanzi": "楼", "ru": "этаж, здание", "ex_cn": "我住九楼。", "ex_ru": "Я живу на девятом этаже."}, {"hanzi": "房间", "ru": "комната", "ex_cn": "在三号楼三二五房间。", "ex_ru": "В корпусе 3, комната 325."}, {"hanzi": "汽车", "ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}, {"hanzi": "辆", "ru": "сч. слово (транспорт)", "ex_cn": "两辆汽车", "ex_ru": "две машины"}, {"hanzi": "家", "ru": "сч. слово (заведения)", "ex_cn": "两家超市", "ex_ru": "два супермаркета"}, {"hanzi": "桌子", "ru": "стол", "ex_cn": "桌子上有一本书。", "ex_ru": "На столе лежит книга."}], "sections": [{"type": "mcq", "title_ru": "Выбери правильный перевод", "title_cn": "选择正确的翻译", "instructions_ru": "Отметь верный вариант и нажми «Проверить».", "items": [{"q_cn": "超市", "q_ru": "Что это за место?", "options": ["супермаркет", "больница", "парк"], "answer": 0, "explain_ru": "超市 (chāoshì) — супермаркет."}, {"q_cn": "我妈妈在医院工作。", "q_ru": "Где работает мама?", "options": ["в магазине", "в больнице", "в банке"], "answer": 1, "explain_ru": "医院 (yīyuàn) — больница."}, {"q_cn": "图书馆", "q_ru": "Что это за место?", "options": ["книжный магазин", "библиотека", "бар"], "answer": 1, "explain_ru": "图书馆 (túshūguǎn) — библиотека. (书店 — книжный магазин.)"}, {"q_cn": "银行在医院的后面。", "q_ru": "Где банк?", "options": ["перед больницей", "позади больницы", "напротив больницы"], "answer": 1, "explain_ru": "后面 — позади."}]}, {"type": "fill", "title_ru": "Вставь пропущенное слово", "title_cn": "填空", "instructions_ru": "Впиши иероглиф. Где просят пиньинь — тоны можно не ставить.", "items": [{"prompt_cn": "路口有两___超市。", "prompt_ru": "На перекрёстке два супермаркета. (счётное слово)", "accept": ["家"], "mode": "hanzi", "hint_ru": "счётное слово для заведений"}, {"prompt_cn": "我有两___汽车。", "prompt_ru": "У меня две машины. (счётное слово)", "accept": ["辆"], "mode": "hanzi", "hint_ru": "счётное слово для транспорта"}, {"prompt_cn": "我妈妈在___工作。", "prompt_ru": "Моя мама работает в больнице.", "accept": ["医院"], "mode": "hanzi", "hint_ru": "больница"}, {"prompt_cn": "银行在医院的___面。", "prompt_ru": "Банк позади больницы.", "accept": ["后"], "mode": "hanzi", "hint_ru": "后面 — позади"}, {"prompt_cn": "今天我没去___。", "prompt_ru": "Сегодня я не ходил в парк. (впиши пиньинь)", "accept": ["gōngyuán", "gong yuan"], "mode": "pinyin", "hint_ru": "公园"}]}, {"type": "match", "title_ru": "Соедини место с переводом", "title_cn": "连线", "items": [{"left": "商店", "right": "магазин"}, {"left": "超市", "right": "супермаркет"}, {"left": "书店", "right": "книжный магазин"}, {"left": "图书馆", "right": "библиотека"}, {"left": "公园", "right": "парк"}, {"left": "医院", "right": "больница"}]}, {"type": "order", "title_ru": "Собери предложение", "title_cn": "连词成句", "items": [{"chips": ["前面", "有", "个", "商店"], "answer": ["前面", "有", "个", "商店"], "translation_ru": "Впереди есть магазин.", "explain_ru": "Схема наличия: место + 有 + предмет."}, {"chips": ["路口", "有", "两家", "超市"], "answer": ["路口", "有", "两家", "超市"], "translation_ru": "На перекрёстке два супермаркета.", "explain_ru": "两家 — «два» со счётным 家."}, {"chips": ["银行", "在", "医院", "的", "后面"], "answer": ["银行", "在", "医院", "的", "后面"], "translation_ru": "Банк позади больницы.", "explain_ru": "Схема расположения: A 在 B 的 + 方位词."}]}, {"type": "truefalse", "title_ru": "Верно или неверно", "title_cn": "判断对错", "items": [{"statement_cn": "「超市」是买东西的地方。", "statement_ru": "«超市» — это место, где покупают вещи.", "answer": true, "explain_ru": "超市 — супермаркет."}, {"statement_cn": "「图书馆」的意思是「больница」。", "statement_ru": "«图书馆» означает «больница».", "answer": false, "explain_ru": "图书馆 — библиотека. Больница — 医院."}, {"statement_cn": "「对面」的意思是「напротив」。", "statement_ru": "«对面» означает «напротив».", "answer": true, "explain_ru": "对面 (duìmiàn) — напротив."}, {"statement_cn": "量词「辆」用于汽车。", "statement_ru": "Счётное слово «辆» употребляется для машин.", "answer": true, "explain_ru": "一辆汽车 — одна машина."}]}, {"type": "listen", "title_ru": "Аудирование", "title_cn": "听力", "instructions_ru": "Нажми 🔊, прослушай и выбери, что ты услышал.", "items": [{"audio_text": "前面有个超市。", "q_ru": "Что вы услышали?", "options": ["前面有个超市。", "前面有个商店。", "前面有个公园。"], "answer": 0, "explain_ru": "«Впереди есть супермаркет.»"}, {"audio_text": "我妈妈在医院工作。", "q_ru": "Что вы услышали?", "options": ["我妈妈在医院工作。", "我爸爸在银行工作。", "我在图书馆看书。"], "answer": 0, "explain_ru": "«Моя мама работает в больнице.»"}, {"audio_text": "银行在后面。", "q_ru": "Что вы услышали?", "options": ["银行在后面。", "银行在前面。", "银行在对面。"], "answer": 0, "explain_ru": "«Банк сзади.»"}]}]};
+const ANNO = {"商店在对面。": [{"w": "商店", "h": true, "p": ["shāng", "diàn"], "g": {"ru": "магазин", "ex_cn": "前面有个商店。", "ex_ru": "Впереди есть магазин."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "对面", "h": true, "p": ["duì", "miàn"], "g": {"ru": "напротив", "ex_cn": "商店在对面。", "ex_ru": "Магазин напротив."}}, {"w": "。"}], "辆": [{"w": "辆", "h": true, "p": ["liàng"], "g": {"ru": "сч. слово (транспорт)", "ex_cn": "两辆汽车", "ex_ru": "две машины"}}], "两家": [{"w": "两", "h": true, "p": ["liǎng"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "сч. слово (заведения)", "ex_cn": "两家超市", "ex_ru": "два супермаркета"}}], "对面": [{"w": "对面", "h": true, "p": ["duì", "miàn"], "g": {"ru": "напротив", "ex_cn": "商店在对面。", "ex_ru": "Магазин напротив."}}], "银行在医院的___面。": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "医院", "h": true, "p": ["yī", "yuàn"], "g": {"ru": "больница", "ex_cn": "我妈妈在医院工作。", "ex_ru": "Моя мама работает в больнице."}}, {"w": "的", "h": true, "p": ["de"]}, {"w": "___"}, {"w": "面", "h": true, "p": ["miàn"]}, {"w": "。"}], "超市": [{"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}], "两辆汽车": [{"w": "两", "h": true, "p": ["liǎng"]}, {"w": "辆", "h": true, "p": ["liàng"], "g": {"ru": "сч. слово (транспорт)", "ex_cn": "两辆汽车", "ex_ru": "две машины"}}, {"w": "汽车", "h": true, "p": ["qì", "chē"], "g": {"ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}}], "书店在银行旁边。": [{"w": "书店", "h": true, "p": ["shū", "diàn"], "g": {"ru": "книжный магазин", "ex_cn": "书店在银行旁边。", "ex_ru": "Книжный рядом с банком."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "旁", "h": true, "p": ["páng"]}, {"w": "边", "h": true, "p": ["biān"]}, {"w": "。"}], "后面": [{"w": "后面", "h": true, "p": ["hòu", "miàn"], "g": {"ru": "позади, сзади", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}], "今天我去市场了。": [{"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "去", "h": true, "p": ["qù"]}, {"w": "市场", "h": true, "p": ["shì", "chǎng"], "g": {"ru": "рынок", "ex_cn": "今天我去市场了。", "ex_ru": "Сегодня я ходил на рынок."}}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "我有两___汽车。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "两", "h": true, "p": ["liǎng"]}, {"w": "___"}, {"w": "汽车", "h": true, "p": ["qì", "chē"], "g": {"ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}}, {"w": "。"}], "今天我没去___。": [{"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "没", "h": true, "p": ["méi"]}, {"w": "去", "h": true, "p": ["qù"]}, {"w": "___。"}], "「对面」的意思是「напротив」。": [{"w": "「"}, {"w": "对面", "h": true, "p": ["duì", "miàn"], "g": {"ru": "напротив", "ex_cn": "商店在对面。", "ex_ru": "Магазин напротив."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「напротив」。"}], "的": [{"w": "的", "h": true, "p": ["de"]}], "银行在对面。": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "对面", "h": true, "p": ["duì", "miàn"], "g": {"ru": "напротив", "ex_cn": "商店在对面。", "ex_ru": "Магазин напротив."}}, {"w": "。"}], "我妈妈在___工作。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "妈", "h": true, "p": ["mā"]}, {"w": "妈", "h": true, "p": ["mā"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "___"}, {"w": "工", "h": true, "p": ["gōng"]}, {"w": "作", "h": true, "p": ["zuò"]}, {"w": "。"}], "书店": [{"w": "书店", "h": true, "p": ["shū", "diàn"], "g": {"ru": "книжный магазин", "ex_cn": "书店在银行旁边。", "ex_ru": "Книжный рядом с банком."}}], "前面有个幼儿园。": [{"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "幼", "h": true, "p": ["yòu"]}, {"w": "儿", "h": true, "p": ["ér"]}, {"w": "园", "h": true, "p": ["yuán"]}, {"w": "。"}], "量词「辆」用于汽车。": [{"w": "量", "h": true, "p": ["liàng"]}, {"w": "词", "h": true, "p": ["cí"]}, {"w": "「"}, {"w": "辆", "h": true, "p": ["liàng"], "g": {"ru": "сч. слово (транспорт)", "ex_cn": "两辆汽车", "ex_ru": "две машины"}}, {"w": "」"}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "于", "h": true, "p": ["yú"]}, {"w": "汽车", "h": true, "p": ["qì", "chē"], "g": {"ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}}, {"w": "。"}], "前面有个公园。": [{"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "公园", "h": true, "p": ["gōng", "yuán"], "g": {"ru": "парк", "ex_cn": "今天我没去公园。", "ex_ru": "Сегодня я не ходил в парк."}}, {"w": "。"}], "有": [{"w": "有", "h": true, "p": ["yǒu"]}], "银行在后面。": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "后面", "h": true, "p": ["hòu", "miàn"], "g": {"ru": "позади, сзади", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "。"}], "校园里有酒吧。": [{"w": "校", "h": true, "p": ["xiào"]}, {"w": "园", "h": true, "p": ["yuán"]}, {"w": "里", "h": true, "p": ["lǐ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "酒吧", "h": true, "p": ["jiǔ", "bā"], "g": {"ru": "бар", "ex_cn": "校园里有酒吧。", "ex_ru": "В кампусе есть бар."}}, {"w": "。"}], "路口有两___超市。": [{"w": "路", "h": true, "p": ["lù"]}, {"w": "口", "h": true, "p": ["kǒu"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "两", "h": true, "p": ["liǎng"]}, {"w": "___"}, {"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}, {"w": "。"}], "医院": [{"w": "医院", "h": true, "p": ["yī", "yuàn"], "g": {"ru": "больница", "ex_cn": "我妈妈在医院工作。", "ex_ru": "Моя мама работает в больнице."}}], "前面有个超市。": [{"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}, {"w": "。"}], "桌子": [{"w": "桌子", "h": true, "p": ["zhuō", "zi"], "g": {"ru": "стол", "ex_cn": "桌子上有一本书。", "ex_ru": "На столе лежит книга."}}], "路口": [{"w": "路", "h": true, "p": ["lù"]}, {"w": "口", "h": true, "p": ["kǒu"]}], "银行在前面。": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}, {"w": "。"}], "商店": [{"w": "商店", "h": true, "p": ["shāng", "diàn"], "g": {"ru": "магазин", "ex_cn": "前面有个商店。", "ex_ru": "Впереди есть магазин."}}], "楼": [{"w": "楼", "h": true, "p": ["lóu"], "g": {"ru": "этаж, здание", "ex_cn": "我住九楼。", "ex_ru": "Я живу на девятом этаже."}}], "房间": [{"w": "房间", "h": true, "p": ["fáng", "jiān"], "g": {"ru": "комната", "ex_cn": "在三号楼三二五房间。", "ex_ru": "В корпусе 3, комната 325."}}], "图书馆": [{"w": "图书馆", "h": true, "p": ["tú", "shū", "guǎn"], "g": {"ru": "библиотека", "ex_cn": "图书馆在学校里。", "ex_ru": "Библиотека находится в школе."}}], "我在图书馆看书。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "图书馆", "h": true, "p": ["tú", "shū", "guǎn"], "g": {"ru": "библиотека", "ex_cn": "图书馆在学校里。", "ex_ru": "Библиотека находится в школе."}}, {"w": "看", "h": true, "p": ["kàn"]}, {"w": "书", "h": true, "p": ["shū"]}, {"w": "。"}], "我有两辆汽车。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "两", "h": true, "p": ["liǎng"]}, {"w": "辆", "h": true, "p": ["liàng"], "g": {"ru": "сч. слово (транспорт)", "ex_cn": "两辆汽车", "ex_ru": "две машины"}}, {"w": "汽车", "h": true, "p": ["qì", "chē"], "g": {"ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}}, {"w": "。"}], "家": [{"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "сч. слово (заведения)", "ex_cn": "两家超市", "ex_ru": "два супермаркета"}}], "今天我没去公园。": [{"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "没", "h": true, "p": ["méi"]}, {"w": "去", "h": true, "p": ["qù"]}, {"w": "公园", "h": true, "p": ["gōng", "yuán"], "g": {"ru": "парк", "ex_cn": "今天我没去公园。", "ex_ru": "Сегодня я не ходил в парк."}}, {"w": "。"}], "我爸爸在银行工作。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "爸", "h": true, "p": ["bà"]}, {"w": "爸", "h": true, "p": ["bà"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "工", "h": true, "p": ["gōng"]}, {"w": "作", "h": true, "p": ["zuò"]}, {"w": "。"}], "市场": [{"w": "市场", "h": true, "p": ["shì", "chǎng"], "g": {"ru": "рынок", "ex_cn": "今天我去市场了。", "ex_ru": "Сегодня я ходил на рынок."}}], "在": [{"w": "在", "h": true, "p": ["zài"]}], "我住九楼。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "住", "h": true, "p": ["zhù"]}, {"w": "九", "h": true, "p": ["jiǔ"]}, {"w": "楼", "h": true, "p": ["lóu"], "g": {"ru": "этаж, здание", "ex_cn": "我住九楼。", "ex_ru": "Я живу на девятом этаже."}}, {"w": "。"}], "银行": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}], "前面有个商店。": [{"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "商店", "h": true, "p": ["shāng", "diàn"], "g": {"ru": "магазин", "ex_cn": "前面有个商店。", "ex_ru": "Впереди есть магазин."}}, {"w": "。"}], "城市里的地方和位置": [{"w": "城", "h": true, "p": ["chéng"]}, {"w": "市", "h": true, "p": ["shì"]}, {"w": "里", "h": true, "p": ["lǐ"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "地", "h": true, "p": ["dì"]}, {"w": "方", "h": true, "p": ["fāng"]}, {"w": "和", "h": true, "p": ["hé"]}, {"w": "位", "h": true, "p": ["wèi"]}, {"w": "置", "h": true, "p": ["zhì"]}], "路口有两家超市。": [{"w": "路", "h": true, "p": ["lù"]}, {"w": "口", "h": true, "p": ["kǒu"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "两", "h": true, "p": ["liǎng"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "сч. слово (заведения)", "ex_cn": "两家超市", "ex_ru": "два супермаркета"}}, {"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}, {"w": "。"}], "前面": [{"w": "前面", "h": true, "p": ["qián", "miàn"], "g": {"ru": "впереди", "ex_cn": "前面有个幼儿园。", "ex_ru": "Впереди детский сад."}}], "在三号楼三二五房间。": [{"w": "在", "h": true, "p": ["zài"]}, {"w": "三", "h": true, "p": ["sān"]}, {"w": "号", "h": true, "p": ["hào"]}, {"w": "楼", "h": true, "p": ["lóu"], "g": {"ru": "этаж, здание", "ex_cn": "我住九楼。", "ex_ru": "Я живу на девятом этаже."}}, {"w": "三", "h": true, "p": ["sān"]}, {"w": "二", "h": true, "p": ["èr"]}, {"w": "五", "h": true, "p": ["wǔ"]}, {"w": "房间", "h": true, "p": ["fáng", "jiān"], "g": {"ru": "комната", "ex_cn": "在三号楼三二五房间。", "ex_ru": "В корпусе 3, комната 325."}}, {"w": "。"}], "「超市」是买东西的地方。": [{"w": "「"}, {"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}, {"w": "」"}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "买", "h": true, "p": ["mǎi"]}, {"w": "东", "h": true, "p": ["dōng"]}, {"w": "西", "h": true, "p": ["xī"]}, {"w": "的", "h": true, "p": ["de"]}, {"w": "地", "h": true, "p": ["dì"]}, {"w": "方", "h": true, "p": ["fāng"]}, {"w": "。"}], "「图书馆」的意思是「больница」。": [{"w": "「"}, {"w": "图书馆", "h": true, "p": ["tú", "shū", "guǎn"], "g": {"ru": "библиотека", "ex_cn": "图书馆在学校里。", "ex_ru": "Библиотека находится в школе."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「больница」。"}], "银行在医院的后面。": [{"w": "银行", "h": true, "p": ["yín", "háng"], "g": {"ru": "банк", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "医院", "h": true, "p": ["yī", "yuàn"], "g": {"ru": "больница", "ex_cn": "我妈妈在医院工作。", "ex_ru": "Моя мама работает в больнице."}}, {"w": "的", "h": true, "p": ["de"]}, {"w": "后面", "h": true, "p": ["hòu", "miàn"], "g": {"ru": "позади, сзади", "ex_cn": "银行在医院的后面。", "ex_ru": "Банк позади больницы."}}, {"w": "。"}], "两家超市": [{"w": "两", "h": true, "p": ["liǎng"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "сч. слово (заведения)", "ex_cn": "两家超市", "ex_ru": "два супермаркета"}}, {"w": "超市", "h": true, "p": ["chāo", "shì"], "g": {"ru": "супермаркет", "ex_cn": "路口有两家超市。", "ex_ru": "На перекрёстке два супермаркета."}}], "个": [{"w": "个", "h": true, "p": ["gè"]}], "我妈妈在医院工作。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "妈", "h": true, "p": ["mā"]}, {"w": "妈", "h": true, "p": ["mā"]}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "医院", "h": true, "p": ["yī", "yuàn"], "g": {"ru": "больница", "ex_cn": "我妈妈在医院工作。", "ex_ru": "Моя мама работает в больнице."}}, {"w": "工", "h": true, "p": ["gōng"]}, {"w": "作", "h": true, "p": ["zuò"]}, {"w": "。"}], "酒吧": [{"w": "酒吧", "h": true, "p": ["jiǔ", "bā"], "g": {"ru": "бар", "ex_cn": "校园里有酒吧。", "ex_ru": "В кампусе есть бар."}}], "公园": [{"w": "公园", "h": true, "p": ["gōng", "yuán"], "g": {"ru": "парк", "ex_cn": "今天我没去公园。", "ex_ru": "Сегодня я не ходил в парк."}}], "后": [{"w": "后", "h": true, "p": ["hòu"]}], "图书馆在学校里。": [{"w": "图书馆", "h": true, "p": ["tú", "shū", "guǎn"], "g": {"ru": "библиотека", "ex_cn": "图书馆在学校里。", "ex_ru": "Библиотека находится в школе."}}, {"w": "在", "h": true, "p": ["zài"]}, {"w": "学", "h": true, "p": ["xué"]}, {"w": "校", "h": true, "p": ["xiào"]}, {"w": "里", "h": true, "p": ["lǐ"]}, {"w": "。"}], "汽车": [{"w": "汽车", "h": true, "p": ["qì", "chē"], "g": {"ru": "машина, автомобиль", "ex_cn": "我有两辆汽车。", "ex_ru": "У меня две машины."}}], "桌子上有一本书。": [{"w": "桌子", "h": true, "p": ["zhuō", "zi"], "g": {"ru": "стол", "ex_cn": "桌子上有一本书。", "ex_ru": "На столе лежит книга."}}, {"w": "上", "h": true, "p": ["shàng"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "一", "h": true, "p": ["yī"]}, {"w": "本", "h": true, "p": ["běn"]}, {"w": "书", "h": true, "p": ["shū"]}, {"w": "。"}]};   // строка → массив сегментов {w, h, p?, g?}
+
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+
+/* ---------- рендер китайского с пиньинем + подсказками ---------- */
+function cn(s){
+  const segs = ANNO[s];
+  if(!segs) return esc(s);              // не-китайский текст (русский, латиница) — как есть
+  let html='';
+  for(const seg of segs){
+    if(seg.h){                          // китайское слово/иероглиф
+      const chars=[...seg.w];
+      let inner='';
+      for(let i=0;i<chars.length;i++){
+        const py=seg.p?seg.p[i]:'';
+        inner += py ? `<ruby>${esc(chars[i])}<rt>${esc(py)}</rt></ruby>` : esc(chars[i]);
+      }
+      if(seg.g){
+        const py=seg.p?seg.p.join(' '):'';
+        html += `<span class="word" data-w="${esc(seg.w)}" data-py="${esc(py)}" data-ru="${esc(seg.g.ru||'')}" data-excn="${esc(seg.g.ex_cn||'')}" data-exru="${esc(seg.g.ex_ru||'')}">${inner}</span>`;
+      } else html += inner;
+    } else if(/^[_＿]{2,}$/.test(seg.w)){
+      html += '<span class="blank">?</span>';
+    } else html += esc(seg.w);
+  }
+  return html;
+}
+
+/* ---------- popover ---------- */
+const pop=document.getElementById('pop');
+let popPinned=false;
+function showPop(w){
+  const ex = w.dataset.excn ? `<div class="pex"><span class="excn">${cn(w.dataset.excn)}</span>${esc(w.dataset.exru||'')}</div>` : '';
+  pop.innerHTML = `<div class="pw">${cn(w.dataset.w)}</div>`+
+    (w.dataset.py?`<div class="ppy">${esc(w.dataset.py)}</div>`:'')+
+    `<div class="pru">${esc(w.dataset.ru)}</div>`+ex;
+  pop.classList.add('show');
+  const r=w.getBoundingClientRect();
+  const pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left+window.scrollX;
+  left=Math.min(left, window.scrollX+document.documentElement.clientWidth-pw-10);
+  left=Math.max(left, window.scrollX+8);
+  let top=r.bottom+window.scrollY+6;
+  if(r.bottom+ph+10>document.documentElement.clientHeight) top=r.top+window.scrollY-ph-6;
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hidePop(){ pop.classList.remove('show'); popPinned=false; }
+document.body.addEventListener('mouseover',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) showPop(w); });
+document.body.addEventListener('mouseout',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) hidePop(); });
+document.body.addEventListener('click',e=>{
+  const w=e.target.closest('.word');
+  if(w){ e.stopPropagation(); if(popPinned&&pop._for===w){hidePop();} else {showPop(w);popPinned=true;pop._for=w;} return; }
+  if(!e.target.closest('.pop')) hidePop();
+});
+
+/* ---------- pinyin / text normalization (проверка ответов) ---------- */
+const TONE_MAP={'ā':'a','á':'a','ǎ':'a','à':'a','ē':'e','é':'e','ě':'e','è':'e','ī':'i','í':'i','ǐ':'i','ì':'i','ō':'o','ó':'o','ǒ':'o','ò':'o','ū':'u','ú':'u','ǔ':'u','ù':'u','ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v'};
+function stripTones(s){let o='';for(const ch of s.toLowerCase())o+=(TONE_MAP[ch]!==undefined?TONE_MAP[ch]:ch);return o.replace(/[1-5]/g,'').replace(/\s+/g,'').replace(/[，。！？、,.!?'’\-]/g,'');}
+function normHanzi(s){return s.trim().replace(/\s+/g,'').replace(/[，。！？、,.!?\s]/g,'');}
+function eqv(a,b){return a.trim().toLowerCase()===b.trim().toLowerCase();}
+function matchAnswer(user,accept,mode){
+  user=(user||'').trim(); if(!user)return false;
+  for(const a of accept){
+    if(mode==='pinyin'){if(stripTones(user)===stripTones(a))return true;}
+    else if(mode==='hanzi'){if(normHanzi(user)===normHanzi(a))return true;}
+    else {if(eqv(user,a))return true;}
+  }
+  return false;
+}
+
+/* ---------- TTS ---------- */
+let zhVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh|chinese/i.test(v.lang+v.name))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function speak(text){
+  if(!('speechSynthesis' in window)){alert('Браузер не поддерживает озвучку.');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=0.85;if(zhVoice)u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- scoring ---------- */
+const graded={}; let totalItems=0;
+function setGraded(key,ok){graded[key]=ok;refreshScore();}
+function refreshScore(){
+  const keys=Object.keys(graded);
+  const correct=keys.filter(k=>graded[k]).length;
+  document.getElementById('score').textContent=correct+' / '+totalItems;
+  document.getElementById('bar').style.width=(totalItems?correct/totalItems*100:0)+'%';
+  const done=document.getElementById('done');
+  if(keys.length===totalItems&&totalItems>0){
+    done.classList.add('show');
+    const pct=Math.round(correct/totalItems*100);
+    document.getElementById('doneScore').textContent=correct+' / '+totalItems+'  ('+pct+'%)';
+    document.getElementById('doneMsg').textContent=pct>=90?'Отлично! 太棒了！':pct>=70?'Хорошо! 很好！':pct>=50?'Неплохо, повтори ошибки. 加油！':'Стоит повторить урок. 别灰心，再来一次！';
+  } else done.classList.remove('show');
+}
+
+function feedback(el,ok,answerHTML,explain){
+  el.className='fb '+(ok?'ok':'bad');
+  let h=ok?'✓ Верно · 正确':'✗ Неверно · 错误';
+  if(!ok&&answerHTML)h+=' — правильный ответ: <span class="ans">'+answerHTML+'</span>';
+  if(explain)h+='<br><span style="color:var(--muted)">'+esc(explain)+'</span>';
+  el.innerHTML=h;
+}
+
+/* ---------- renderers ---------- */
+function renderMCQ(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.q_cn||'')}</span></div>`+
+      (it.q_ru?`<div class="qru">${esc(it.q_ru)}</div>`:'');
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&sel>=0) b.onclick(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderFill(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`;
+    item.appendChild(el(`<div class="prompt">${cn(it.prompt_cn||'')}</div>`));
+    if(it.prompt_ru) item.appendChild(el(`<div class="qru">${esc(it.prompt_ru)}</div>`));
+    const inp=el(`<input class="fill" placeholder="${it.mode==='pinyin'?'pīnyīn / pinyin':it.mode==='ru'?'перевод':'汉字'}">`);
+    const fb=el('<div class="fb"></div>');
+    const wrap=el('<div class="inpwrap"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    const doCheck=()=>{ if(graded[key]!==undefined)return;
+      const ok=matchAnswer(inp.value,it.accept,it.mode||'hanzi');
+      inp.classList.add(ok?'correct':'wrong'); inp.disabled=true; b.disabled=true;
+      feedback(fb,ok,cn(it.accept[0]),it.explain_ru||it.hint_ru); setGraded(key,ok); };
+    b.onclick=doCheck; inp.addEventListener('keydown',e=>{if(e.key==='Enter')doCheck();});
+    wrap.appendChild(inp); wrap.appendChild(b);
+    item.appendChild(wrap); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&inp.value.trim()) doCheck(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderTrueFalse(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.statement_cn||'')}</span></div>`+
+      (it.statement_ru?`<div class="qru">${esc(it.statement_ru)}</div>`:'');
+    const tf=el('<div class="tf"></div>'); const fb=el('<div class="fb"></div>');
+    [['Верно · 对',true],['Неверно · 错',false]].forEach(([label,val])=>{
+      const op=el(`<div class="opt">${label}</div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return;
+        [...tf.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel');
+        const ok=val===it.answer; [...tf.children].forEach(c=>c.style.pointerEvents='none');
+        op.classList.add(ok?'correct':'wrong');
+        feedback(fb,ok,(it.answer?'Верно · 对':'Неверно · 错'),it.explain_ru); setGraded(key,ok); };
+      tf.appendChild(op);
+    });
+    item.appendChild(tf); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderOrder(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`+
+      (it.translation_ru?`<div class="qru">Собери предложение: «${esc(it.translation_ru)}»</div>`:'<div class="qru">Собери предложение из слов</div>');
+    const answer=el('<div class="answerline"></div>');
+    const pool=el('<div class="chips"></div>');
+    const current=[];
+    const shuffled=[...it.chips].map((c,idx)=>({c,idx})).sort(()=>Math.random()-0.5);
+    shuffled.forEach(({c})=>{
+      const chip=el(`<div class="chip">${cn(c)}</div>`);
+      chip.onclick=()=>{ if(graded[key]!==undefined)return;
+        chip.classList.add('used'); current.push({c,chip});
+        const a=el(`<div class="chip">${cn(c)}</div>`);
+        a.onclick=()=>{ if(graded[key]!==undefined)return; chip.classList.remove('used');
+          const p=current.findIndex(x=>x.chip===chip); if(p>=0)current.splice(p,1); a.remove(); };
+        answer.appendChild(a); };
+      pool.appendChild(chip);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(graded[key]!==undefined)return;
+      const got=current.map(x=>x.c); const ok=JSON.stringify(got)===JSON.stringify(it.answer);
+      answer.classList.add(ok?'correct':'wrong'); b.disabled=true;
+      feedback(fb,ok,it.answer.map(cn).join(' '),it.explain_ru); setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(answer); item.appendChild(pool); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderMatch(sec,sIdx){
+  const key='s'+sIdx; totalItems++;
+  const item=el('<div class="item"></div>');
+  const grid=el('<div class="match"></div>');
+  const colL=el('<div class="col"></div>'), colR=el('<div class="col"></div>');
+  const left=sec.items.map((it,idx)=>({t:it.left,idx}));
+  const right=sec.items.map((it,idx)=>({t:it.right,idx})).sort(()=>Math.random()-0.5);
+  let selL=null; let solved=0;
+  left.forEach(o=>{ const tile=el(`<div class="mtile cn">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(tile.classList.contains('matched'))return;
+      [...colL.children].forEach(c=>c.classList.remove('sel')); tile.classList.add('sel'); selL=tile; };
+    colL.appendChild(tile); });
+  right.forEach(o=>{ const tile=el(`<div class="mtile">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(!selL||tile.classList.contains('matched'))return;
+      if(selL._idx===o.idx){ selL.classList.remove('sel'); selL.classList.add('matched');
+        tile.classList.add('matched'); selL=null; solved++; if(solved===left.length) setGraded(key,true); }
+      else { const bad=selL; bad.classList.add('wrongflash'); tile.classList.add('wrongflash');
+        setTimeout(()=>{bad.classList.remove('wrongflash','sel');tile.classList.remove('wrongflash');},500);
+        if(graded[key]===undefined) graded[key]=false; selL=null; } };
+    colR.appendChild(tile); });
+  grid.appendChild(colL); grid.appendChild(colR);
+  item.appendChild(el('<div class="qru">Нажми слово слева, затем его пару справа · 连线</div>'));
+  item.appendChild(grid);
+  sec._el.appendChild(item);
+}
+
+function renderListen(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qru" style="margin:0">${esc(it.q_ru||'Что вы услышали?')}</span></div>`;
+    const sb=el('<button class="speakbtn" title="Прослушать">🔊</button>');
+    sb.onclick=()=>speak(it.audio_text);
+    item.appendChild(sb);
+    item.appendChild(el('<span class="speakhint">нажми, чтобы прослушать · 点击播放</span>'));
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+const RENDERERS={mcq:renderMCQ,fill:renderFill,truefalse:renderTrueFalse,order:renderOrder,match:renderMatch,listen:renderListen};
+
+/* ---------- словарь урока (все новые слова) ---------- */
+function renderVocabCard(app){
+  const vocab = HW.vocab || [];
+  if(!vocab.length) return;
+  const sec=el('<section class="vocab"></section>');
+  sec.appendChild(el('<h2>Словарь урока <span class="subcn">生词</span></h2>'));
+  sec.appendChild(el(`<div class="cnt">Все новые слова урока (${vocab.length}). Нажми 🔊, чтобы прослушать. Слова из этого списка подсвечены в заданиях.</div>`));
+  const list=el('<div class="vlist"></div>');
+  vocab.forEach(v=>{
+    const row=el('<div class="vrow"></div>');
+    const b=el('<button class="spk" title="Прослушать">🔊</button>');
+    b.onclick=()=>speak(v.hanzi);
+    const body=el('<div class="body"></div>');
+    body.appendChild(el(`<div class="hz">${cn(v.hanzi)}</div>`));
+    body.appendChild(el(`<div class="tr">${esc(v.ru||'')}</div>`));
+    const ex = v.ex_cn||v.example_cn;
+    if(ex) body.appendChild(el(`<div class="ex"><span class="excn">${cn(ex)}</span>${(v.ex_ru||v.example_ru)?' — '+esc(v.ex_ru||v.example_ru):''}</div>`));
+    row.appendChild(b); row.appendChild(body); list.appendChild(row);
+  });
+  sec.appendChild(list);
+  app.appendChild(sec);
+}
+
+function build(){
+  document.title=(HW.lesson.title_ru||HW.lesson.title_cn||'Домашнее задание');
+  document.getElementById('tcn').innerHTML=cn(HW.lesson.title_cn||'');
+  document.getElementById('tru').textContent=HW.lesson.title_ru||'';
+  const meta=document.getElementById('meta');
+  if(HW.lesson.topic_cn||HW.lesson.topic_ru) meta.appendChild(el(`<span class="tag">${esc((HW.lesson.topic_cn||'')+(HW.lesson.topic_ru?' · '+HW.lesson.topic_ru:''))}</span>`));
+  if(HW.lesson.level) meta.appendChild(el(`<span class="tag alt">${esc(HW.lesson.level)}</span>`));
+  const app=document.getElementById('app');
+  renderVocabCard(app);
+  (HW.sections||[]).forEach((sec,sIdx)=>{
+    const s=el('<section class="ex"></section>');
+    s.appendChild(el(`<h2>${esc(sec.title_ru||'Задание')}${sec.title_cn?` <span class="subcn">${esc(sec.title_cn)}</span>`:''}</h2>`));
+    if(sec.instructions_ru||sec.instructions_cn)
+      s.appendChild(el(`<div class="instr">${esc(sec.instructions_ru||'')}${sec.instructions_cn?' · '+esc(sec.instructions_cn):''}</div>`));
+    sec._el=s;
+    const r=RENDERERS[sec.type];
+    if(r) r(sec,sIdx); else s.appendChild(el('<div class="instr">Неизвестный тип задания: '+esc(sec.type)+'</div>'));
+    app.appendChild(s);
+  });
+  refreshScore();
+}
+
+document.getElementById('checkAll').onclick=()=>{ document.querySelectorAll('.item').forEach(it=>{ if(it._check) it._check(); }); };
+document.getElementById('reset').onclick=()=>{ location.reload(); };
+
+build();
+</script>
+</body>
+</html>

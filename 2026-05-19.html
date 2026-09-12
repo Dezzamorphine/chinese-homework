@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Китайский · ДЗ">
+<meta name="theme-color" content="#c0392b">
+<title>Урок (19 мая): Семья и знакомство</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --muted:#6b7280;
+    --line:#e3e7ef; --accent:#c0392b; --accent-soft:#fdecea;
+    --ok:#1e8e4f; --ok-soft:#e6f4ea; --bad:#c0392b; --bad-soft:#fdecea;
+    --chip:#eef1f7; --chip-active:#fff3cd; --radius:14px;
+    --cn:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;padding:0 16px 90px}
+  .wrap{max-width:820px;margin:0 auto}
+  header.hd{padding:28px 0 18px;border-bottom:2px solid var(--line);margin-bottom:8px}
+  .titlecn{font-family:var(--cn);font-size:30px;font-weight:700;letter-spacing:1px}
+  .titleru{font-size:17px;color:var(--muted);margin-top:4px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tag{background:var(--accent-soft);color:var(--accent);font-size:13px;
+    padding:4px 11px;border-radius:999px;font-weight:600}
+  .tag.alt{background:#eef2ff;color:#3b50c4}
+  .hint-tip{font-size:13px;color:var(--muted);margin-top:10px}
+  .nav{padding:14px 0 0}
+  .nav a{color:var(--accent);text-decoration:none;font-weight:600;font-size:15px}
+  .nav a:hover{text-decoration:underline}
+
+  /* ruby pinyin */
+  ruby{ruby-position:over;-webkit-ruby-position:before}
+  rt{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:.56em;color:var(--accent);font-weight:600;line-height:1.1;letter-spacing:0}
+  .word{cursor:help;border-bottom:1.5px dotted var(--accent);padding-bottom:0}
+  .word:hover{background:var(--accent-soft);border-radius:4px}
+
+  /* popover */
+  .pop{position:absolute;z-index:100;max-width:300px;background:#fff;color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(20,30,60,.18);
+    padding:12px 14px;font-size:14px;display:none}
+  .pop.show{display:block}
+  .pop .pw{font-family:var(--cn);font-size:22px;font-weight:700}
+  .pop .ppy{color:var(--accent);font-weight:600;font-size:13px;margin-top:2px}
+  .pop .pru{margin-top:6px;font-size:15px}
+  .pop .pex{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--muted)}
+  .pop .pex .excn{font-family:var(--cn);color:var(--ink);display:block;margin-bottom:2px}
+
+  /* vocab study card */
+  .vocab{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .vocab h2{margin:0 0 4px;font-size:19px}
+  .vocab .cnt{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .vlist{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+  .vrow{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);align-items:flex-start}
+  .vrow .spk{flex:none;width:34px;height:34px;border:none;border-radius:8px;background:var(--accent-soft);
+    color:var(--accent);font-size:16px;cursor:pointer;margin-top:2px}
+  .vrow .spk:hover{background:#fbdcd8}
+  .vrow .body{flex:1;min-width:0}
+  .vrow .hz{font-family:var(--cn);font-size:20px}
+  .vrow .tr{font-size:14px;color:var(--ink)}
+  .vrow .ex{font-size:13px;color:var(--muted);margin-top:2px}
+  .vrow .ex .excn{font-family:var(--cn);color:var(--ink)}
+  @media(max-width:560px){.vlist{grid-template-columns:1fr}}
+
+  /* score bar */
+  .scorebar{position:sticky;top:0;z-index:30;background:rgba(244,246,251,.94);
+    backdrop-filter:blur(6px);padding:12px 0;margin:0 -16px;border-bottom:1px solid var(--line)}
+  .scorebar .inner{max-width:820px;margin:0 auto;padding:0 16px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap}
+  .progress{flex:1;min-width:140px;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e8e4f,#36c46f);
+    border-radius:999px;transition:width .35s ease}
+  .scoretxt{font-weight:700;font-size:15px;white-space:nowrap}
+  .btn{border:none;cursor:pointer;font-size:14px;font-weight:600;border-radius:10px;
+    padding:8px 14px;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.07)}
+  .btn.ghost{background:var(--chip);color:var(--ink)}
+  .btn.ghost:hover{background:#e3e7ef}
+
+  section.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .ex h2{margin:0 0 2px;font-size:19px}
+  .ex .subcn{font-family:var(--cn);color:var(--accent);font-size:15px;font-weight:600}
+  .ex .instr{color:var(--muted);font-size:14px;margin:6px 0 16px}
+  .item{padding:16px 0;border-top:1px dashed var(--line)}
+  .item:first-of-type{border-top:none;padding-top:4px}
+  .qhead{display:flex;gap:10px;align-items:baseline}
+  .qnum{font-weight:700;color:var(--muted);font-size:14px;min-width:22px}
+  .qcn{font-family:var(--cn);font-size:20px}
+  .qru{color:var(--muted);font-size:14px;margin:6px 0 10px 32px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-left:32px}
+  .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1.5px solid var(--line);
+    border-radius:10px;cursor:pointer;font-size:16px;transition:.12s;background:#fff}
+  .opt:hover{border-color:#c7cede}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt .cn{font-family:var(--cn)}
+  .opt .mark{margin-left:auto;font-weight:700}
+
+  .inpwrap{margin-left:32px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input.fill{font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:var(--cn);min-width:120px}
+  input.fill:focus{outline:none;border-color:var(--accent)}
+  input.fill.correct{border-color:var(--ok);background:var(--ok-soft)}
+  input.fill.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .prompt{font-family:var(--cn);font-size:20px;margin-left:32px;margin-bottom:10px;line-height:2.1}
+  .prompt .blank,.fb .blank{display:inline-block;min-width:46px;border-bottom:2px solid var(--accent);
+    text-align:center;color:var(--accent);font-weight:700}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-left:32px;margin-bottom:8px}
+  .chip{font-family:var(--cn);font-size:18px;padding:10px 14px;background:var(--chip);
+    border:1.5px solid var(--line);border-radius:10px;cursor:pointer;user-select:none;transition:.12s;line-height:1.9}
+  .chip:hover{background:#e3e7ef}
+  .chip.used{opacity:.35;pointer-events:none}
+  .answerline{min-height:52px;margin-left:32px;border:1.5px dashed var(--line);border-radius:10px;
+    padding:8px;display:flex;flex-wrap:wrap;gap:8px;background:#fafbfe}
+  .answerline.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .answerline.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .answerline .chip{background:#fff}
+
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-left:32px}
+  .match .col{display:flex;flex-direction:column;gap:8px}
+  .mtile{padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;
+    font-size:16px;transition:.12s;background:#fff;line-height:1.9}
+  .mtile.cn{font-family:var(--cn)}
+  .mtile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .mtile.matched{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+  .mtile.wrongflash{border-color:var(--bad);background:var(--bad-soft)}
+
+  .tf{display:flex;gap:10px;margin-left:32px}
+  .tf .opt{flex:1;justify-content:center;font-weight:600}
+
+  .speakbtn{margin-left:32px;font-size:22px;width:54px;height:54px;border-radius:50%;
+    border:none;background:var(--accent);color:#fff;cursor:pointer;margin-bottom:10px}
+  .speakbtn:hover{filter:brightness(1.08)}
+  .speakhint{margin-left:10px;color:var(--muted);font-size:13px}
+
+  .row-actions{margin-left:32px;margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fb{margin-left:32px;margin-top:8px;font-size:14px;padding:8px 12px;border-radius:9px;display:none}
+  .fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+  .fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+  .fb .ans{font-family:var(--cn);font-weight:700}
+
+  .done{text-align:center;padding:30px;margin:20px 0;border-radius:var(--radius);
+    background:linear-gradient(135deg,#1e8e4f,#36c46f);color:#fff;display:none}
+  .done.show{display:block}
+  .done .big{font-size:40px;font-weight:800}
+  footer.ft{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  @media(max-width:560px){.match{grid-template-columns:1fr}.qru,.opts,.inpwrap,.chips,.answerline,.match,.tf,.row-actions,.fb,.prompt{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="scorebar"><div class="inner">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="scoretxt" id="score">0 / 0</div>
+  <button class="btn primary" id="checkAll">Проверить всё · 全部检查</button>
+  <button class="btn ghost" id="reset">Сброс · 重置</button>
+</div></div>
+
+<div class="wrap">
+  <div class="nav"><a href="./index.html">← Все уроки</a></div>
+  <header class="hd">
+    <div class="titlecn" id="tcn"></div>
+    <div class="titleru" id="tru"></div>
+    <div class="meta" id="meta"></div>
+    <div class="hint-tip">💡 Пиньинь стоит над иероглифами. Подведи курсор или нажми на <span style="border-bottom:1.5px dotted var(--accent)">подчёркнутое слово</span>, чтобы увидеть перевод и пример.</div>
+  </header>
+  <main id="app"></main>
+  <div class="done" id="done"><div class="big" id="doneScore"></div><div id="doneMsg"></div></div>
+  <footer class="ft">Сгенерировано из видеоурока · 自动生成的作业 · автопроверка работает офлайн</footer>
+</div>
+<div class="pop" id="pop"></div>
+
+<script>
+const HW = {"lesson": {"title_cn": "家庭和认识新朋友", "title_ru": "Урок (19 мая): Семья и знакомство", "topic_cn": "家庭、认识", "topic_ru": "Семья и знакомство", "level": "HSK 1", "source": "Screen Recording 2026-05-19 at 20.07.24.mov"}, "vocab": [{"hanzi": "家", "ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}, {"hanzi": "口", "ru": "сч. слово (члены семьи)", "ex_cn": "你家有几口人？", "ex_ru": "Сколько человек в твоей семье?"}, {"hanzi": "爸爸", "ru": "папа", "ex_cn": "我爸爸是老师。", "ex_ru": "Мой папа — учитель."}, {"hanzi": "妈妈", "ru": "мама", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}, {"hanzi": "哥哥", "ru": "старший брат", "ex_cn": "我有一个哥哥。", "ex_ru": "У меня есть старший брат."}, {"hanzi": "弟弟", "ru": "младший брат", "ex_cn": "我弟弟九岁。", "ex_ru": "Моему младшему брату девять лет."}, {"hanzi": "姐姐", "ru": "старшая сестра", "ex_cn": "我姐姐是大学生。", "ex_ru": "Моя старшая сестра — студентка."}, {"hanzi": "妹妹", "ru": "младшая сестра", "ex_cn": "我有一个妹妹。", "ex_ru": "У меня есть младшая сестра."}, {"hanzi": "爷爷", "ru": "дедушка", "ex_cn": "我爷爷不工作。", "ex_ru": "Мой дедушка не работает."}, {"hanzi": "奶奶", "ru": "бабушка", "ex_cn": "我奶奶六十二岁。", "ex_ru": "Моей бабушке 62 года."}, {"hanzi": "兄弟姐妹", "ru": "братья и сёстры", "ex_cn": "你有兄弟姐妹吗？", "ex_ru": "У тебя есть братья и сёстры?"}, {"hanzi": "几岁", "ru": "сколько лет", "ex_cn": "你弟弟几岁？", "ex_ru": "Сколько лет твоему младшему брату?"}, {"hanzi": "老师", "ru": "учитель", "ex_cn": "我爸爸是汉语老师。", "ex_ru": "Мой папа — учитель китайского."}, {"hanzi": "医生", "ru": "врач", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}, {"hanzi": "经理", "ru": "менеджер", "ex_cn": "我妈妈是经理。", "ex_ru": "Моя мама — менеджер."}, {"hanzi": "留学生", "ru": "иностранный студент", "ex_cn": "我们都是留学生。", "ex_ru": "Мы все иностранные студенты."}, {"hanzi": "认识", "ru": "быть знакомым, познакомиться", "ex_cn": "认识你很高兴。", "ex_ru": "Рад знакомству."}, {"hanzi": "介绍", "ru": "представлять, знакомить", "ex_cn": "我介绍一下。", "ex_ru": "Позвольте представить."}, {"hanzi": "贵姓", "ru": "(вежл.) Ваша фамилия", "ex_cn": "您贵姓？", "ex_ru": "Как Ваша фамилия?"}, {"hanzi": "高兴", "ru": "рад, радостный", "ex_cn": "我很高兴。", "ex_ru": "Я очень рад."}], "sections": [{"type": "mcq", "title_ru": "Выбери правильный перевод", "title_cn": "选择正确的翻译", "instructions_ru": "Отметь верный вариант и нажми «Проверить».", "items": [{"q_cn": "你家有几口人？", "q_ru": "О чём спрашивают?", "options": ["Сколько человек в твоей семье?", "Где твой дом?", "Сколько тебе лет?"], "answer": 0, "explain_ru": "几口人 — «сколько человек» (口 — счётное для членов семьи)."}, {"q_cn": "哥哥", "q_ru": "Кто это?", "options": ["младший брат", "старший брат", "старшая сестра"], "answer": 1, "explain_ru": "哥哥 (gēge) — старший брат."}, {"q_cn": "认识你很高兴。", "q_ru": "Что это значит?", "options": ["Рад знакомству.", "Как тебя зовут?", "До свидания."], "answer": 0, "explain_ru": "认识你很高兴 — «рад познакомиться с тобой»."}, {"q_cn": "留学生", "q_ru": "Кто это?", "options": ["учитель", "иностранный студент", "менеджер"], "answer": 1, "explain_ru": "留学生 (liúxuéshēng) — иностранный студент."}]}, {"type": "fill", "title_ru": "Вставь пропущенное слово", "title_cn": "填空", "instructions_ru": "Впиши иероглиф. Где просят пиньинь — тоны можно не ставить.", "items": [{"prompt_cn": "我家有五___人。", "prompt_ru": "В моей семье пять человек. (счётное слово)", "accept": ["口"], "mode": "hanzi", "hint_ru": "счётное слово для членов семьи"}, {"prompt_cn": "你有___姐妹吗？", "prompt_ru": "У тебя есть братья и сёстры?", "accept": ["兄弟"], "mode": "hanzi", "hint_ru": "兄弟姐妹"}, {"prompt_cn": "认识你很___。", "prompt_ru": "Рад познакомиться с тобой.", "accept": ["高兴"], "mode": "hanzi", "hint_ru": "рад"}, {"prompt_cn": "您___姓？", "prompt_ru": "Как Ваша фамилия? (вежливо)", "accept": ["贵"], "mode": "hanzi", "hint_ru": "贵姓 — вежливый вопрос о фамилии"}, {"prompt_cn": "我有一个___。", "prompt_ru": "У меня есть младшая сестра. (впиши пиньинь)", "accept": ["mèimei", "mei mei"], "mode": "pinyin", "hint_ru": "妹妹"}]}, {"type": "match", "title_ru": "Соедини члена семьи с переводом", "title_cn": "连线", "items": [{"left": "爸爸", "right": "папа"}, {"left": "妈妈", "right": "мама"}, {"left": "哥哥", "right": "старший брат"}, {"left": "妹妹", "right": "младшая сестра"}, {"left": "爷爷", "right": "дедушка"}, {"left": "奶奶", "right": "бабушка"}]}, {"type": "order", "title_ru": "Собери предложение", "title_cn": "连词成句", "items": [{"chips": ["我家", "有", "五", "口", "人"], "answer": ["我家", "有", "五", "口", "人"], "translation_ru": "В моей семье пять человек.", "explain_ru": "Счёт людей в семье: число + 口 + 人."}, {"chips": ["认识", "你", "很", "高兴"], "answer": ["认识", "你", "很", "高兴"], "translation_ru": "Рад познакомиться с тобой."}, {"chips": ["我", "介绍", "一下"], "answer": ["我", "介绍", "一下"], "translation_ru": "Позвольте представить.", "explain_ru": "一下 смягчает действие: «немного представлю»."}]}, {"type": "truefalse", "title_ru": "Верно или неверно", "title_cn": "判断对错", "items": [{"statement_cn": "「弟弟」是младший брат。", "statement_ru": "«弟弟» — это младший брат.", "answer": true, "explain_ru": "弟弟 (dìdi) — младший брат."}, {"statement_cn": "「贵姓」用来礼貌地问姓。", "statement_ru": "«贵姓» используют, чтобы вежливо спросить фамилию.", "answer": true, "explain_ru": "您贵姓？ — вежливый вопрос о фамилии."}, {"statement_cn": "「医生」的意思是「учитель」。", "statement_ru": "«医生» означает «учитель».", "answer": false, "explain_ru": "医生 (yīshēng) — врач. Учитель — 老师."}, {"statement_cn": "「奶奶」的意思是「бабушка」。", "statement_ru": "«奶奶» означает «бабушка».", "answer": true, "explain_ru": "奶奶 (nǎinai) — бабушка (по отцу)."}]}, {"type": "listen", "title_ru": "Аудирование", "title_cn": "听力", "instructions_ru": "Нажми 🔊, прослушай и выбери, что ты услышал.", "items": [{"audio_text": "你家有几口人？", "q_ru": "Что вы услышали?", "options": ["你家有几口人？", "你有兄弟姐妹吗？", "你弟弟几岁？"], "answer": 0, "explain_ru": "«Сколько человек в твоей семье?»"}, {"audio_text": "认识你很高兴。", "q_ru": "Что вы услышали?", "options": ["认识你很高兴。", "我介绍一下。", "您贵姓？"], "answer": 0, "explain_ru": "«Рад знакомству.»"}, {"audio_text": "我爸爸是老师。", "q_ru": "Что вы услышали?", "options": ["我爸爸是老师。", "我妈妈是医生。", "我哥哥是学生。"], "answer": 0, "explain_ru": "«Мой папа — учитель.»"}]}]};
+const ANNO = {"我家": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}], "你弟弟几岁？": [{"w": "你", "h": true, "p": ["nǐ"]}, {"w": "弟弟", "h": true, "p": ["dì", "di"], "g": {"ru": "младший брат", "ex_cn": "我弟弟九岁。", "ex_ru": "Моему младшему брату девять лет."}}, {"w": "几岁", "h": true, "p": ["jǐ", "suì"], "g": {"ru": "сколько лет", "ex_cn": "你弟弟几岁？", "ex_ru": "Сколько лет твоему младшему брату?"}}, {"w": "？"}], "兄弟": [{"w": "兄", "h": true, "p": ["xiōng"]}, {"w": "弟", "h": true, "p": ["dì"]}], "爷爷": [{"w": "爷爷", "h": true, "p": ["yé", "yé"], "g": {"ru": "дедушка", "ex_cn": "我爷爷不工作。", "ex_ru": "Мой дедушка не работает."}}], "人": [{"w": "人", "h": true, "p": ["rén"]}], "我有一个哥哥。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "一", "h": true, "p": ["yí"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "哥哥", "h": true, "p": ["gē", "gē"], "g": {"ru": "старший брат", "ex_cn": "我有一个哥哥。", "ex_ru": "У меня есть старший брат."}}, {"w": "。"}], "几岁": [{"w": "几岁", "h": true, "p": ["jǐ", "suì"], "g": {"ru": "сколько лет", "ex_cn": "你弟弟几岁？", "ex_ru": "Сколько лет твоему младшему брату?"}}], "你家有几口人？": [{"w": "你", "h": true, "p": ["nǐ"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "几", "h": true, "p": ["jǐ"]}, {"w": "口", "h": true, "p": ["kǒu"], "g": {"ru": "сч. слово (члены семьи)", "ex_cn": "你家有几口人？", "ex_ru": "Сколько человек в твоей семье?"}}, {"w": "人", "h": true, "p": ["rén"]}, {"w": "？"}], "贵": [{"w": "贵", "h": true, "p": ["guì"]}], "医生": [{"w": "医生", "h": true, "p": ["yī", "shēng"], "g": {"ru": "врач", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}], "家庭和认识新朋友": [{"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}, {"w": "庭", "h": true, "p": ["tíng"]}, {"w": "和", "h": true, "p": ["hé"]}, {"w": "认识", "h": true, "p": ["rèn", "shí"], "g": {"ru": "быть знакомым, познакомиться", "ex_cn": "认识你很高兴。", "ex_ru": "Рад знакомству."}}, {"w": "新", "h": true, "p": ["xīn"]}, {"w": "朋", "h": true, "p": ["péng"]}, {"w": "友", "h": true, "p": ["yǒu"]}], "我爸爸是汉语老师。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "爸爸", "h": true, "p": ["bà", "bà"], "g": {"ru": "папа", "ex_cn": "我爸爸是老师。", "ex_ru": "Мой папа — учитель."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "汉", "h": true, "p": ["hàn"]}, {"w": "语", "h": true, "p": ["yǔ"]}, {"w": "老师", "h": true, "p": ["lǎo", "shī"], "g": {"ru": "учитель", "ex_cn": "我爸爸是汉语老师。", "ex_ru": "Мой папа — учитель китайского."}}, {"w": "。"}], "你有___姐妹吗？": [{"w": "你", "h": true, "p": ["nǐ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "___"}, {"w": "姐", "h": true, "p": ["jiě"]}, {"w": "妹", "h": true, "p": ["mèi"]}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "五": [{"w": "五", "h": true, "p": ["wǔ"]}], "妈妈": [{"w": "妈妈", "h": true, "p": ["mā", "mā"], "g": {"ru": "мама", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}], "有": [{"w": "有", "h": true, "p": ["yǒu"]}], "哥哥": [{"w": "哥哥", "h": true, "p": ["gē", "gē"], "g": {"ru": "старший брат", "ex_cn": "我有一个哥哥。", "ex_ru": "У меня есть старший брат."}}], "一下": [{"w": "一", "h": true, "p": ["yī"]}, {"w": "下", "h": true, "p": ["xià"]}], "我很高兴。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "很", "h": true, "p": ["hěn"]}, {"w": "高兴", "h": true, "p": ["gāo", "xìng"], "g": {"ru": "рад, радостный", "ex_cn": "我很高兴。", "ex_ru": "Я очень рад."}}, {"w": "。"}], "「弟弟」是младший брат。": [{"w": "「"}, {"w": "弟弟", "h": true, "p": ["dì", "di"], "g": {"ru": "младший брат", "ex_cn": "我弟弟九岁。", "ex_ru": "Моему младшему брату девять лет."}}, {"w": "」"}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "младший брат。"}], "您___姓？": [{"w": "您", "h": true, "p": ["nín"]}, {"w": "___"}, {"w": "姓", "h": true, "p": ["xìng"]}, {"w": "？"}], "我家有五口人。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "五", "h": true, "p": ["wǔ"]}, {"w": "口", "h": true, "p": ["kǒu"], "g": {"ru": "сч. слово (члены семьи)", "ex_cn": "你家有几口人？", "ex_ru": "Сколько человек в твоей семье?"}}, {"w": "人", "h": true, "p": ["rén"]}, {"w": "。"}], "爸爸": [{"w": "爸爸", "h": true, "p": ["bà", "bà"], "g": {"ru": "папа", "ex_cn": "我爸爸是老师。", "ex_ru": "Мой папа — учитель."}}], "认识": [{"w": "认识", "h": true, "p": ["rèn", "shí"], "g": {"ru": "быть знакомым, познакомиться", "ex_cn": "认识你很高兴。", "ex_ru": "Рад знакомству."}}], "我爸爸是老师。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "爸爸", "h": true, "p": ["bà", "bà"], "g": {"ru": "папа", "ex_cn": "我爸爸是老师。", "ex_ru": "Мой папа — учитель."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "老师", "h": true, "p": ["lǎo", "shī"], "g": {"ru": "учитель", "ex_cn": "我爸爸是汉语老师。", "ex_ru": "Мой папа — учитель китайского."}}, {"w": "。"}], "我妈妈是医生。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "妈妈", "h": true, "p": ["mā", "mā"], "g": {"ru": "мама", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "医生", "h": true, "p": ["yī", "shēng"], "g": {"ru": "врач", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}, {"w": "。"}], "兄弟姐妹": [{"w": "兄弟姐妹", "h": true, "p": ["xiōng", "dì", "jiě", "mèi"], "g": {"ru": "братья и сёстры", "ex_cn": "你有兄弟姐妹吗？", "ex_ru": "У тебя есть братья и сёстры?"}}], "留学生": [{"w": "留学生", "h": true, "p": ["liú", "xué", "shēng"], "g": {"ru": "иностранный студент", "ex_cn": "我们都是留学生。", "ex_ru": "Мы все иностранные студенты."}}], "我介绍一下。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "介绍", "h": true, "p": ["jiè", "shào"], "g": {"ru": "представлять, знакомить", "ex_cn": "我介绍一下。", "ex_ru": "Позвольте представить."}}, {"w": "一", "h": true, "p": ["yī"]}, {"w": "下", "h": true, "p": ["xià"]}, {"w": "。"}], "介绍": [{"w": "介绍", "h": true, "p": ["jiè", "shào"], "g": {"ru": "представлять, знакомить", "ex_cn": "我介绍一下。", "ex_ru": "Позвольте представить."}}], "我妈妈是经理。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "妈妈", "h": true, "p": ["mā", "mā"], "g": {"ru": "мама", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "经理", "h": true, "p": ["jīng", "lǐ"], "g": {"ru": "менеджер", "ex_cn": "我妈妈是经理。", "ex_ru": "Моя мама — менеджер."}}, {"w": "。"}], "我们都是留学生。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "们", "h": true, "p": ["men"]}, {"w": "都", "h": true, "p": ["dōu"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "留学生", "h": true, "p": ["liú", "xué", "shēng"], "g": {"ru": "иностранный студент", "ex_cn": "我们都是留学生。", "ex_ru": "Мы все иностранные студенты."}}, {"w": "。"}], "家": [{"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}], "您贵姓？": [{"w": "您", "h": true, "p": ["nín"]}, {"w": "贵姓", "h": true, "p": ["guì", "xìng"], "g": {"ru": "(вежл.) Ваша фамилия", "ex_cn": "您贵姓？", "ex_ru": "Как Ваша фамилия?"}}, {"w": "？"}], "你有兄弟姐妹吗？": [{"w": "你", "h": true, "p": ["nǐ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "兄弟姐妹", "h": true, "p": ["xiōng", "dì", "jiě", "mèi"], "g": {"ru": "братья и сёстры", "ex_cn": "你有兄弟姐妹吗？", "ex_ru": "У тебя есть братья и сёстры?"}}, {"w": "吗", "h": true, "p": ["ma"]}, {"w": "？"}], "我家有五___人。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "家", "h": true, "p": ["jiā"], "g": {"ru": "семья, дом", "ex_cn": "我家有五口人。", "ex_ru": "В моей семье пять человек."}}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "五", "h": true, "p": ["wǔ"]}, {"w": "___"}, {"w": "人", "h": true, "p": ["rén"]}, {"w": "。"}], "我弟弟九岁。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "弟弟", "h": true, "p": ["dì", "di"], "g": {"ru": "младший брат", "ex_cn": "我弟弟九岁。", "ex_ru": "Моему младшему брату девять лет."}}, {"w": "九", "h": true, "p": ["jiǔ"]}, {"w": "岁", "h": true, "p": ["suì"]}, {"w": "。"}], "认识你很___。": [{"w": "认识", "h": true, "p": ["rèn", "shí"], "g": {"ru": "быть знакомым, познакомиться", "ex_cn": "认识你很高兴。", "ex_ru": "Рад знакомству."}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "很", "h": true, "p": ["hěn"]}, {"w": "___。"}], "我奶奶六十二岁。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "奶奶", "h": true, "p": ["nǎi", "nǎi"], "g": {"ru": "бабушка", "ex_cn": "我奶奶六十二岁。", "ex_ru": "Моей бабушке 62 года."}}, {"w": "六", "h": true, "p": ["liù"]}, {"w": "十", "h": true, "p": ["shí"]}, {"w": "二", "h": true, "p": ["èr"]}, {"w": "岁", "h": true, "p": ["suì"]}, {"w": "。"}], "「医生」的意思是「учитель」。": [{"w": "「"}, {"w": "医生", "h": true, "p": ["yī", "shēng"], "g": {"ru": "врач", "ex_cn": "我妈妈是医生。", "ex_ru": "Моя мама — врач."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「учитель」。"}], "我": [{"w": "我", "h": true, "p": ["wǒ"]}], "弟弟": [{"w": "弟弟", "h": true, "p": ["dì", "di"], "g": {"ru": "младший брат", "ex_cn": "我弟弟九岁。", "ex_ru": "Моему младшему брату девять лет."}}], "妹妹": [{"w": "妹妹", "h": true, "p": ["mèi", "mèi"], "g": {"ru": "младшая сестра", "ex_cn": "我有一个妹妹。", "ex_ru": "У меня есть младшая сестра."}}], "我姐姐是大学生。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "姐姐", "h": true, "p": ["jiě", "jiě"], "g": {"ru": "старшая сестра", "ex_cn": "我姐姐是大学生。", "ex_ru": "Моя старшая сестра — студентка."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "大", "h": true, "p": ["dà"]}, {"w": "学", "h": true, "p": ["xué"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "。"}], "你": [{"w": "你", "h": true, "p": ["nǐ"]}], "奶奶": [{"w": "奶奶", "h": true, "p": ["nǎi", "nǎi"], "g": {"ru": "бабушка", "ex_cn": "我奶奶六十二岁。", "ex_ru": "Моей бабушке 62 года."}}], "我哥哥是学生。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "哥哥", "h": true, "p": ["gē", "gē"], "g": {"ru": "старший брат", "ex_cn": "我有一个哥哥。", "ex_ru": "У меня есть старший брат."}}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "学", "h": true, "p": ["xué"]}, {"w": "生", "h": true, "p": ["shēng"]}, {"w": "。"}], "高兴": [{"w": "高兴", "h": true, "p": ["gāo", "xìng"], "g": {"ru": "рад, радостный", "ex_cn": "我很高兴。", "ex_ru": "Я очень рад."}}], "「奶奶」的意思是「бабушка」。": [{"w": "「"}, {"w": "奶奶", "h": true, "p": ["nǎi", "nǎi"], "g": {"ru": "бабушка", "ex_cn": "我奶奶六十二岁。", "ex_ru": "Моей бабушке 62 года."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「бабушка」。"}], "认识你很高兴。": [{"w": "认识", "h": true, "p": ["rèn", "shí"], "g": {"ru": "быть знакомым, познакомиться", "ex_cn": "认识你很高兴。", "ex_ru": "Рад знакомству."}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "很", "h": true, "p": ["hěn"]}, {"w": "高兴", "h": true, "p": ["gāo", "xìng"], "g": {"ru": "рад, радостный", "ex_cn": "我很高兴。", "ex_ru": "Я очень рад."}}, {"w": "。"}], "我爷爷不工作。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "爷爷", "h": true, "p": ["yé", "yé"], "g": {"ru": "дедушка", "ex_cn": "我爷爷不工作。", "ex_ru": "Мой дедушка не работает."}}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "工", "h": true, "p": ["gōng"]}, {"w": "作", "h": true, "p": ["zuò"]}, {"w": "。"}], "姐姐": [{"w": "姐姐", "h": true, "p": ["jiě", "jiě"], "g": {"ru": "старшая сестра", "ex_cn": "我姐姐是大学生。", "ex_ru": "Моя старшая сестра — студентка."}}], "经理": [{"w": "经理", "h": true, "p": ["jīng", "lǐ"], "g": {"ru": "менеджер", "ex_cn": "我妈妈是经理。", "ex_ru": "Моя мама — менеджер."}}], "老师": [{"w": "老师", "h": true, "p": ["lǎo", "shī"], "g": {"ru": "учитель", "ex_cn": "我爸爸是汉语老师。", "ex_ru": "Мой папа — учитель китайского."}}], "「贵姓」用来礼貌地问姓。": [{"w": "「"}, {"w": "贵姓", "h": true, "p": ["guì", "xìng"], "g": {"ru": "(вежл.) Ваша фамилия", "ex_cn": "您贵姓？", "ex_ru": "Как Ваша фамилия?"}}, {"w": "」"}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "来", "h": true, "p": ["lái"]}, {"w": "礼", "h": true, "p": ["lǐ"]}, {"w": "貌", "h": true, "p": ["mào"]}, {"w": "地", "h": true, "p": ["dì"]}, {"w": "问", "h": true, "p": ["wèn"]}, {"w": "姓", "h": true, "p": ["xìng"]}, {"w": "。"}], "贵姓": [{"w": "贵姓", "h": true, "p": ["guì", "xìng"], "g": {"ru": "(вежл.) Ваша фамилия", "ex_cn": "您贵姓？", "ex_ru": "Как Ваша фамилия?"}}], "很": [{"w": "很", "h": true, "p": ["hěn"]}], "我有一个妹妹。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "一", "h": true, "p": ["yí"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "妹妹", "h": true, "p": ["mèi", "mèi"], "g": {"ru": "младшая сестра", "ex_cn": "我有一个妹妹。", "ex_ru": "У меня есть младшая сестра."}}, {"w": "。"}], "口": [{"w": "口", "h": true, "p": ["kǒu"], "g": {"ru": "сч. слово (члены семьи)", "ex_cn": "你家有几口人？", "ex_ru": "Сколько человек в твоей семье?"}}], "我有一个___。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "有", "h": true, "p": ["yǒu"]}, {"w": "一", "h": true, "p": ["yí"]}, {"w": "个", "h": true, "p": ["gè"]}, {"w": "___。"}]};   // строка → массив сегментов {w, h, p?, g?}
+
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+
+/* ---------- рендер китайского с пиньинем + подсказками ---------- */
+function cn(s){
+  const segs = ANNO[s];
+  if(!segs) return esc(s);              // не-китайский текст (русский, латиница) — как есть
+  let html='';
+  for(const seg of segs){
+    if(seg.h){                          // китайское слово/иероглиф
+      const chars=[...seg.w];
+      let inner='';
+      for(let i=0;i<chars.length;i++){
+        const py=seg.p?seg.p[i]:'';
+        inner += py ? `<ruby>${esc(chars[i])}<rt>${esc(py)}</rt></ruby>` : esc(chars[i]);
+      }
+      if(seg.g){
+        const py=seg.p?seg.p.join(' '):'';
+        html += `<span class="word" data-w="${esc(seg.w)}" data-py="${esc(py)}" data-ru="${esc(seg.g.ru||'')}" data-excn="${esc(seg.g.ex_cn||'')}" data-exru="${esc(seg.g.ex_ru||'')}">${inner}</span>`;
+      } else html += inner;
+    } else if(/^[_＿]{2,}$/.test(seg.w)){
+      html += '<span class="blank">?</span>';
+    } else html += esc(seg.w);
+  }
+  return html;
+}
+
+/* ---------- popover ---------- */
+const pop=document.getElementById('pop');
+let popPinned=false;
+function showPop(w){
+  const ex = w.dataset.excn ? `<div class="pex"><span class="excn">${cn(w.dataset.excn)}</span>${esc(w.dataset.exru||'')}</div>` : '';
+  pop.innerHTML = `<div class="pw">${cn(w.dataset.w)}</div>`+
+    (w.dataset.py?`<div class="ppy">${esc(w.dataset.py)}</div>`:'')+
+    `<div class="pru">${esc(w.dataset.ru)}</div>`+ex;
+  pop.classList.add('show');
+  const r=w.getBoundingClientRect();
+  const pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left+window.scrollX;
+  left=Math.min(left, window.scrollX+document.documentElement.clientWidth-pw-10);
+  left=Math.max(left, window.scrollX+8);
+  let top=r.bottom+window.scrollY+6;
+  if(r.bottom+ph+10>document.documentElement.clientHeight) top=r.top+window.scrollY-ph-6;
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hidePop(){ pop.classList.remove('show'); popPinned=false; }
+document.body.addEventListener('mouseover',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) showPop(w); });
+document.body.addEventListener('mouseout',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) hidePop(); });
+document.body.addEventListener('click',e=>{
+  const w=e.target.closest('.word');
+  if(w){ e.stopPropagation(); if(popPinned&&pop._for===w){hidePop();} else {showPop(w);popPinned=true;pop._for=w;} return; }
+  if(!e.target.closest('.pop')) hidePop();
+});
+
+/* ---------- pinyin / text normalization (проверка ответов) ---------- */
+const TONE_MAP={'ā':'a','á':'a','ǎ':'a','à':'a','ē':'e','é':'e','ě':'e','è':'e','ī':'i','í':'i','ǐ':'i','ì':'i','ō':'o','ó':'o','ǒ':'o','ò':'o','ū':'u','ú':'u','ǔ':'u','ù':'u','ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v'};
+function stripTones(s){let o='';for(const ch of s.toLowerCase())o+=(TONE_MAP[ch]!==undefined?TONE_MAP[ch]:ch);return o.replace(/[1-5]/g,'').replace(/\s+/g,'').replace(/[，。！？、,.!?'’\-]/g,'');}
+function normHanzi(s){return s.trim().replace(/\s+/g,'').replace(/[，。！？、,.!?\s]/g,'');}
+function eqv(a,b){return a.trim().toLowerCase()===b.trim().toLowerCase();}
+function matchAnswer(user,accept,mode){
+  user=(user||'').trim(); if(!user)return false;
+  for(const a of accept){
+    if(mode==='pinyin'){if(stripTones(user)===stripTones(a))return true;}
+    else if(mode==='hanzi'){if(normHanzi(user)===normHanzi(a))return true;}
+    else {if(eqv(user,a))return true;}
+  }
+  return false;
+}
+
+/* ---------- TTS ---------- */
+let zhVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh|chinese/i.test(v.lang+v.name))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function speak(text){
+  if(!('speechSynthesis' in window)){alert('Браузер не поддерживает озвучку.');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=0.85;if(zhVoice)u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- scoring ---------- */
+const graded={}; let totalItems=0;
+function setGraded(key,ok){graded[key]=ok;refreshScore();}
+function refreshScore(){
+  const keys=Object.keys(graded);
+  const correct=keys.filter(k=>graded[k]).length;
+  document.getElementById('score').textContent=correct+' / '+totalItems;
+  document.getElementById('bar').style.width=(totalItems?correct/totalItems*100:0)+'%';
+  const done=document.getElementById('done');
+  if(keys.length===totalItems&&totalItems>0){
+    done.classList.add('show');
+    const pct=Math.round(correct/totalItems*100);
+    document.getElementById('doneScore').textContent=correct+' / '+totalItems+'  ('+pct+'%)';
+    document.getElementById('doneMsg').textContent=pct>=90?'Отлично! 太棒了！':pct>=70?'Хорошо! 很好！':pct>=50?'Неплохо, повтори ошибки. 加油！':'Стоит повторить урок. 别灰心，再来一次！';
+  } else done.classList.remove('show');
+}
+
+function feedback(el,ok,answerHTML,explain){
+  el.className='fb '+(ok?'ok':'bad');
+  let h=ok?'✓ Верно · 正确':'✗ Неверно · 错误';
+  if(!ok&&answerHTML)h+=' — правильный ответ: <span class="ans">'+answerHTML+'</span>';
+  if(explain)h+='<br><span style="color:var(--muted)">'+esc(explain)+'</span>';
+  el.innerHTML=h;
+}
+
+/* ---------- renderers ---------- */
+function renderMCQ(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.q_cn||'')}</span></div>`+
+      (it.q_ru?`<div class="qru">${esc(it.q_ru)}</div>`:'');
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&sel>=0) b.onclick(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderFill(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`;
+    item.appendChild(el(`<div class="prompt">${cn(it.prompt_cn||'')}</div>`));
+    if(it.prompt_ru) item.appendChild(el(`<div class="qru">${esc(it.prompt_ru)}</div>`));
+    const inp=el(`<input class="fill" placeholder="${it.mode==='pinyin'?'pīnyīn / pinyin':it.mode==='ru'?'перевод':'汉字'}">`);
+    const fb=el('<div class="fb"></div>');
+    const wrap=el('<div class="inpwrap"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    const doCheck=()=>{ if(graded[key]!==undefined)return;
+      const ok=matchAnswer(inp.value,it.accept,it.mode||'hanzi');
+      inp.classList.add(ok?'correct':'wrong'); inp.disabled=true; b.disabled=true;
+      feedback(fb,ok,cn(it.accept[0]),it.explain_ru||it.hint_ru); setGraded(key,ok); };
+    b.onclick=doCheck; inp.addEventListener('keydown',e=>{if(e.key==='Enter')doCheck();});
+    wrap.appendChild(inp); wrap.appendChild(b);
+    item.appendChild(wrap); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&inp.value.trim()) doCheck(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderTrueFalse(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.statement_cn||'')}</span></div>`+
+      (it.statement_ru?`<div class="qru">${esc(it.statement_ru)}</div>`:'');
+    const tf=el('<div class="tf"></div>'); const fb=el('<div class="fb"></div>');
+    [['Верно · 对',true],['Неверно · 错',false]].forEach(([label,val])=>{
+      const op=el(`<div class="opt">${label}</div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return;
+        [...tf.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel');
+        const ok=val===it.answer; [...tf.children].forEach(c=>c.style.pointerEvents='none');
+        op.classList.add(ok?'correct':'wrong');
+        feedback(fb,ok,(it.answer?'Верно · 对':'Неверно · 错'),it.explain_ru); setGraded(key,ok); };
+      tf.appendChild(op);
+    });
+    item.appendChild(tf); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderOrder(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`+
+      (it.translation_ru?`<div class="qru">Собери предложение: «${esc(it.translation_ru)}»</div>`:'<div class="qru">Собери предложение из слов</div>');
+    const answer=el('<div class="answerline"></div>');
+    const pool=el('<div class="chips"></div>');
+    const current=[];
+    const shuffled=[...it.chips].map((c,idx)=>({c,idx})).sort(()=>Math.random()-0.5);
+    shuffled.forEach(({c})=>{
+      const chip=el(`<div class="chip">${cn(c)}</div>`);
+      chip.onclick=()=>{ if(graded[key]!==undefined)return;
+        chip.classList.add('used'); current.push({c,chip});
+        const a=el(`<div class="chip">${cn(c)}</div>`);
+        a.onclick=()=>{ if(graded[key]!==undefined)return; chip.classList.remove('used');
+          const p=current.findIndex(x=>x.chip===chip); if(p>=0)current.splice(p,1); a.remove(); };
+        answer.appendChild(a); };
+      pool.appendChild(chip);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(graded[key]!==undefined)return;
+      const got=current.map(x=>x.c); const ok=JSON.stringify(got)===JSON.stringify(it.answer);
+      answer.classList.add(ok?'correct':'wrong'); b.disabled=true;
+      feedback(fb,ok,it.answer.map(cn).join(' '),it.explain_ru); setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(answer); item.appendChild(pool); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderMatch(sec,sIdx){
+  const key='s'+sIdx; totalItems++;
+  const item=el('<div class="item"></div>');
+  const grid=el('<div class="match"></div>');
+  const colL=el('<div class="col"></div>'), colR=el('<div class="col"></div>');
+  const left=sec.items.map((it,idx)=>({t:it.left,idx}));
+  const right=sec.items.map((it,idx)=>({t:it.right,idx})).sort(()=>Math.random()-0.5);
+  let selL=null; let solved=0;
+  left.forEach(o=>{ const tile=el(`<div class="mtile cn">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(tile.classList.contains('matched'))return;
+      [...colL.children].forEach(c=>c.classList.remove('sel')); tile.classList.add('sel'); selL=tile; };
+    colL.appendChild(tile); });
+  right.forEach(o=>{ const tile=el(`<div class="mtile">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(!selL||tile.classList.contains('matched'))return;
+      if(selL._idx===o.idx){ selL.classList.remove('sel'); selL.classList.add('matched');
+        tile.classList.add('matched'); selL=null; solved++; if(solved===left.length) setGraded(key,true); }
+      else { const bad=selL; bad.classList.add('wrongflash'); tile.classList.add('wrongflash');
+        setTimeout(()=>{bad.classList.remove('wrongflash','sel');tile.classList.remove('wrongflash');},500);
+        if(graded[key]===undefined) graded[key]=false; selL=null; } };
+    colR.appendChild(tile); });
+  grid.appendChild(colL); grid.appendChild(colR);
+  item.appendChild(el('<div class="qru">Нажми слово слева, затем его пару справа · 连线</div>'));
+  item.appendChild(grid);
+  sec._el.appendChild(item);
+}
+
+function renderListen(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qru" style="margin:0">${esc(it.q_ru||'Что вы услышали?')}</span></div>`;
+    const sb=el('<button class="speakbtn" title="Прослушать">🔊</button>');
+    sb.onclick=()=>speak(it.audio_text);
+    item.appendChild(sb);
+    item.appendChild(el('<span class="speakhint">нажми, чтобы прослушать · 点击播放</span>'));
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+const RENDERERS={mcq:renderMCQ,fill:renderFill,truefalse:renderTrueFalse,order:renderOrder,match:renderMatch,listen:renderListen};
+
+/* ---------- словарь урока (все новые слова) ---------- */
+function renderVocabCard(app){
+  const vocab = HW.vocab || [];
+  if(!vocab.length) return;
+  const sec=el('<section class="vocab"></section>');
+  sec.appendChild(el('<h2>Словарь урока <span class="subcn">生词</span></h2>'));
+  sec.appendChild(el(`<div class="cnt">Все новые слова урока (${vocab.length}). Нажми 🔊, чтобы прослушать. Слова из этого списка подсвечены в заданиях.</div>`));
+  const list=el('<div class="vlist"></div>');
+  vocab.forEach(v=>{
+    const row=el('<div class="vrow"></div>');
+    const b=el('<button class="spk" title="Прослушать">🔊</button>');
+    b.onclick=()=>speak(v.hanzi);
+    const body=el('<div class="body"></div>');
+    body.appendChild(el(`<div class="hz">${cn(v.hanzi)}</div>`));
+    body.appendChild(el(`<div class="tr">${esc(v.ru||'')}</div>`));
+    const ex = v.ex_cn||v.example_cn;
+    if(ex) body.appendChild(el(`<div class="ex"><span class="excn">${cn(ex)}</span>${(v.ex_ru||v.example_ru)?' — '+esc(v.ex_ru||v.example_ru):''}</div>`));
+    row.appendChild(b); row.appendChild(body); list.appendChild(row);
+  });
+  sec.appendChild(list);
+  app.appendChild(sec);
+}
+
+function build(){
+  document.title=(HW.lesson.title_ru||HW.lesson.title_cn||'Домашнее задание');
+  document.getElementById('tcn').innerHTML=cn(HW.lesson.title_cn||'');
+  document.getElementById('tru').textContent=HW.lesson.title_ru||'';
+  const meta=document.getElementById('meta');
+  if(HW.lesson.topic_cn||HW.lesson.topic_ru) meta.appendChild(el(`<span class="tag">${esc((HW.lesson.topic_cn||'')+(HW.lesson.topic_ru?' · '+HW.lesson.topic_ru:''))}</span>`));
+  if(HW.lesson.level) meta.appendChild(el(`<span class="tag alt">${esc(HW.lesson.level)}</span>`));
+  const app=document.getElementById('app');
+  renderVocabCard(app);
+  (HW.sections||[]).forEach((sec,sIdx)=>{
+    const s=el('<section class="ex"></section>');
+    s.appendChild(el(`<h2>${esc(sec.title_ru||'Задание')}${sec.title_cn?` <span class="subcn">${esc(sec.title_cn)}</span>`:''}</h2>`));
+    if(sec.instructions_ru||sec.instructions_cn)
+      s.appendChild(el(`<div class="instr">${esc(sec.instructions_ru||'')}${sec.instructions_cn?' · '+esc(sec.instructions_cn):''}</div>`));
+    sec._el=s;
+    const r=RENDERERS[sec.type];
+    if(r) r(sec,sIdx); else s.appendChild(el('<div class="instr">Неизвестный тип задания: '+esc(sec.type)+'</div>'));
+    app.appendChild(s);
+  });
+  refreshScore();
+}
+
+document.getElementById('checkAll').onclick=()=>{ document.querySelectorAll('.item').forEach(it=>{ if(it._check) it._check(); }); };
+document.getElementById('reset').onclick=()=>{ location.reload(); };
+
+build();
+</script>
+</body>
+</html>

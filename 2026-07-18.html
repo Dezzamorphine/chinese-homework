@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Китайский · ДЗ">
+<meta name="theme-color" content="#c0392b">
+<title>Урок (18 июля): В ресторане и в гостях</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2430; --muted:#6b7280;
+    --line:#e3e7ef; --accent:#c0392b; --accent-soft:#fdecea;
+    --ok:#1e8e4f; --ok-soft:#e6f4ea; --bad:#c0392b; --bad-soft:#fdecea;
+    --chip:#eef1f7; --chip-active:#fff3cd; --radius:14px;
+    --cn:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;padding:0 16px 90px}
+  .wrap{max-width:820px;margin:0 auto}
+  header.hd{padding:28px 0 18px;border-bottom:2px solid var(--line);margin-bottom:8px}
+  .titlecn{font-family:var(--cn);font-size:30px;font-weight:700;letter-spacing:1px}
+  .titleru{font-size:17px;color:var(--muted);margin-top:4px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tag{background:var(--accent-soft);color:var(--accent);font-size:13px;
+    padding:4px 11px;border-radius:999px;font-weight:600}
+  .tag.alt{background:#eef2ff;color:#3b50c4}
+  .hint-tip{font-size:13px;color:var(--muted);margin-top:10px}
+  .nav{padding:14px 0 0}
+  .nav a{color:var(--accent);text-decoration:none;font-weight:600;font-size:15px}
+  .nav a:hover{text-decoration:underline}
+
+  /* ruby pinyin */
+  ruby{ruby-position:over;-webkit-ruby-position:before}
+  rt{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:.56em;color:var(--accent);font-weight:600;line-height:1.1;letter-spacing:0}
+  .word{cursor:help;border-bottom:1.5px dotted var(--accent);padding-bottom:0}
+  .word:hover{background:var(--accent-soft);border-radius:4px}
+
+  /* popover */
+  .pop{position:absolute;z-index:100;max-width:300px;background:#fff;color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 28px rgba(20,30,60,.18);
+    padding:12px 14px;font-size:14px;display:none}
+  .pop.show{display:block}
+  .pop .pw{font-family:var(--cn);font-size:22px;font-weight:700}
+  .pop .ppy{color:var(--accent);font-weight:600;font-size:13px;margin-top:2px}
+  .pop .pru{margin-top:6px;font-size:15px}
+  .pop .pex{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);color:var(--muted)}
+  .pop .pex .excn{font-family:var(--cn);color:var(--ink);display:block;margin-bottom:2px}
+
+  /* vocab study card */
+  .vocab{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .vocab h2{margin:0 0 4px;font-size:19px}
+  .vocab .cnt{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .vlist{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+  .vrow{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--line);align-items:flex-start}
+  .vrow .spk{flex:none;width:34px;height:34px;border:none;border-radius:8px;background:var(--accent-soft);
+    color:var(--accent);font-size:16px;cursor:pointer;margin-top:2px}
+  .vrow .spk:hover{background:#fbdcd8}
+  .vrow .body{flex:1;min-width:0}
+  .vrow .hz{font-family:var(--cn);font-size:20px}
+  .vrow .tr{font-size:14px;color:var(--ink)}
+  .vrow .ex{font-size:13px;color:var(--muted);margin-top:2px}
+  .vrow .ex .excn{font-family:var(--cn);color:var(--ink)}
+  @media(max-width:560px){.vlist{grid-template-columns:1fr}}
+
+  /* score bar */
+  .scorebar{position:sticky;top:0;z-index:30;background:rgba(244,246,251,.94);
+    backdrop-filter:blur(6px);padding:12px 0;margin:0 -16px;border-bottom:1px solid var(--line)}
+  .scorebar .inner{max-width:820px;margin:0 auto;padding:0 16px;display:flex;
+    align-items:center;gap:14px;flex-wrap:wrap}
+  .progress{flex:1;min-width:140px;height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#1e8e4f,#36c46f);
+    border-radius:999px;transition:width .35s ease}
+  .scoretxt{font-weight:700;font-size:15px;white-space:nowrap}
+  .btn{border:none;cursor:pointer;font-size:14px;font-weight:600;border-radius:10px;
+    padding:8px 14px;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--accent);color:#fff}
+  .btn.primary:hover{filter:brightness(1.07)}
+  .btn.ghost{background:var(--chip);color:var(--ink)}
+  .btn.ghost:hover{background:#e3e7ef}
+
+  section.ex{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin:18px 0;box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  .ex h2{margin:0 0 2px;font-size:19px}
+  .ex .subcn{font-family:var(--cn);color:var(--accent);font-size:15px;font-weight:600}
+  .ex .instr{color:var(--muted);font-size:14px;margin:6px 0 16px}
+  .item{padding:16px 0;border-top:1px dashed var(--line)}
+  .item:first-of-type{border-top:none;padding-top:4px}
+  .qhead{display:flex;gap:10px;align-items:baseline}
+  .qnum{font-weight:700;color:var(--muted);font-size:14px;min-width:22px}
+  .qcn{font-family:var(--cn);font-size:20px}
+  .qru{color:var(--muted);font-size:14px;margin:6px 0 10px 32px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-left:32px}
+  .opt{display:flex;align-items:center;gap:10px;padding:9px 13px;border:1.5px solid var(--line);
+    border-radius:10px;cursor:pointer;font-size:16px;transition:.12s;background:#fff}
+  .opt:hover{border-color:#c7cede}
+  .opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .opt.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt .cn{font-family:var(--cn)}
+  .opt .mark{margin-left:auto;font-weight:700}
+
+  .inpwrap{margin-left:32px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  input.fill{font-size:16px;padding:8px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-family:var(--cn);min-width:120px}
+  input.fill:focus{outline:none;border-color:var(--accent)}
+  input.fill.correct{border-color:var(--ok);background:var(--ok-soft)}
+  input.fill.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .prompt{font-family:var(--cn);font-size:20px;margin-left:32px;margin-bottom:10px;line-height:2.1}
+  .prompt .blank,.fb .blank{display:inline-block;min-width:46px;border-bottom:2px solid var(--accent);
+    text-align:center;color:var(--accent);font-weight:700}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-left:32px;margin-bottom:8px}
+  .chip{font-family:var(--cn);font-size:18px;padding:10px 14px;background:var(--chip);
+    border:1.5px solid var(--line);border-radius:10px;cursor:pointer;user-select:none;transition:.12s;line-height:1.9}
+  .chip:hover{background:#e3e7ef}
+  .chip.used{opacity:.35;pointer-events:none}
+  .answerline{min-height:52px;margin-left:32px;border:1.5px dashed var(--line);border-radius:10px;
+    padding:8px;display:flex;flex-wrap:wrap;gap:8px;background:#fafbfe}
+  .answerline.correct{border-color:var(--ok);background:var(--ok-soft)}
+  .answerline.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .answerline .chip{background:#fff}
+
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-left:32px}
+  .match .col{display:flex;flex-direction:column;gap:8px}
+  .mtile{padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;cursor:pointer;
+    font-size:16px;transition:.12s;background:#fff;line-height:1.9}
+  .mtile.cn{font-family:var(--cn)}
+  .mtile.sel{border-color:var(--accent);background:var(--accent-soft)}
+  .mtile.matched{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+  .mtile.wrongflash{border-color:var(--bad);background:var(--bad-soft)}
+
+  .tf{display:flex;gap:10px;margin-left:32px}
+  .tf .opt{flex:1;justify-content:center;font-weight:600}
+
+  .speakbtn{margin-left:32px;font-size:22px;width:54px;height:54px;border-radius:50%;
+    border:none;background:var(--accent);color:#fff;cursor:pointer;margin-bottom:10px}
+  .speakbtn:hover{filter:brightness(1.08)}
+  .speakhint{margin-left:10px;color:var(--muted);font-size:13px}
+
+  .row-actions{margin-left:32px;margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .fb{margin-left:32px;margin-top:8px;font-size:14px;padding:8px 12px;border-radius:9px;display:none}
+  .fb.ok{display:block;background:var(--ok-soft);color:var(--ok)}
+  .fb.bad{display:block;background:var(--bad-soft);color:var(--bad)}
+  .fb .ans{font-family:var(--cn);font-weight:700}
+
+  .done{text-align:center;padding:30px;margin:20px 0;border-radius:var(--radius);
+    background:linear-gradient(135deg,#1e8e4f,#36c46f);color:#fff;display:none}
+  .done.show{display:block}
+  .done .big{font-size:40px;font-weight:800}
+  footer.ft{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  @media(max-width:560px){.match{grid-template-columns:1fr}.qru,.opts,.inpwrap,.chips,.answerline,.match,.tf,.row-actions,.fb,.prompt{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="scorebar"><div class="inner">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="scoretxt" id="score">0 / 0</div>
+  <button class="btn primary" id="checkAll">Проверить всё · 全部检查</button>
+  <button class="btn ghost" id="reset">Сброс · 重置</button>
+</div></div>
+
+<div class="wrap">
+  <div class="nav"><a href="./index.html">← Все уроки</a></div>
+  <header class="hd">
+    <div class="titlecn" id="tcn"></div>
+    <div class="titleru" id="tru"></div>
+    <div class="meta" id="meta"></div>
+    <div class="hint-tip">💡 Пиньинь стоит над иероглифами. Подведи курсор или нажми на <span style="border-bottom:1.5px dotted var(--accent)">подчёркнутое слово</span>, чтобы увидеть перевод и пример.</div>
+  </header>
+  <main id="app"></main>
+  <div class="done" id="done"><div class="big" id="doneScore"></div><div id="doneMsg"></div></div>
+  <footer class="ft">Сгенерировано из видеоурока · 自动生成的作业 · автопроверка работает офлайн</footer>
+</div>
+<div class="pop" id="pop"></div>
+
+<script>
+const HW = {"lesson": {"title_cn": "在餐厅和请客吃饭", "title_ru": "Урок (18 июля): В ресторане и в гостях", "topic_cn": "请客、吃饭", "topic_ru": "Ресторан, угощение, тосты", "level": "HSK 1-2", "source": "Screen Recording 2026-07-18 at 10.06.51.mov"}, "vocab": [{"hanzi": "请客", "ru": "угощать (платить за всех)", "ex_cn": "今天我请客。", "ex_ru": "Сегодня я угощаю."}, {"hanzi": "请", "ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}, {"hanzi": "招待", "ru": "принимать гостей", "ex_cn": "谢谢招待。", "ex_ru": "Спасибо за приём."}, {"hanzi": "点菜", "ru": "заказывать блюда", "ex_cn": "服务员，点菜。", "ex_ru": "Официант, будем заказывать."}, {"hanzi": "菜单", "ru": "меню", "ex_cn": "请给我菜单。", "ex_ru": "Дайте мне, пожалуйста, меню."}, {"hanzi": "服务员", "ru": "официант", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт."}, {"hanzi": "买单", "ru": "попросить счёт", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт, пожалуйста."}, {"hanzi": "好吃", "ru": "вкусный", "ex_cn": "这个菜很好吃。", "ex_ru": "Это блюдо очень вкусное."}, {"hanzi": "味道", "ru": "вкус", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}, {"hanzi": "好极了", "ru": "превосходно, отлично", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}, {"hanzi": "辣", "ru": "острый", "ex_cn": "这个菜有点辣。", "ex_ru": "Это блюдо немного острое."}, {"hanzi": "有点", "ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}, {"hanzi": "少放", "ru": "положить поменьше", "ex_cn": "请少放一点辣。", "ex_ru": "Поменьше остроты, пожалуйста."}, {"hanzi": "够", "ru": "достаточно, хватит", "ex_cn": "菜够了。", "ex_ru": "Блюд достаточно."}, {"hanzi": "饱", "ru": "сытый", "ex_cn": "我吃饱了。", "ex_ru": "Я наелся."}, {"hanzi": "饿", "ru": "голодный", "ex_cn": "我饿了。", "ex_ru": "Я проголодался."}, {"hanzi": "筷子", "ru": "палочки для еды", "ex_cn": "我会用筷子。", "ex_ru": "Я умею есть палочками."}, {"hanzi": "米饭", "ru": "рис (варёный)", "ex_cn": "一碗米饭。", "ex_ru": "Миска риса."}, {"hanzi": "饺子", "ru": "пельмени, цзяоцзы", "ex_cn": "我喜欢吃饺子。", "ex_ru": "Я люблю есть цзяоцзы."}, {"hanzi": "茶", "ru": "чай", "ex_cn": "多喝茶。", "ex_ru": "Пей побольше чая."}, {"hanzi": "啤酒", "ru": "пиво", "ex_cn": "一杯啤酒。", "ex_ru": "Бокал пива."}, {"hanzi": "喝酒", "ru": "пить алкоголь", "ex_cn": "我今天不能喝酒。", "ex_ru": "Я сегодня не могу пить."}, {"hanzi": "敬", "ru": "поднимать тост, чествовать", "ex_cn": "我敬你一杯。", "ex_ru": "Я поднимаю за тебя бокал."}, {"hanzi": "干杯", "ru": "до дна, чокнуться", "ex_cn": "来，干杯！", "ex_ru": "Ну, до дна!"}, {"hanzi": "祝", "ru": "желать (в тосте/пожелании)", "ex_cn": "祝你健康！", "ex_ru": "Желаю тебе здоровья!"}, {"hanzi": "健康", "ru": "здоровье", "ex_cn": "祝你健康！", "ex_ru": "Желаю здоровья!"}, {"hanzi": "合作", "ru": "сотрудничество", "ex_cn": "祝合作愉快！", "ex_ru": "За успешное сотрудничество!"}, {"hanzi": "能", "ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}, {"hanzi": "开车", "ru": "водить машину", "ex_cn": "因为我要开车。", "ex_ru": "Потому что я за рулём."}, {"hanzi": "客气", "ru": "стесняться, церемониться", "ex_cn": "别客气。", "ex_ru": "Не стесняйся."}, {"hanzi": "不客气", "ru": "не за что, пожалуйста", "ex_cn": "不客气。", "ex_ru": "Не за что."}], "sections": [{"type": "mcq", "title_ru": "Выбери правильный перевод", "title_cn": "选择正确的翻译", "instructions_ru": "Отметь верный вариант и нажми «Проверить».", "items": [{"q_cn": "今天我请客。", "q_ru": "Что это значит?", "options": ["Сегодня я угощаю.", "Сегодня я готовлю.", "Сегодня я занят."], "answer": 0, "explain_ru": "请客 (qǐngkè) — угощать, платить за компанию."}, {"q_cn": "点菜", "q_ru": "Что это значит?", "options": ["считать деньги", "заказывать блюда", "мыть посуду"], "answer": 1, "explain_ru": "点菜 (diǎncài) — заказывать блюда."}, {"q_cn": "干杯！", "q_ru": "Когда это говорят?", "options": ["когда прощаются", "когда чокаются и пьют", "когда платят"], "answer": 1, "explain_ru": "干杯 (gānbēi) — «до дна!», тост."}, {"q_cn": "我吃饱了。", "q_ru": "Что это значит?", "options": ["Я голоден.", "Я наелся.", "Мне невкусно."], "answer": 1, "explain_ru": "饱 (bǎo) — сытый. «Я наелся»."}, {"q_cn": "味道好极了。", "q_ru": "Что сказали о блюде?", "options": ["Вкус превосходный.", "Слишком остро.", "Дороговато."], "answer": 0, "explain_ru": "味道 — вкус, 好极了 — превосходно."}]}, {"type": "fill", "title_ru": "Вставь пропущенное слово", "title_cn": "填空", "instructions_ru": "Впиши иероглиф. Где просят пиньинь — тоны можно не ставить.", "items": [{"prompt_cn": "请给我___。", "prompt_ru": "Дайте мне меню.", "accept": ["菜单"], "mode": "hanzi", "hint_ru": "меню"}, {"prompt_cn": "这个菜有点___。", "prompt_ru": "Это блюдо немного острое.", "accept": ["辣"], "mode": "hanzi", "hint_ru": "острый"}, {"prompt_cn": "我吃___了。", "prompt_ru": "Я наелся.", "accept": ["饱"], "mode": "hanzi", "hint_ru": "сытый"}, {"prompt_cn": "我___你吃饭。", "prompt_ru": "Я приглашаю тебя поесть.", "accept": ["请"], "mode": "hanzi", "hint_ru": "приглашать"}, {"prompt_cn": "我今天不能___。", "prompt_ru": "Я сегодня не могу пить (алкоголь).", "accept": ["喝酒"], "mode": "hanzi", "hint_ru": "пить алкоголь"}, {"prompt_cn": "___，买单。", "prompt_ru": "Официант, счёт! (впиши пиньинь)", "accept": ["fúwùyuán", "fu wu yuan"], "mode": "pinyin", "hint_ru": "服务员"}]}, {"type": "match", "title_ru": "Соедини слово с переводом", "title_cn": "连线", "items": [{"left": "请客", "right": "угощать"}, {"left": "点菜", "right": "заказывать блюда"}, {"left": "好吃", "right": "вкусный"}, {"left": "辣", "right": "острый"}, {"left": "买单", "right": "счёт"}, {"left": "筷子", "right": "палочки"}, {"left": "饱", "right": "сытый"}, {"left": "敬", "right": "поднимать тост"}]}, {"type": "order", "title_ru": "Собери предложение", "title_cn": "连词成句", "items": [{"chips": ["这个", "菜", "很", "好吃"], "answer": ["这个", "菜", "很", "好吃"], "translation_ru": "Это блюдо очень вкусное."}, {"chips": ["请", "少", "放", "一点", "辣"], "answer": ["请", "少", "放", "一点", "辣"], "translation_ru": "Поменьше остроты, пожалуйста.", "explain_ru": "少放 — «положить меньше»; 请… — вежливая просьба."}, {"chips": ["我", "今天", "不能", "喝酒"], "answer": ["我", "今天", "不能", "喝酒"], "translation_ru": "Я сегодня не могу пить (алкоголь).", "explain_ru": "不能 — «нельзя / не могу»."}, {"chips": ["祝", "你", "健康"], "answer": ["祝", "你", "健康"], "translation_ru": "Желаю тебе здоровья!", "explain_ru": "祝 + кому + пожелание — формула тоста/пожелания."}]}, {"type": "truefalse", "title_ru": "Верно или неверно", "title_cn": "判断对错", "items": [{"statement_cn": "「请客」的意思是「угощать, платить за всех」。", "statement_ru": "«请客» означает «угощать, платить за всех».", "answer": true, "explain_ru": "请客 — пригласить и оплатить."}, {"statement_cn": "「饱」的意思是「голодный」。", "statement_ru": "«饱» означает «голодный».", "answer": false, "explain_ru": "饱 — сытый. Голодный — 饿 (è)."}, {"statement_cn": "「干杯」用于喝酒的时候。", "statement_ru": "«干杯» говорят, когда пьют (тост).", "answer": true, "explain_ru": "干杯 — «до дна!»."}, {"statement_cn": "「买单」的意思是「попросить счёт」。", "statement_ru": "«买单» означает «попросить счёт».", "answer": true, "explain_ru": "买单 — счёт в ресторане."}, {"statement_cn": "「我会用筷子」的意思是「я умею есть палочками」。", "statement_ru": "«我会用筷子» означает «я умею есть палочками».", "answer": true, "explain_ru": "会 + 用筷子 — уметь пользоваться палочками."}]}, {"type": "listen", "title_ru": "Аудирование", "title_cn": "听力", "instructions_ru": "Нажми 🔊, прослушай и выбери, что ты услышал.", "items": [{"audio_text": "请给我菜单。", "q_ru": "Что вы услышали?", "options": ["请给我菜单。", "服务员，买单。", "我请你吃饭。"], "answer": 0, "explain_ru": "«Дайте мне меню.»"}, {"audio_text": "这个菜有点辣。", "q_ru": "Что вы услышали?", "options": ["这个菜有点辣。", "这个菜很好吃。", "这个菜有点贵。"], "answer": 0, "explain_ru": "«Это блюдо немного острое.»"}, {"audio_text": "我吃饱了。", "q_ru": "Что вы услышали?", "options": ["我吃饱了。", "我饿了。", "我敬你一杯。"], "answer": 0, "explain_ru": "«Я наелся.»"}]}]};
+const ANNO = {"米饭": [{"w": "米饭", "h": true, "p": ["mǐ", "fàn"], "g": {"ru": "рис (варёный)", "ex_cn": "一碗米饭。", "ex_ru": "Миска риса."}}], "有点贵。": [{"w": "有点", "h": true, "p": ["yǒu", "diǎn"], "g": {"ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}}, {"w": "贵", "h": true, "p": ["guì"]}, {"w": "。"}], "味道好极了。": [{"w": "味道", "h": true, "p": ["wèi", "dào"], "g": {"ru": "вкус", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}}, {"w": "好极了", "h": true, "p": ["hǎo", "jí", "le"], "g": {"ru": "превосходно, отлично", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}}, {"w": "。"}], "饺子": [{"w": "饺子", "h": true, "p": ["jiǎo", "zi"], "g": {"ru": "пельмени, цзяоцзы", "ex_cn": "我喜欢吃饺子。", "ex_ru": "Я люблю есть цзяоцзы."}}], "菜": [{"w": "菜", "h": true, "p": ["cài"]}], "祝": [{"w": "祝", "h": true, "p": ["zhù"], "g": {"ru": "желать (в тосте/пожелании)", "ex_cn": "祝你健康！", "ex_ru": "Желаю тебе здоровья!"}}], "___，买单。": [{"w": "___，"}, {"w": "买单", "h": true, "p": ["mǎi", "dān"], "g": {"ru": "попросить счёт", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт, пожалуйста."}}, {"w": "。"}], "请少放一点辣。": [{"w": "请", "h": true, "p": ["qǐng"], "g": {"ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}}, {"w": "少放", "h": true, "p": ["shǎo", "fàng"], "g": {"ru": "положить поменьше", "ex_cn": "请少放一点辣。", "ex_ru": "Поменьше остроты, пожалуйста."}}, {"w": "一", "h": true, "p": ["yì"]}, {"w": "点", "h": true, "p": ["diǎn"]}, {"w": "辣", "h": true, "p": ["là"], "g": {"ru": "острый", "ex_cn": "这个菜有点辣。", "ex_ru": "Это блюдо немного острое."}}, {"w": "。"}], "「干杯」用于喝酒的时候。": [{"w": "「"}, {"w": "干杯", "h": true, "p": ["gān", "bēi"], "g": {"ru": "до дна, чокнуться", "ex_cn": "来，干杯！", "ex_ru": "Ну, до дна!"}}, {"w": "」"}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "于", "h": true, "p": ["yú"]}, {"w": "喝酒", "h": true, "p": ["hē", "jiǔ"], "g": {"ru": "пить алкоголь", "ex_cn": "我今天不能喝酒。", "ex_ru": "Я сегодня не могу пить."}}, {"w": "的", "h": true, "p": ["de"]}, {"w": "时", "h": true, "p": ["shí"]}, {"w": "候", "h": true, "p": ["hòu"]}, {"w": "。"}], "能": [{"w": "能", "h": true, "p": ["néng"], "g": {"ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}}], "今天我请客。": [{"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "请客", "h": true, "p": ["qǐng", "kè"], "g": {"ru": "угощать (платить за всех)", "ex_cn": "今天我请客。", "ex_ru": "Сегодня я угощаю."}}, {"w": "。"}], "请客": [{"w": "请客", "h": true, "p": ["qǐng", "kè"], "g": {"ru": "угощать (платить за всех)", "ex_cn": "今天我请客。", "ex_ru": "Сегодня я угощаю."}}], "服务员，买单。": [{"w": "服务员", "h": true, "p": ["fú", "wù", "yuán"], "g": {"ru": "официант", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт."}}, {"w": "，"}, {"w": "买单", "h": true, "p": ["mǎi", "dān"], "g": {"ru": "попросить счёт", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт, пожалуйста."}}, {"w": "。"}], "啤酒": [{"w": "啤酒", "h": true, "p": ["pí", "jiǔ"], "g": {"ru": "пиво", "ex_cn": "一杯啤酒。", "ex_ru": "Бокал пива."}}], "「买单」的意思是「попросить счёт」。": [{"w": "「"}, {"w": "买单", "h": true, "p": ["mǎi", "dān"], "g": {"ru": "попросить счёт", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт, пожалуйста."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「попросить счёт」。"}], "我吃___了。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "___"}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "请给我菜单。": [{"w": "请", "h": true, "p": ["qǐng"], "g": {"ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "菜单", "h": true, "p": ["cài", "dān"], "g": {"ru": "меню", "ex_cn": "请给我菜单。", "ex_ru": "Дайте мне, пожалуйста, меню."}}, {"w": "。"}], "来，干杯！": [{"w": "来", "h": true, "p": ["lái"]}, {"w": "，"}, {"w": "干杯", "h": true, "p": ["gān", "bēi"], "g": {"ru": "до дна, чокнуться", "ex_cn": "来，干杯！", "ex_ru": "Ну, до дна!"}}, {"w": "！"}], "不能": [{"w": "不", "h": true, "p": ["bù"]}, {"w": "能", "h": true, "p": ["néng"], "g": {"ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}}], "好吃": [{"w": "好吃", "h": true, "p": ["hǎo", "chī"], "g": {"ru": "вкусный", "ex_cn": "这个菜很好吃。", "ex_ru": "Это блюдо очень вкусное."}}], "「饱」的意思是「голодный」。": [{"w": "「"}, {"w": "饱", "h": true, "p": ["bǎo"], "g": {"ru": "сытый", "ex_cn": "我吃饱了。", "ex_ru": "Я наелся."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「голодный」。"}], "味道": [{"w": "味道", "h": true, "p": ["wèi", "dào"], "g": {"ru": "вкус", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}}], "今天": [{"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}], "这个菜有点___。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "个", "h": true, "p": ["ge"]}, {"w": "菜", "h": true, "p": ["cài"]}, {"w": "有点", "h": true, "p": ["yǒu", "diǎn"], "g": {"ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}}, {"w": "___。"}], "饿": [{"w": "饿", "h": true, "p": ["è"], "g": {"ru": "голодный", "ex_cn": "我饿了。", "ex_ru": "Я проголодался."}}], "菜单": [{"w": "菜单", "h": true, "p": ["cài", "dān"], "g": {"ru": "меню", "ex_cn": "请给我菜单。", "ex_ru": "Дайте мне, пожалуйста, меню."}}], "筷子": [{"w": "筷子", "h": true, "p": ["kuài", "zi"], "g": {"ru": "палочки для еды", "ex_cn": "我会用筷子。", "ex_ru": "Я умею есть палочками."}}], "这个菜很好吃。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "个", "h": true, "p": ["ge"]}, {"w": "菜", "h": true, "p": ["cài"]}, {"w": "很", "h": true, "p": ["hěn"]}, {"w": "好吃", "h": true, "p": ["hǎo", "chī"], "g": {"ru": "вкусный", "ex_cn": "这个菜很好吃。", "ex_ru": "Это блюдо очень вкусное."}}, {"w": "。"}], "不客气": [{"w": "不客气", "h": true, "p": ["bú", "kè", "qì"], "g": {"ru": "не за что, пожалуйста", "ex_cn": "不客气。", "ex_ru": "Не за что."}}], "辣": [{"w": "辣", "h": true, "p": ["là"], "g": {"ru": "острый", "ex_cn": "这个菜有点辣。", "ex_ru": "Это блюдо немного острое."}}], "这个菜有点辣。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "个", "h": true, "p": ["ge"]}, {"w": "菜", "h": true, "p": ["cài"]}, {"w": "有点", "h": true, "p": ["yǒu", "diǎn"], "g": {"ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}}, {"w": "辣", "h": true, "p": ["là"], "g": {"ru": "острый", "ex_cn": "这个菜有点辣。", "ex_ru": "Это блюдо немного острое."}}, {"w": "。"}], "服务员": [{"w": "服务员", "h": true, "p": ["fú", "wù", "yuán"], "g": {"ru": "официант", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт."}}], "我": [{"w": "我", "h": true, "p": ["wǒ"]}], "干杯！": [{"w": "干杯", "h": true, "p": ["gān", "bēi"], "g": {"ru": "до дна, чокнуться", "ex_cn": "来，干杯！", "ex_ru": "Ну, до дна!"}}, {"w": "！"}], "你": [{"w": "你", "h": true, "p": ["nǐ"]}], "不客气。": [{"w": "不客气", "h": true, "p": ["bú", "kè", "qì"], "g": {"ru": "не за что, пожалуйста", "ex_cn": "不客气。", "ex_ru": "Не за что."}}, {"w": "。"}], "少放": [{"w": "少放", "h": true, "p": ["shǎo", "fàng"], "g": {"ru": "положить поменьше", "ex_cn": "请少放一点辣。", "ex_ru": "Поменьше остроты, пожалуйста."}}], "我今天不能喝酒。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "能", "h": true, "p": ["néng"], "g": {"ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}}, {"w": "喝酒", "h": true, "p": ["hē", "jiǔ"], "g": {"ru": "пить алкоголь", "ex_cn": "我今天不能喝酒。", "ex_ru": "Я сегодня не могу пить."}}, {"w": "。"}], "茶": [{"w": "茶", "h": true, "p": ["chá"], "g": {"ru": "чай", "ex_cn": "多喝茶。", "ex_ru": "Пей побольше чая."}}], "一碗米饭。": [{"w": "一", "h": true, "p": ["yī"]}, {"w": "碗", "h": true, "p": ["wǎn"]}, {"w": "米饭", "h": true, "p": ["mǐ", "fàn"], "g": {"ru": "рис (варёный)", "ex_cn": "一碗米饭。", "ex_ru": "Миска риса."}}, {"w": "。"}], "在餐厅和请客吃饭": [{"w": "在", "h": true, "p": ["zài"]}, {"w": "餐", "h": true, "p": ["cān"]}, {"w": "厅", "h": true, "p": ["tīng"]}, {"w": "和", "h": true, "p": ["hé"]}, {"w": "请客", "h": true, "p": ["qǐng", "kè"], "g": {"ru": "угощать (платить за всех)", "ex_cn": "今天我请客。", "ex_ru": "Сегодня я угощаю."}}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "饭", "h": true, "p": ["fàn"]}], "客气": [{"w": "客气", "h": true, "p": ["kè", "qì"], "g": {"ru": "стесняться, церемониться", "ex_cn": "别客气。", "ex_ru": "Не стесняйся."}}], "请给我___。": [{"w": "请", "h": true, "p": ["qǐng"], "g": {"ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}}, {"w": "给", "h": true, "p": ["gěi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "___。"}], "「请客」的意思是「угощать, платить за всех」。": [{"w": "「"}, {"w": "请客", "h": true, "p": ["qǐng", "kè"], "g": {"ru": "угощать (платить за всех)", "ex_cn": "今天我请客。", "ex_ru": "Сегодня я угощаю."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「угощать, платить за всех」。"}], "我吃饱了。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "饱", "h": true, "p": ["bǎo"], "g": {"ru": "сытый", "ex_cn": "我吃饱了。", "ex_ru": "Я наелся."}}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "祝你健康！": [{"w": "祝", "h": true, "p": ["zhù"], "g": {"ru": "желать (в тосте/пожелании)", "ex_cn": "祝你健康！", "ex_ru": "Желаю тебе здоровья!"}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "健康", "h": true, "p": ["jiàn", "kāng"], "g": {"ru": "здоровье", "ex_cn": "祝你健康！", "ex_ru": "Желаю здоровья!"}}, {"w": "！"}], "干杯": [{"w": "干杯", "h": true, "p": ["gān", "bēi"], "g": {"ru": "до дна, чокнуться", "ex_cn": "来，干杯！", "ex_ru": "Ну, до дна!"}}], "合作": [{"w": "合作", "h": true, "p": ["hé", "zuò"], "g": {"ru": "сотрудничество", "ex_cn": "祝合作愉快！", "ex_ru": "За успешное сотрудничество!"}}], "我饿了。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "饿", "h": true, "p": ["è"], "g": {"ru": "голодный", "ex_cn": "我饿了。", "ex_ru": "Я проголодался."}}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "喝酒": [{"w": "喝酒", "h": true, "p": ["hē", "jiǔ"], "g": {"ru": "пить алкоголь", "ex_cn": "我今天不能喝酒。", "ex_ru": "Я сегодня не могу пить."}}], "谢谢招待。": [{"w": "谢", "h": true, "p": ["xiè"]}, {"w": "谢", "h": true, "p": ["xiè"]}, {"w": "招待", "h": true, "p": ["zhāo", "dài"], "g": {"ru": "принимать гостей", "ex_cn": "谢谢招待。", "ex_ru": "Спасибо за приём."}}, {"w": "。"}], "开车": [{"w": "开车", "h": true, "p": ["kāi", "chē"], "g": {"ru": "водить машину", "ex_cn": "因为我要开车。", "ex_ru": "Потому что я за рулём."}}], "别客气。": [{"w": "别", "h": true, "p": ["bié"]}, {"w": "客气", "h": true, "p": ["kè", "qì"], "g": {"ru": "стесняться, церемониться", "ex_cn": "别客气。", "ex_ru": "Не стесняйся."}}, {"w": "。"}], "有点": [{"w": "有点", "h": true, "p": ["yǒu", "diǎn"], "g": {"ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}}], "因为我要开车。": [{"w": "因", "h": true, "p": ["yīn"]}, {"w": "为", "h": true, "p": ["wèi"]}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "要", "h": true, "p": ["yào"]}, {"w": "开车", "h": true, "p": ["kāi", "chē"], "g": {"ru": "водить машину", "ex_cn": "因为我要开车。", "ex_ru": "Потому что я за рулём."}}, {"w": "。"}], "我不能喝酒。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "能", "h": true, "p": ["néng"], "g": {"ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}}, {"w": "喝酒", "h": true, "p": ["hē", "jiǔ"], "g": {"ru": "пить алкоголь", "ex_cn": "我今天不能喝酒。", "ex_ru": "Я сегодня не могу пить."}}, {"w": "。"}], "饱": [{"w": "饱", "h": true, "p": ["bǎo"], "g": {"ru": "сытый", "ex_cn": "我吃饱了。", "ex_ru": "Я наелся."}}], "多喝茶。": [{"w": "多", "h": true, "p": ["duō"]}, {"w": "喝", "h": true, "p": ["hē"]}, {"w": "茶", "h": true, "p": ["chá"], "g": {"ru": "чай", "ex_cn": "多喝茶。", "ex_ru": "Пей побольше чая."}}, {"w": "。"}], "菜够了。": [{"w": "菜", "h": true, "p": ["cài"]}, {"w": "够", "h": true, "p": ["gòu"], "g": {"ru": "достаточно, хватит", "ex_cn": "菜够了。", "ex_ru": "Блюд достаточно."}}, {"w": "了", "h": true, "p": ["le"]}, {"w": "。"}], "健康": [{"w": "健康", "h": true, "p": ["jiàn", "kāng"], "g": {"ru": "здоровье", "ex_cn": "祝你健康！", "ex_ru": "Желаю здоровья!"}}], "这个菜有点贵。": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "个", "h": true, "p": ["ge"]}, {"w": "菜", "h": true, "p": ["cài"]}, {"w": "有点", "h": true, "p": ["yǒu", "diǎn"], "g": {"ru": "немного (перед прилагательным, с оттенком «слишком»)", "ex_cn": "有点贵。", "ex_ru": "Немного дороговато."}}, {"w": "贵", "h": true, "p": ["guì"]}, {"w": "。"}], "我今天不能___。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "今", "h": true, "p": ["jīn"]}, {"w": "天", "h": true, "p": ["tiān"]}, {"w": "不", "h": true, "p": ["bù"]}, {"w": "能", "h": true, "p": ["néng"], "g": {"ru": "мочь, можно", "ex_cn": "我不能喝酒。", "ex_ru": "Мне нельзя пить."}}, {"w": "___。"}], "够": [{"w": "够", "h": true, "p": ["gòu"], "g": {"ru": "достаточно, хватит", "ex_cn": "菜够了。", "ex_ru": "Блюд достаточно."}}], "少": [{"w": "少", "h": true, "p": ["shǎo"]}], "一点": [{"w": "一", "h": true, "p": ["yì"]}, {"w": "点", "h": true, "p": ["diǎn"]}], "请": [{"w": "请", "h": true, "p": ["qǐng"], "g": {"ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}}], "我喜欢吃饺子。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "喜", "h": true, "p": ["xǐ"]}, {"w": "欢", "h": true, "p": ["huān"]}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "饺子", "h": true, "p": ["jiǎo", "zi"], "g": {"ru": "пельмени, цзяоцзы", "ex_cn": "我喜欢吃饺子。", "ex_ru": "Я люблю есть цзяоцзы."}}, {"w": "。"}], "这个": [{"w": "这", "h": true, "p": ["zhè"]}, {"w": "个", "h": true, "p": ["ge"]}], "招待": [{"w": "招待", "h": true, "p": ["zhāo", "dài"], "g": {"ru": "принимать гостей", "ex_cn": "谢谢招待。", "ex_ru": "Спасибо за приём."}}], "我请你吃饭。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "请", "h": true, "p": ["qǐng"], "g": {"ru": "приглашать; пожалуйста", "ex_cn": "我请你吃饭。", "ex_ru": "Я приглашаю тебя поесть."}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "饭", "h": true, "p": ["fàn"]}, {"w": "。"}], "敬": [{"w": "敬", "h": true, "p": ["jìng"], "g": {"ru": "поднимать тост, чествовать", "ex_cn": "我敬你一杯。", "ex_ru": "Я поднимаю за тебя бокал."}}], "一杯啤酒。": [{"w": "一", "h": true, "p": ["yī"]}, {"w": "杯", "h": true, "p": ["bēi"]}, {"w": "啤酒", "h": true, "p": ["pí", "jiǔ"], "g": {"ru": "пиво", "ex_cn": "一杯啤酒。", "ex_ru": "Бокал пива."}}, {"w": "。"}], "放": [{"w": "放", "h": true, "p": ["fàng"]}], "我敬你一杯。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "敬", "h": true, "p": ["jìng"], "g": {"ru": "поднимать тост, чествовать", "ex_cn": "我敬你一杯。", "ex_ru": "Я поднимаю за тебя бокал."}}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "一", "h": true, "p": ["yī"]}, {"w": "杯", "h": true, "p": ["bēi"]}, {"w": "。"}], "我会用筷子。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "会", "h": true, "p": ["huì"]}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "筷子", "h": true, "p": ["kuài", "zi"], "g": {"ru": "палочки для еды", "ex_cn": "我会用筷子。", "ex_ru": "Я умею есть палочками."}}, {"w": "。"}], "我___你吃饭。": [{"w": "我", "h": true, "p": ["wǒ"]}, {"w": "___"}, {"w": "你", "h": true, "p": ["nǐ"]}, {"w": "吃", "h": true, "p": ["chī"]}, {"w": "饭", "h": true, "p": ["fàn"]}, {"w": "。"}], "「我会用筷子」的意思是「я умею есть палочками」。": [{"w": "「"}, {"w": "我", "h": true, "p": ["wǒ"]}, {"w": "会", "h": true, "p": ["huì"]}, {"w": "用", "h": true, "p": ["yòng"]}, {"w": "筷子", "h": true, "p": ["kuài", "zi"], "g": {"ru": "палочки для еды", "ex_cn": "我会用筷子。", "ex_ru": "Я умею есть палочками."}}, {"w": "」"}, {"w": "的", "h": true, "p": ["de"]}, {"w": "意", "h": true, "p": ["yì"]}, {"w": "思", "h": true, "p": ["si"]}, {"w": "是", "h": true, "p": ["shì"]}, {"w": "「я умею есть палочками」。"}], "服务员，点菜。": [{"w": "服务员", "h": true, "p": ["fú", "wù", "yuán"], "g": {"ru": "официант", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт."}}, {"w": "，"}, {"w": "点菜", "h": true, "p": ["diǎn", "cài"], "g": {"ru": "заказывать блюда", "ex_cn": "服务员，点菜。", "ex_ru": "Официант, будем заказывать."}}, {"w": "。"}], "点菜": [{"w": "点菜", "h": true, "p": ["diǎn", "cài"], "g": {"ru": "заказывать блюда", "ex_cn": "服务员，点菜。", "ex_ru": "Официант, будем заказывать."}}], "好极了": [{"w": "好极了", "h": true, "p": ["hǎo", "jí", "le"], "g": {"ru": "превосходно, отлично", "ex_cn": "味道好极了。", "ex_ru": "Вкус превосходный."}}], "买单": [{"w": "买单", "h": true, "p": ["mǎi", "dān"], "g": {"ru": "попросить счёт", "ex_cn": "服务员，买单。", "ex_ru": "Официант, счёт, пожалуйста."}}], "祝合作愉快！": [{"w": "祝", "h": true, "p": ["zhù"], "g": {"ru": "желать (в тосте/пожелании)", "ex_cn": "祝你健康！", "ex_ru": "Желаю тебе здоровья!"}}, {"w": "合作", "h": true, "p": ["hé", "zuò"], "g": {"ru": "сотрудничество", "ex_cn": "祝合作愉快！", "ex_ru": "За успешное сотрудничество!"}}, {"w": "愉", "h": true, "p": ["yú"]}, {"w": "快", "h": true, "p": ["kuài"]}, {"w": "！"}], "很": [{"w": "很", "h": true, "p": ["hěn"]}]};   // строка → массив сегментов {w, h, p?, g?}
+
+const esc=s=>(s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function el(html){const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild;}
+
+/* ---------- рендер китайского с пиньинем + подсказками ---------- */
+function cn(s){
+  const segs = ANNO[s];
+  if(!segs) return esc(s);              // не-китайский текст (русский, латиница) — как есть
+  let html='';
+  for(const seg of segs){
+    if(seg.h){                          // китайское слово/иероглиф
+      const chars=[...seg.w];
+      let inner='';
+      for(let i=0;i<chars.length;i++){
+        const py=seg.p?seg.p[i]:'';
+        inner += py ? `<ruby>${esc(chars[i])}<rt>${esc(py)}</rt></ruby>` : esc(chars[i]);
+      }
+      if(seg.g){
+        const py=seg.p?seg.p.join(' '):'';
+        html += `<span class="word" data-w="${esc(seg.w)}" data-py="${esc(py)}" data-ru="${esc(seg.g.ru||'')}" data-excn="${esc(seg.g.ex_cn||'')}" data-exru="${esc(seg.g.ex_ru||'')}">${inner}</span>`;
+      } else html += inner;
+    } else if(/^[_＿]{2,}$/.test(seg.w)){
+      html += '<span class="blank">?</span>';
+    } else html += esc(seg.w);
+  }
+  return html;
+}
+
+/* ---------- popover ---------- */
+const pop=document.getElementById('pop');
+let popPinned=false;
+function showPop(w){
+  const ex = w.dataset.excn ? `<div class="pex"><span class="excn">${cn(w.dataset.excn)}</span>${esc(w.dataset.exru||'')}</div>` : '';
+  pop.innerHTML = `<div class="pw">${cn(w.dataset.w)}</div>`+
+    (w.dataset.py?`<div class="ppy">${esc(w.dataset.py)}</div>`:'')+
+    `<div class="pru">${esc(w.dataset.ru)}</div>`+ex;
+  pop.classList.add('show');
+  const r=w.getBoundingClientRect();
+  const pw=pop.offsetWidth, ph=pop.offsetHeight;
+  let left=r.left+window.scrollX;
+  left=Math.min(left, window.scrollX+document.documentElement.clientWidth-pw-10);
+  left=Math.max(left, window.scrollX+8);
+  let top=r.bottom+window.scrollY+6;
+  if(r.bottom+ph+10>document.documentElement.clientHeight) top=r.top+window.scrollY-ph-6;
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hidePop(){ pop.classList.remove('show'); popPinned=false; }
+document.body.addEventListener('mouseover',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) showPop(w); });
+document.body.addEventListener('mouseout',e=>{ const w=e.target.closest('.word'); if(w&&!popPinned) hidePop(); });
+document.body.addEventListener('click',e=>{
+  const w=e.target.closest('.word');
+  if(w){ e.stopPropagation(); if(popPinned&&pop._for===w){hidePop();} else {showPop(w);popPinned=true;pop._for=w;} return; }
+  if(!e.target.closest('.pop')) hidePop();
+});
+
+/* ---------- pinyin / text normalization (проверка ответов) ---------- */
+const TONE_MAP={'ā':'a','á':'a','ǎ':'a','à':'a','ē':'e','é':'e','ě':'e','è':'e','ī':'i','í':'i','ǐ':'i','ì':'i','ō':'o','ó':'o','ǒ':'o','ò':'o','ū':'u','ú':'u','ǔ':'u','ù':'u','ǖ':'v','ǘ':'v','ǚ':'v','ǜ':'v','ü':'v'};
+function stripTones(s){let o='';for(const ch of s.toLowerCase())o+=(TONE_MAP[ch]!==undefined?TONE_MAP[ch]:ch);return o.replace(/[1-5]/g,'').replace(/\s+/g,'').replace(/[，。！？、,.!?'’\-]/g,'');}
+function normHanzi(s){return s.trim().replace(/\s+/g,'').replace(/[，。！？、,.!?\s]/g,'');}
+function eqv(a,b){return a.trim().toLowerCase()===b.trim().toLowerCase();}
+function matchAnswer(user,accept,mode){
+  user=(user||'').trim(); if(!user)return false;
+  for(const a of accept){
+    if(mode==='pinyin'){if(stripTones(user)===stripTones(a))return true;}
+    else if(mode==='hanzi'){if(normHanzi(user)===normHanzi(a))return true;}
+    else {if(eqv(user,a))return true;}
+  }
+  return false;
+}
+
+/* ---------- TTS ---------- */
+let zhVoice=null;
+function pickVoice(){const vs=speechSynthesis.getVoices();zhVoice=vs.find(v=>/zh|chinese/i.test(v.lang+v.name))||null;}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function speak(text){
+  if(!('speechSynthesis' in window)){alert('Браузер не поддерживает озвучку.');return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';u.rate=0.85;if(zhVoice)u.voice=zhVoice;
+  speechSynthesis.speak(u);
+}
+
+/* ---------- scoring ---------- */
+const graded={}; let totalItems=0;
+function setGraded(key,ok){graded[key]=ok;refreshScore();}
+function refreshScore(){
+  const keys=Object.keys(graded);
+  const correct=keys.filter(k=>graded[k]).length;
+  document.getElementById('score').textContent=correct+' / '+totalItems;
+  document.getElementById('bar').style.width=(totalItems?correct/totalItems*100:0)+'%';
+  const done=document.getElementById('done');
+  if(keys.length===totalItems&&totalItems>0){
+    done.classList.add('show');
+    const pct=Math.round(correct/totalItems*100);
+    document.getElementById('doneScore').textContent=correct+' / '+totalItems+'  ('+pct+'%)';
+    document.getElementById('doneMsg').textContent=pct>=90?'Отлично! 太棒了！':pct>=70?'Хорошо! 很好！':pct>=50?'Неплохо, повтори ошибки. 加油！':'Стоит повторить урок. 别灰心，再来一次！';
+  } else done.classList.remove('show');
+}
+
+function feedback(el,ok,answerHTML,explain){
+  el.className='fb '+(ok?'ok':'bad');
+  let h=ok?'✓ Верно · 正确':'✗ Неверно · 错误';
+  if(!ok&&answerHTML)h+=' — правильный ответ: <span class="ans">'+answerHTML+'</span>';
+  if(explain)h+='<br><span style="color:var(--muted)">'+esc(explain)+'</span>';
+  el.innerHTML=h;
+}
+
+/* ---------- renderers ---------- */
+function renderMCQ(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.q_cn||'')}</span></div>`+
+      (it.q_ru?`<div class="qru">${esc(it.q_ru)}</div>`:'');
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&sel>=0) b.onclick(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderFill(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`;
+    item.appendChild(el(`<div class="prompt">${cn(it.prompt_cn||'')}</div>`));
+    if(it.prompt_ru) item.appendChild(el(`<div class="qru">${esc(it.prompt_ru)}</div>`));
+    const inp=el(`<input class="fill" placeholder="${it.mode==='pinyin'?'pīnyīn / pinyin':it.mode==='ru'?'перевод':'汉字'}">`);
+    const fb=el('<div class="fb"></div>');
+    const wrap=el('<div class="inpwrap"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    const doCheck=()=>{ if(graded[key]!==undefined)return;
+      const ok=matchAnswer(inp.value,it.accept,it.mode||'hanzi');
+      inp.classList.add(ok?'correct':'wrong'); inp.disabled=true; b.disabled=true;
+      feedback(fb,ok,cn(it.accept[0]),it.explain_ru||it.hint_ru); setGraded(key,ok); };
+    b.onclick=doCheck; inp.addEventListener('keydown',e=>{if(e.key==='Enter')doCheck();});
+    wrap.appendChild(inp); wrap.appendChild(b);
+    item.appendChild(wrap); item.appendChild(fb);
+    item._check=()=>{ if(graded[key]===undefined&&inp.value.trim()) doCheck(); };
+    sec._el.appendChild(item);
+  });
+}
+
+function renderTrueFalse(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qcn">${cn(it.statement_cn||'')}</span></div>`+
+      (it.statement_ru?`<div class="qru">${esc(it.statement_ru)}</div>`:'');
+    const tf=el('<div class="tf"></div>'); const fb=el('<div class="fb"></div>');
+    [['Верно · 对',true],['Неверно · 错',false]].forEach(([label,val])=>{
+      const op=el(`<div class="opt">${label}</div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return;
+        [...tf.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel');
+        const ok=val===it.answer; [...tf.children].forEach(c=>c.style.pointerEvents='none');
+        op.classList.add(ok?'correct':'wrong');
+        feedback(fb,ok,(it.answer?'Верно · 对':'Неверно · 错'),it.explain_ru); setGraded(key,ok); };
+      tf.appendChild(op);
+    });
+    item.appendChild(tf); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderOrder(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span></div>`+
+      (it.translation_ru?`<div class="qru">Собери предложение: «${esc(it.translation_ru)}»</div>`:'<div class="qru">Собери предложение из слов</div>');
+    const answer=el('<div class="answerline"></div>');
+    const pool=el('<div class="chips"></div>');
+    const current=[];
+    const shuffled=[...it.chips].map((c,idx)=>({c,idx})).sort(()=>Math.random()-0.5);
+    shuffled.forEach(({c})=>{
+      const chip=el(`<div class="chip">${cn(c)}</div>`);
+      chip.onclick=()=>{ if(graded[key]!==undefined)return;
+        chip.classList.add('used'); current.push({c,chip});
+        const a=el(`<div class="chip">${cn(c)}</div>`);
+        a.onclick=()=>{ if(graded[key]!==undefined)return; chip.classList.remove('used');
+          const p=current.findIndex(x=>x.chip===chip); if(p>=0)current.splice(p,1); a.remove(); };
+        answer.appendChild(a); };
+      pool.appendChild(chip);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(graded[key]!==undefined)return;
+      const got=current.map(x=>x.c); const ok=JSON.stringify(got)===JSON.stringify(it.answer);
+      answer.classList.add(ok?'correct':'wrong'); b.disabled=true;
+      feedback(fb,ok,it.answer.map(cn).join(' '),it.explain_ru); setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(answer); item.appendChild(pool); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+function renderMatch(sec,sIdx){
+  const key='s'+sIdx; totalItems++;
+  const item=el('<div class="item"></div>');
+  const grid=el('<div class="match"></div>');
+  const colL=el('<div class="col"></div>'), colR=el('<div class="col"></div>');
+  const left=sec.items.map((it,idx)=>({t:it.left,idx}));
+  const right=sec.items.map((it,idx)=>({t:it.right,idx})).sort(()=>Math.random()-0.5);
+  let selL=null; let solved=0;
+  left.forEach(o=>{ const tile=el(`<div class="mtile cn">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(tile.classList.contains('matched'))return;
+      [...colL.children].forEach(c=>c.classList.remove('sel')); tile.classList.add('sel'); selL=tile; };
+    colL.appendChild(tile); });
+  right.forEach(o=>{ const tile=el(`<div class="mtile">${cn(o.t)}</div>`); tile._idx=o.idx;
+    tile.onclick=()=>{ if(!selL||tile.classList.contains('matched'))return;
+      if(selL._idx===o.idx){ selL.classList.remove('sel'); selL.classList.add('matched');
+        tile.classList.add('matched'); selL=null; solved++; if(solved===left.length) setGraded(key,true); }
+      else { const bad=selL; bad.classList.add('wrongflash'); tile.classList.add('wrongflash');
+        setTimeout(()=>{bad.classList.remove('wrongflash','sel');tile.classList.remove('wrongflash');},500);
+        if(graded[key]===undefined) graded[key]=false; selL=null; } };
+    colR.appendChild(tile); });
+  grid.appendChild(colL); grid.appendChild(colR);
+  item.appendChild(el('<div class="qru">Нажми слово слева, затем его пару справа · 连线</div>'));
+  item.appendChild(grid);
+  sec._el.appendChild(item);
+}
+
+function renderListen(sec,sIdx){
+  sec.items.forEach((it,i)=>{
+    const key='s'+sIdx+'_'+i; totalItems++;
+    const item=el('<div class="item"></div>');
+    item.innerHTML=`<div class="qhead"><span class="qnum">${i+1}.</span><span class="qru" style="margin:0">${esc(it.q_ru||'Что вы услышали?')}</span></div>`;
+    const sb=el('<button class="speakbtn" title="Прослушать">🔊</button>');
+    sb.onclick=()=>speak(it.audio_text);
+    item.appendChild(sb);
+    item.appendChild(el('<span class="speakhint">нажми, чтобы прослушать · 点击播放</span>'));
+    const opts=el('<div class="opts"></div>'); let sel=-1;
+    it.options.forEach((o,oi)=>{
+      const op=el(`<div class="opt"><span class="cn">${cn(o)}</span></div>`);
+      op.onclick=()=>{ if(graded[key]!==undefined)return; sel=oi;
+        [...opts.children].forEach(c=>c.classList.remove('sel')); op.classList.add('sel'); };
+      opts.appendChild(op);
+    });
+    const fb=el('<div class="fb"></div>');
+    const act=el('<div class="row-actions"></div>');
+    const b=el('<button class="btn ghost">Проверить</button>');
+    b.onclick=()=>{ if(sel<0){fb.className='fb bad';fb.textContent='Выбери вариант · 请选择';return;}
+      const ok=sel===it.answer;
+      [...opts.children].forEach((c,ci)=>{c.style.pointerEvents='none';
+        if(ci===it.answer)c.classList.add('correct'); if(ci===sel&&!ok)c.classList.add('wrong');});
+      feedback(fb,ok,cn(it.options[it.answer]),it.explain_ru); b.disabled=true; setGraded(key,ok); };
+    act.appendChild(b);
+    item.appendChild(opts); item.appendChild(act); item.appendChild(fb);
+    sec._el.appendChild(item);
+  });
+}
+
+const RENDERERS={mcq:renderMCQ,fill:renderFill,truefalse:renderTrueFalse,order:renderOrder,match:renderMatch,listen:renderListen};
+
+/* ---------- словарь урока (все новые слова) ---------- */
+function renderVocabCard(app){
+  const vocab = HW.vocab || [];
+  if(!vocab.length) return;
+  const sec=el('<section class="vocab"></section>');
+  sec.appendChild(el('<h2>Словарь урока <span class="subcn">生词</span></h2>'));
+  sec.appendChild(el(`<div class="cnt">Все новые слова урока (${vocab.length}). Нажми 🔊, чтобы прослушать. Слова из этого списка подсвечены в заданиях.</div>`));
+  const list=el('<div class="vlist"></div>');
+  vocab.forEach(v=>{
+    const row=el('<div class="vrow"></div>');
+    const b=el('<button class="spk" title="Прослушать">🔊</button>');
+    b.onclick=()=>speak(v.hanzi);
+    const body=el('<div class="body"></div>');
+    body.appendChild(el(`<div class="hz">${cn(v.hanzi)}</div>`));
+    body.appendChild(el(`<div class="tr">${esc(v.ru||'')}</div>`));
+    const ex = v.ex_cn||v.example_cn;
+    if(ex) body.appendChild(el(`<div class="ex"><span class="excn">${cn(ex)}</span>${(v.ex_ru||v.example_ru)?' — '+esc(v.ex_ru||v.example_ru):''}</div>`));
+    row.appendChild(b); row.appendChild(body); list.appendChild(row);
+  });
+  sec.appendChild(list);
+  app.appendChild(sec);
+}
+
+function build(){
+  document.title=(HW.lesson.title_ru||HW.lesson.title_cn||'Домашнее задание');
+  document.getElementById('tcn').innerHTML=cn(HW.lesson.title_cn||'');
+  document.getElementById('tru').textContent=HW.lesson.title_ru||'';
+  const meta=document.getElementById('meta');
+  if(HW.lesson.topic_cn||HW.lesson.topic_ru) meta.appendChild(el(`<span class="tag">${esc((HW.lesson.topic_cn||'')+(HW.lesson.topic_ru?' · '+HW.lesson.topic_ru:''))}</span>`));
+  if(HW.lesson.level) meta.appendChild(el(`<span class="tag alt">${esc(HW.lesson.level)}</span>`));
+  const app=document.getElementById('app');
+  renderVocabCard(app);
+  (HW.sections||[]).forEach((sec,sIdx)=>{
+    const s=el('<section class="ex"></section>');
+    s.appendChild(el(`<h2>${esc(sec.title_ru||'Задание')}${sec.title_cn?` <span class="subcn">${esc(sec.title_cn)}</span>`:''}</h2>`));
+    if(sec.instructions_ru||sec.instructions_cn)
+      s.appendChild(el(`<div class="instr">${esc(sec.instructions_ru||'')}${sec.instructions_cn?' · '+esc(sec.instructions_cn):''}</div>`));
+    sec._el=s;
+    const r=RENDERERS[sec.type];
+    if(r) r(sec,sIdx); else s.appendChild(el('<div class="instr">Неизвестный тип задания: '+esc(sec.type)+'</div>'));
+    app.appendChild(s);
+  });
+  refreshScore();
+}
+
+document.getElementById('checkAll').onclick=()=>{ document.querySelectorAll('.item').forEach(it=>{ if(it._check) it._check(); }); };
+document.getElementById('reset').onclick=()=>{ location.reload(); };
+
+build();
+</script>
+</body>
+</html>
