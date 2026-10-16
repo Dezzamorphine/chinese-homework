@@ -102,6 +102,12 @@
   .pr:disabled{color:var(--mute)}
   .pr:disabled .g{color:var(--ink4)}
   /* Профиль */
+  .sync-f{display:flex;gap:8px}
+  .sync-f input{flex:1;min-width:0;min-height:44px;box-sizing:border-box;padding:0 12px;border:1.5px solid var(--line);border-radius:10px;
+    background:var(--paper);color:var(--ink);font:inherit;font-size:16px}
+  .sync-f input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .sync-f button{min-height:44px;padding:0 16px;border-radius:10px;background:var(--ink);color:var(--paper);font-weight:600;text-align:center}
+  .sync-f button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
   .me-h{display:flex;align-items:center;gap:14px}
   .me-h .num{font-family:var(--cn);font-weight:900;font-size:60px;line-height:1}
   .xpbar{height:4px;background:var(--paper2);margin-top:8px}
@@ -146,7 +152,7 @@
     <section class="tab" id="tab-today" aria-labelledby="h-today"><h1 class="vh" id="h-today">Сегодня</h1><div class="tab" id="today"></div></section>
     <section class="tab" id="tab-path" aria-labelledby="h-path" hidden><h1 class="vh" id="h-path">Путь</h1><div class="tab" id="path"></div></section>
     <section class="tab" id="tab-practice" aria-labelledby="h-practice" hidden><h1 class="vh" id="h-practice">Практика</h1><div id="practice"></div></section>
-    <section class="tab" id="tab-me" aria-labelledby="h-me" hidden><h1 class="vh" id="h-me">Профиль</h1><div class="tab" id="me"></div></section>
+    <section class="tab" id="tab-me" aria-labelledby="h-me" hidden><h1 class="vh" id="h-me">Профиль</h1><div class="tab" id="me"></div><div class="tab" id="me-sync"></div></section>
   </main>
   <section class="session" id="session" role="dialog" aria-modal="true" aria-label="Занятие" hidden><div id="session-root"></div></section>
   <nav class="nav" aria-label="Разделы">
@@ -490,11 +496,61 @@ const DATA = {"mode": "app", "lessons": [{"id": "audio-01", "number": 1, "title_
     $('#me').innerHTML = h;
   }
 
+  /* ---- ключ синхронизации (в приложении с экрана «Домой» своё хранилище — ключ вводится здесь) ---- */
+  function parseKey(v) {
+    v = String(v || '').trim();
+    const m = /(?:^|[#&?])key=([^&\s]+)/.exec(v);
+    if (m) { try { v = decodeURIComponent(m[1]); } catch (e) { v = m[1]; } }
+    return v.trim();
+  }
+  const KEY_RE = /^[A-Za-z0-9_\-.~+\/=]{16,200}$/;
+  let syncErr = null;                // результат последней синхронизации: null | 'auth' | 'network' | …
+  function syncText(r) {
+    if (!r) return 'ключ сохранён, нет сети';
+    if (r.ok) return 'включена';
+    if (r.error === 'auth') return 'ключ не подошёл';
+    if (r.error === 'no_key') return 'выключена';
+    return 'ключ сохранён, нет сети';
+  }
+  function syncStatus(msg, bad) {
+    const el = $('#sync-st');
+    if (!el) return;
+    if (!msg) { msg = !hasKey() ? 'выключена' : syncErr === 'auth' ? 'ключ не подошёл' : syncErr ? 'нет сети' : 'включена'; bad = syncErr === 'auth' && hasKey(); }
+    el.textContent = msg;
+    el.style.color = bad ? 'var(--red)' : '';
+  }
+  function renderSync() {
+    const box = $('#me-sync');
+    if (!box || box.dataset.ready) return;
+    box.dataset.ready = '1';
+    box.innerHTML = '<section class="sec"><div class="sec-h"><h2>Синхронизация</h2><span class="sub" id="sync-st" role="status" aria-live="polite"></span></div>' +
+      '<form class="sync-f" id="sync-form" autocomplete="off"><label class="vh" for="sync-key">Ключ синхронизации</label>' +
+      '<input id="sync-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ключ или ссылка">' +
+      '<button type="submit">Сохранить</button></form></section>';
+    syncStatus();
+    $('#sync-form').addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const inp = $('#sync-key'), k = parseKey(inp.value);
+      if (!KEY_RE.test(k)) { syncStatus(k ? 'это не ключ' : 'нужен ключ', true); return; }   // прежний ключ не трогаем
+      lsSet('zh_talk_key', k);
+      inp.value = '';
+      if (!S) { syncStatus('ключ сохранён'); return; }
+      syncStatus('проверяю…');
+      let r = null;
+      // первая синхронизация могла уже идти со старым ключом — дожидаемся её и проверяем новым ключом отдельно
+      try { await S.sync(); } catch (e) { /* итог — по второй */ }
+      try { r = await S.sync(); } catch (e) { r = null; }
+      syncErr = r && r.ok ? null : (r && r.error) || 'network';
+      syncStatus(syncText(r), !!(r && r.error === 'auth'));
+      if (r && r.ok && r.pulled) refresh();
+    });
+  }
+
   /* ---- вкладки ---- */
   const TABS = ['today', 'path', 'practice', 'me'];
   function render() {
     if (!state) return;
-    renderToday(); renderPath(); renderPractice(); renderMe();
+    renderToday(); renderPath(); renderPractice(); renderMe(); renderSync();
     showTab(tab, false);
   }
   function showTab(name, push) {
@@ -543,9 +599,26 @@ const DATA = {"mode": "app", "lessons": [{"id": "audio-01", "number": 1, "title_
     }
     await refresh();
     if (S && hasKey()) {
-      try { const r = await S.sync(); if (r && r.pulled) await refresh(); } catch (e) { /* офлайн — работаем локально */ }
+      syncStatus('проверяю…');
+      try {
+        const r = await S.sync();
+        syncErr = r && r.ok ? null : (r && r.error) || 'network';
+        if (r && r.pulled) await refresh();
+      } catch (e) { syncErr = 'network'; /* офлайн — работаем локально */ }
+      syncStatus();
     }
   }
+  // статус синхронизации живой: сеть вернулась или приложение снова на экране — проверяем заново
+  async function recheck() {
+    if (!S || !hasKey() || document.visibilityState === 'hidden') return;
+    let r = null;
+    try { r = await S.sync(); } catch (e) { r = null; }
+    syncErr = r && r.ok ? null : (r && r.error) || 'network';
+    syncStatus();
+    if (r && r.pulled) refresh();
+  }
+  window.addEventListener('online', recheck);
+  document.addEventListener('visibilitychange', recheck);
   App.ready = boot();
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });

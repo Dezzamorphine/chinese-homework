@@ -214,7 +214,7 @@ function viewQuiz(box,words,pool){
   qs=shuffle(qs); const total=qs.length; let right=0, i=0, firstTry=new Set(), missed=new Set();
   const c=el(`<div class="card q"><div class="prog"><i></i></div><div class="pl"><span class="pl1"></span><span class="pl2"></span></div><div class="body"></div></div>`);
   const body=c.querySelector('.body'), bar=c.querySelector('.prog i');
-  function distract(w,key){ const same=shuffle(pool.filter(x=>x.id!==w.id && x[key]!==w[key])); return shuffle([w,...same.slice(0,3)]); }
+  function distract(w,key){ const seen=new Set([w[key]]); const same=shuffle(pool.filter(x=>x.id!==w.id)).filter(x=>!seen.has(x[key])&&seen.add(x[key])); return shuffle([w,...same.slice(0,3)]); }
   function next(){
     bar.style.width=(i/total*100)+'%'; c.querySelector('.pl1').textContent=`Вопрос ${Math.min(i+1,total)} из ${total}`; c.querySelector('.pl2').textContent=`верно ${right}`;
     if(i>=total){ endSession(); const pct=Math.round(right/total*100);
