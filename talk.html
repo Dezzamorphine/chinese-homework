@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Разговор">
+<meta name="theme-color" content="#f7f3ee">
+<title>Разговор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f7f3ee;--card:#fff;--ink:#1f1b18;--ink2:#4a423b;--muted:#6b625a;--line:#e7dfd6;--accent:#a8321f;--accent-dk:#7d2416;
+    --soft:#f3ebe3;--chip:#ece6df;--due-bg:#fbeee0;--due-ink:#7a4a10;--warn-bg:#fff4e0;--warn-line:#ecd2a4;--warn-ink:#5b3d0c;
+    --mark:#c9822b;--in-line:#d8cfc5;--in-bg:#fbf9f6;--err-bg:#fbe9e6;
+    --ui:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --cn:'Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);line-height:1.4}
+  button,input{font-family:inherit;color:inherit}
+  button{cursor:pointer}
+  a{color:var(--accent)}a:hover{color:var(--accent-dk)}
+  :focus-visible{outline:3px solid #a8321f;outline-offset:2px}
+  #s-h:focus{outline:none}
+  .app{max-width:520px;margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--bg)}
+  @media (min-width:560px){.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+  .screen{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+  .cn,.hz,[lang|=zh]{font-family:var(--cn)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  body.nopy .py{display:none!important}
+  .status{font-size:14px;color:var(--ink2);min-height:0}
+  .status:empty{display:none}
+  .status.err{background:var(--err-bg);color:var(--accent-dk);border-radius:12px;padding:8px 12px}
+  .linkbtn{background:none;border:0;color:var(--accent);font-size:14px;font-weight:500;min-height:44px;padding:0 10px}
+  .linkbtn:hover{color:var(--accent-dk)}
+  .btn-p{height:44px;padding:0 16px;border-radius:12px;border:0;background:var(--accent);color:#fff;font-weight:600;font-size:15px}
+  .btn-p:disabled{opacity:.55}
+  .btn-s{height:48px;border-radius:12px;border:0;background:var(--chip);color:var(--ink);font-weight:600;font-size:15px}
+
+  /* экран 1: темы */
+  .t-head{padding:calc(18px + env(safe-area-inset-top)) 16px 12px;display:flex;flex-direction:column;gap:10px}
+  .h1row{display:flex;align-items:baseline;gap:10px}
+  h1{margin:0;font-size:26px;font-weight:700}
+  .h1row .cn{font-size:18px;color:var(--accent)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:13px;padding:6px 10px;border-radius:999px;background:var(--chip);color:var(--ink2)}
+  .chip.due{background:var(--due-bg);color:var(--due-ink)}
+  .t-body{flex:1;padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+  .pick{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:2px solid var(--accent);
+    border-radius:16px;padding:14px;color:var(--ink)}
+  .pick .b{flex:1;min-width:0;display:block}
+  .pick .k{display:block;font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+  .pick .tt{display:block;font-size:17px;font-weight:600;margin-top:2px}
+  .pick .tm{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+  .sub{font-size:13px;color:var(--muted);margin-top:6px}
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .tile{display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;color:var(--ink);min-height:74px}
+  .tile:hover,.pick:hover{border-color:#cdbfb1}
+  .pick:hover{border-color:var(--accent-dk)}
+  .tile .tt{display:block;font-size:15px;font-weight:600}
+  .tile .tm{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+  .pick:disabled,.tile:disabled{opacity:.6}
+  .more{align-self:center}
+  .empty{font-size:14px;color:var(--muted);padding:8px 0}
+  .t-foot{position:sticky;bottom:0;padding:12px 16px calc(16px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);
+    display:flex;gap:8px;align-items:flex-end}
+  .own{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+  .own label{font-size:13px;color:var(--ink2)}
+  .inp{height:44px;width:100%;border:1px solid var(--in-line);border-radius:12px;padding:0 12px;font-size:16px;background:var(--in-bg)}
+  .inp::placeholder{color:#857b72}
+
+  /* экран 2: разговор */
+  #s-chat{height:100vh;height:100dvh;min-height:0}
+  .c-head{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 12px 10px 8px;background:var(--card);border-bottom:1px solid var(--line)}
+  .icon{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border:0;background:none;color:var(--ink);border-radius:12px}
+  .c-ttl{flex:1;min-width:0}
+  .c-ttl .a{font-size:17px;line-height:1.25;font-weight:600;overflow:hidden;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}
+  .c-ttl .b{font-size:13px;line-height:1.3;color:var(--muted);overflow-wrap:anywhere}
+  .pyt{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);min-height:44px;flex:none;cursor:pointer}
+  .pyt input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+  .fin{font-weight:600;font-size:15px;padding:0 8px;flex:none}
+  .log{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px}
+  .msg{max-width:min(300px,86%)}
+  .ai{align-self:flex-start;background:var(--card);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:12px 14px}
+  .ai .py{font-size:13px;color:var(--muted);line-height:1.3}
+  .ai .hz{font-size:24px;line-height:1.35;word-break:break-word}
+  .ai .ru{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:14px;color:var(--ink2)}
+  .wv{border-bottom:2px dotted var(--mark)}
+  .acts{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+  .act{position:relative;min-width:44px;height:36px;padding:0 12px;border:0;background:var(--soft);border-radius:10px;color:var(--ink2);font-size:13px;
+    display:inline-flex;align-items:center;justify-content:center}
+  .act::after{content:'';position:absolute;left:0;right:0;top:-4px;bottom:-4px}
+  .act.ic{padding:0}
+  .act[aria-pressed=true],.act[aria-expanded=true]{background:#e9dccf}
+  .me{align-self:flex-end;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+  .me .bub{background:var(--accent);color:#fff;border-radius:18px 4px 18px 18px;padding:12px 14px}
+  .me .hz{font-size:22px;line-height:1.35;word-break:break-word}
+  .me .py{font-size:13px;color:#f6dcd6;margin-top:4px}
+  .me .acts{margin-top:0}
+  .better{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:8px 12px;font-size:14px;color:var(--warn-ink)}
+  .better .hz{font-size:17px}
+  .better .py{font-size:12px;color:#7a5a24;margin-top:2px}
+  .c-foot{background:var(--card);border-top:1px solid var(--line);padding:10px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:8px}
+  .weave{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .weave .lb{font-size:13px;color:var(--muted)}
+  .wchip{font-size:15px;padding:4px 10px;border-radius:999px;background:var(--due-bg);color:var(--due-ink)}
+  .weave .done{font-size:13px;color:#2f6b2a}
+  .c-foot .status{text-align:center;max-width:100%}
+  .mic{width:84px;height:84px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(168,50,31,.35);touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    transition:transform .12s,background .12s}
+  .mic.rec{background:var(--accent-dk);transform:scale(1.08);animation:pulse 1.2s ease-out infinite}
+  .mic:disabled{opacity:.5;box-shadow:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(168,50,31,.45)}100%{box-shadow:0 0 0 22px rgba(168,50,31,0)}}
+  @media (prefers-reduced-motion:reduce){.mic.rec{animation:none;box-shadow:0 0 0 6px rgba(168,50,31,.3)}}
+  .mic-hint{font-size:13px;color:var(--muted);text-align:center;-webkit-user-select:none;user-select:none}
+  .mic-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .txt{display:flex;gap:8px;width:100%}
+  .txt .inp{flex:1;min-width:0}
+  .small{font-size:13px;color:var(--muted);min-height:44px}
+
+  /* экран 3: разбор */
+  .s-head{padding:calc(18px + env(safe-area-inset-top)) 16px 12px;background:var(--card);border-bottom:1px solid var(--line)}
+  .s-head .m{font-size:13px;color:var(--muted)}
+  .s-head h1{margin:4px 0 12px;font-size:24px}
+  .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .tl{border-radius:12px;padding:10px}
+  .tl .n{font-size:22px;font-weight:700}
+  .tl .l{font-size:12px}
+  .tl.g{background:#eef5ec}.tl.g .n{color:#2f6b2a}.tl.g .l{color:#3f5a3c}
+  .tl.a{background:var(--warn-bg)}.tl.a .n{color:#8a5a10}.tl.a .l{color:#6b4c14}
+  .tl.r{background:var(--err-bg)}.tl.r .n{color:var(--accent)}.tl.r .l{color:var(--accent-dk)}
+  .s-body{flex:1;padding:14px 16px;display:flex;flex-direction:column;gap:16px}
+  .s-body section{display:flex;flex-direction:column;gap:8px}
+  h2{margin:0;font-size:15px;font-weight:600}
+  #s-corr{display:flex;flex-direction:column;gap:8px}
+  .corr{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .corr .was{font-size:16px;color:var(--muted);text-decoration:line-through}
+  .corr .now{font-size:18px}
+  .corr .rule{font-size:13px;color:var(--muted)}
+  .nr{display:flex;gap:8px;flex-wrap:wrap}
+  .nrw{display:flex;flex-direction:column;background:var(--err-bg);border-radius:12px;padding:8px 12px}
+  .nrw .hz{font-size:18px}
+  .nrw .d{font-size:12px;color:var(--accent-dk)}
+  .said{font-size:17px;line-height:1.7;color:#2f6b2a}
+  .sw{white-space:nowrap}
+  .s-foot{position:sticky;bottom:0;padding:12px 16px calc(16px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .s-foot .row{display:flex;gap:8px}
+  .s-foot .row button{flex:1 1 0;min-width:0;padding:0 12px}  /* у .btn-p свой padding — без этого ширины разные */
+  .s-foot .btn-p{height:48px}
+  .nokey{flex:1;padding:0 16px;display:flex;flex-direction:column;gap:14px}
+  .nokey a{display:inline-flex;align-items:center;align-self:flex-start;min-height:44px;padding:0 4px}
+  .nokey .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;font-size:16px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section class="screen" id="s-nokey" hidden>
+  <header class="t-head"><div class="h1row"><h1>Разговор</h1><span class="cn" lang="zh-CN">对话</span></div></header>
+  <div class="nokey">
+    <div class="card"><b>Нужен ключ:</b> открой ссылку на разговор из сообщения Драко.<div class="status" id="k-status" role="status"></div></div>
+    <a href="./index.html">← На главную</a>
+  </div>
+</section>
+
+<section class="screen" id="s-topics" hidden>
+  <header class="t-head">
+    <div class="h1row"><h1>Разговор</h1><span class="cn" lang="zh-CN">对话</span></div>
+    <div class="chips"><span class="chip due" id="c-due">К повторению сегодня: 0</span><span class="chip" id="c-done">Слов пройдено: 0</span></div>
+  </header>
+  <div class="t-body">
+    <div class="status" id="t-status" role="status" aria-live="polite"></div>
+    <button type="button" class="pick" id="pick" hidden><span class="b"><span class="k" id="pick-k">Подобрано под повторение</span><span class="tt" id="pick-t"></span><span class="tm" id="pick-m"></span></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a8321f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button>
+    <div class="sub" id="grid-h" hidden>Темы уроков</div>
+    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid-more" hidden></div>
+    <button type="button" class="linkbtn more" id="more" aria-expanded="false" aria-controls="grid-more" hidden>Все темы уроков</button>
+  </div>
+  <form class="t-foot" id="own-form" autocomplete="off">
+    <div class="own"><label for="own">Своя тема</label><input class="inp" id="own" type="text" maxlength="100" placeholder="Например: аренда квартиры"></div>
+    <button type="submit" class="btn-p" id="own-go">Начать</button>
+  </form>
+</section>
+
+<section class="screen" id="s-chat" hidden>
+  <header class="c-head">
+    <button type="button" class="icon" id="back" aria-label="Назад к темам"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="c-ttl"><div class="a" id="c-title"></div><div class="b" id="c-sub"></div></div>
+    <label class="pyt"><input type="checkbox" id="py-toggle" aria-label="拼音 — показывать пиньинь"> <span lang="zh">拼音</span></label>
+    <button type="button" class="linkbtn fin" id="finish">Закончить</button>
+  </header>
+  <div class="log" id="log" role="log" aria-live="polite" aria-label="Реплики"></div>
+  <div class="c-foot">
+    <div class="weave" id="weave"></div>
+    <div class="status" id="c-status" role="status" aria-live="polite"></div>
+    <div class="mic-wrap" id="mic-wrap">
+      <button type="button" class="mic" id="mic" aria-label="Удерживайте и говорите"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0014 0"/><path d="M12 17v4"/></svg></button>
+      <div class="mic-hint" id="mic-hint" aria-hidden="true">Удерживайте и говорите</div>
+    </div>
+    <form class="txt" id="txt-form" autocomplete="off" hidden>
+      <label for="txt" class="sr">Реплика текстом</label>
+      <input class="inp" id="txt" type="text" maxlength="300" lang="zh-CN" placeholder="Напиши по-китайски">
+      <button type="submit" class="btn-p" id="txt-go">Отправить</button>
+    </form>
+    <button type="button" class="linkbtn small" id="txt-toggle" aria-controls="txt-form" aria-expanded="false">написать текстом</button>
+  </div>
+</section>
+
+<section class="screen" id="s-sum" hidden>
+  <header class="s-head">
+    <div class="m" id="s-meta"></div>
+    <h1 id="s-h" tabindex="-1">Разбор</h1>
+    <div class="tiles">
+      <div class="tl g"><div class="n" id="n-said">0</div><div class="l" id="l-said">слов сказал</div></div>
+      <div class="tl a"><div class="n" id="n-corr">0</div><div class="l" id="l-corr">поправки</div></div>
+      <div class="tl r"><div class="n" id="n-nr">0</div><div class="l">не вспомнил</div></div>
+    </div>
+  </header>
+  <div class="s-body">
+    <section><h2>Поправки</h2><div id="s-corr"></div></section>
+    <section><h2>Не вспомнил — в повторение сегодня</h2><div class="nr" id="s-nr"></div></section>
+    <section><h2>Сказал сам</h2><div class="said" id="s-said" lang="zh-CN"></div></section>
+  </div>
+  <div class="s-foot">
+    <div class="status" id="s-status" role="status" aria-live="polite"></div>
+    <div class="row"><button type="button" class="btn-p" id="again">Ещё раз</button><button type="button" class="btn-s" id="other">Другая тема</button></div>
+  </div>
+</section>
+
+</div>
+<script>
+const DATA = {"mode": "talk", "words": [{"id": "毛衣", "hz": "毛衣", "ru": "свитер", "py": "máoyī", "lesson": "18 апреля 2026"}, {"id": "裤子", "hz": "裤子", "ru": "брюки", "py": "kùzi", "lesson": "18 апреля 2026"}, {"id": "夹克", "hz": "夹克", "ru": "куртка", "py": "jiákè", "lesson": "18 апреля 2026"}, {"id": "衬衫", "hz": "衬衫", "ru": "рубашка", "py": "chènshān", "lesson": "18 апреля 2026"}, {"id": "试", "hz": "试", "ru": "примерять, пробовать", "py": "shì", "lesson": "18 апреля 2026"}, {"id": "穿", "hz": "穿", "ru": "носить, быть одетым", "py": "chuān", "lesson": "Аудио 1"}, {"id": "颜色", "hz": "颜色", "ru": "цвет", "py": "yánsè", "lesson": "18 апреля 2026"}, {"id": "红色", "hz": "红色", "ru": "красный", "py": "hóngsè", "lesson": "18 апреля 2026"}, {"id": "蓝色", "hz": "蓝色", "ru": "синий", "py": "lánsè", "lesson": "18 апреля 2026"}, {"id": "黑色", "hz": "黑色", "ru": "чёрный", "py": "hēisè", "lesson": "18 апреля 2026"}, {"id": "白色", "hz": "白色", "ru": "белый", "py": "báisè", "lesson": "18 апреля 2026"}, {"id": "大", "hz": "大", "ru": "большой", "py": "dà", "lesson": "18 апреля 2026"}, {"id": "小", "hz": "小", "ru": "маленький", "py": "xiǎo", "lesson": "18 апреля 2026"}, {"id": "长", "hz": "长", "ru": "длинный", "py": "zhǎng", "lesson": "18 апреля 2026"}, {"id": "短", "hz": "短", "ru": "короткий", "py": "duǎn", "lesson": "18 апреля 2026"}, {"id": "多少钱", "hz": "多少钱", "ru": "сколько стоит", "py": "duōshǎoqián", "lesson": "18 апреля 2026"}, {"id": "一共", "hz": "一共", "ru": "всего, итого", "py": "yīgòng", "lesson": "14 июля 2026"}, {"id": "条", "hz": "条", "ru": "сч. слово (брюки, длинные предметы)", "py": "tiáo", "lesson": "18 апреля 2026"}, {"id": "件", "hz": "件", "ru": "сч. слово (одежда, дела)", "py": "jiàn", "lesson": "Аудио 5"}, {"id": "家", "hz": "家", "ru": "сч. слово (заведения)", "py": "jiā", "lesson": "9 июня 2026"}, {"id": "口", "hz": "口", "ru": "сч. слово (члены семьи)", "py": "kǒu", "lesson": "19 мая 2026"}, {"id": "爸爸", "hz": "爸爸", "ru": "папа", "py": "bàbà", "lesson": "19 мая 2026"}, {"id": "妈妈", "hz": "妈妈", "ru": "мама", "py": "māmā", "lesson": "19 мая 2026"}, {"id": "哥哥", "hz": "哥哥", "ru": "старший брат", "py": "gēgē", "lesson": "19 мая 2026"}, {"id": "弟弟", "hz": "弟弟", "ru": "младший брат", "py": "dìdi", "lesson": "19 мая 2026"}, {"id": "姐姐", "hz": "姐姐", "ru": "старшая сестра", "py": "jiějiě", "lesson": "19 мая 2026"}, {"id": "妹妹", "hz": "妹妹", "ru": "младшая сестра", "py": "mèimèi", "lesson": "19 мая 2026"}, {"id": "爷爷", "hz": "爷爷", "ru": "дедушка", "py": "yéyé", "lesson": "19 мая 2026"}, {"id": "奶奶", "hz": "奶奶", "ru": "бабушка", "py": "nǎinǎi", "lesson": "19 мая 2026"}, {"id": "兄弟姐妹", "hz": "兄弟姐妹", "ru": "братья и сёстры", "py": "xiōngdìjiěmèi", "lesson": "19 мая 2026"}, {"id": "几岁", "hz": "几岁", "ru": "сколько лет (ребёнку)", "py": "jǐsuì", "lesson": "Аудио 5"}, {"id": "老师", "hz": "老师", "ru": "учитель", "py": "lǎoshī", "lesson": "23 мая 2026"}, {"id": "医生", "hz": "医生", "ru": "врач", "py": "yīshēng", "lesson": "19 мая 2026"}, {"id": "经理", "hz": "经理", "ru": "менеджер, управляющий", "py": "jīnglǐ", "lesson": "Аудио 3"}, {"id": "留学生", "hz": "留学生", "ru": "иностранный студент", "py": "liúxuéshēng", "lesson": "19 мая 2026"}, {"id": "认识", "hz": "认识", "ru": "быть знакомым, познакомиться", "py": "rènshí", "lesson": "19 мая 2026"}, {"id": "介绍", "hz": "介绍", "ru": "представлять, знакомить", "py": "jièshào", "lesson": "19 мая 2026"}, {"id": "贵姓", "hz": "贵姓", "ru": "(вежл.) Ваша фамилия", "py": "guìxìng", "lesson": "19 мая 2026"}, {"id": "高兴", "hz": "高兴", "ru": "рад, радостный", "py": "gāoxìng", "lesson": "19 мая 2026"}, {"id": "个", "hz": "个", "ru": "сч. слово (универсальное)", "py": "gè", "lesson": "23 мая 2026"}, {"id": "位", "hz": "位", "ru": "сч. слово (вежливо, о людях)", "py": "wèi", "lesson": "23 мая 2026"}, {"id": "本", "hz": "本", "ru": "сч. слово (книги)", "py": "běn", "lesson": "23 мая 2026"}, {"id": "支", "hz": "支", "ru": "сч. слово (ручки, кисти)", "py": "zhī", "lesson": "23 мая 2026"}, {"id": "把", "hz": "把", "ru": "(служебное: выносит объект перед глаголом)", "py": "bǎ", "lesson": "Аудио 4"}, {"id": "杯", "hz": "杯", "ru": "сч. слово (чашка, стакан)", "py": "bēi", "lesson": "23 мая 2026"}, {"id": "张", "hz": "张", "ru": "сч. слово (билеты, листы, столы)", "py": "zhāng", "lesson": "Аудио 2"}, {"id": "两", "hz": "两", "ru": "два (перед счётным словом)", "py": "liǎng", "lesson": "23 мая 2026"}, {"id": "书包", "hz": "书包", "ru": "рюкзак", "py": "shūbāo", "lesson": "23 мая 2026"}, {"id": "毛笔", "hz": "毛笔", "ru": "кисть для письма", "py": "máobǐ", "lesson": "23 мая 2026"}, {"id": "桌子", "hz": "桌子", "ru": "стол", "py": "zhuōzi", "lesson": "9 июня 2026"}, {"id": "椅子", "hz": "椅子", "ru": "стул", "py": "yǐzi", "lesson": "Аудио 3"}, {"id": "红茶", "hz": "红茶", "ru": "чёрный чай", "py": "hóngchá", "lesson": "23 мая 2026"}, {"id": "书", "hz": "书", "ru": "книга", "py": "shū", "lesson": "23 мая 2026"}, {"id": "汉语", "hz": "汉语", "ru": "китайский язык", "py": "hànyǔ", "lesson": "23 мая 2026"}, {"id": "天气", "hz": "天气", "ru": "погода", "py": "tiānqì", "lesson": "Аудио 2"}, {"id": "春天", "hz": "春天", "ru": "весна", "py": "chūntiān", "lesson": "30 мая 2026"}, {"id": "夏天", "hz": "夏天", "ru": "лето", "py": "xiàtiān", "lesson": "30 мая 2026"}, {"id": "秋天", "hz": "秋天", "ru": "осень", "py": "qiūtiān", "lesson": "30 мая 2026"}, {"id": "冬天", "hz": "冬天", "ru": "зима", "py": "dōngtiān", "lesson": "30 мая 2026"}, {"id": "暖和", "hz": "暖和", "ru": "тёплый", "py": "nuǎnhuo", "lesson": "30 мая 2026"}, {"id": "热", "hz": "热", "ru": "жаркий", "py": "rè", "lesson": "30 мая 2026"}, {"id": "凉快", "hz": "凉快", "ru": "прохладный", "py": "liángkuài", "lesson": "30 мая 2026"}, {"id": "冷", "hz": "冷", "ru": "холодный", "py": "lěng", "lesson": "Аудио 2"}, {"id": "下雪", "hz": "下雪", "ru": "идёт снег", "py": "xiàxuě", "lesson": "Аудио 2"}, {"id": "多云", "hz": "多云", "ru": "облачно", "py": "duōyún", "lesson": "30 мая 2026"}, {"id": "季节", "hz": "季节", "ru": "время года, сезон", "py": "jìjié", "lesson": "30 мая 2026"}, {"id": "看书", "hz": "看书", "ru": "читать (книгу)", "py": "kànshū", "lesson": "30 мая 2026"}, {"id": "看电视", "hz": "看电视", "ru": "смотреть телевизор", "py": "kàndiànshì", "lesson": "30 мая 2026"}, {"id": "做饭", "hz": "做饭", "ru": "готовить еду", "py": "zuòfàn", "lesson": "Аудио 3"}, {"id": "打电话", "hz": "打电话", "ru": "звонить по телефону", "py": "dǎdiànhuà", "lesson": "Аудио 2"}, {"id": "睡觉", "hz": "睡觉", "ru": "спать", "py": "shuìjiào", "lesson": "Аудио 5"}, {"id": "在", "hz": "在", "ru": "сейчас (происходит): 在…呢", "py": "zài", "lesson": "30 мая 2026"}, {"id": "商店", "hz": "商店", "ru": "магазин", "py": "shāngdiàn", "lesson": "9 июня 2026"}, {"id": "超市", "hz": "超市", "ru": "супермаркет", "py": "chāoshì", "lesson": "Аудио 3"}, {"id": "市场", "hz": "市场", "ru": "рынок", "py": "shìchǎng", "lesson": "14 июля 2026"}, {"id": "公园", "hz": "公园", "ru": "парк", "py": "gōngyuán", "lesson": "Аудио 2"}, {"id": "书店", "hz": "书店", "ru": "книжный магазин", "py": "shūdiàn", "lesson": "9 июня 2026"}, {"id": "图书馆", "hz": "图书馆", "ru": "библиотека", "py": "túshūguǎn", "lesson": "20 июня 2026"}, {"id": "银行", "hz": "银行", "ru": "банк", "py": "yínháng", "lesson": "Аудио 4"}, {"id": "医院", "hz": "医院", "ru": "больница", "py": "yīyuàn", "lesson": "Аудио 1"}, {"id": "酒吧", "hz": "酒吧", "ru": "бар", "py": "jiǔbā", "lesson": "9 июня 2026"}, {"id": "后面", "hz": "后面", "ru": "сзади, позади", "py": "hòumiàn", "lesson": "Аудио 2"}, {"id": "前面", "hz": "前面", "ru": "впереди", "py": "qiánmiàn", "lesson": "9 июня 2026"}, {"id": "对面", "hz": "对面", "ru": "напротив", "py": "duìmiàn", "lesson": "16 июня 2026"}, {"id": "楼", "hz": "楼", "ru": "этаж, здание", "py": "lóu", "lesson": "9 июня 2026"}, {"id": "房间", "hz": "房间", "ru": "комната, номер", "py": "fángjiān", "lesson": "Аудио 5"}, {"id": "汽车", "hz": "汽车", "ru": "автомобиль", "py": "qìchē", "lesson": "Аудио 3"}, {"id": "辆", "hz": "辆", "ru": "сч. слово (транспорт)", "py": "liàng", "lesson": "9 июня 2026"}, {"id": "请问", "hz": "请问", "ru": "позвольте спросить", "py": "qǐngwèn", "lesson": "16 июня 2026"}, {"id": "怎么走", "hz": "怎么走", "ru": "как пройти", "py": "zěnmezǒu", "lesson": "Аудио 1"}, {"id": "往前走", "hz": "往前走", "ru": "идти прямо/вперёд", "py": "wǎngqiánzǒu", "lesson": "16 июня 2026"}, {"id": "路口", "hz": "路口", "ru": "перекрёсток", "py": "lùkǒu", "lesson": "Аудио 1"}, {"id": "往左拐", "hz": "往左拐", "ru": "повернуть налево", "py": "wǎngzuǒguǎi", "lesson": "Аудио 1"}, {"id": "往右拐", "hz": "往右拐", "ru": "повернуть направо", "py": "wǎngyòuguǎi", "lesson": "Аудио 3"}, {"id": "旁边", "hz": "旁边", "ru": "рядом, сбоку", "py": "pángbiān", "lesson": "Аудио 3"}, {"id": "附近", "hz": "附近", "ru": "поблизости, рядом", "py": "fùjìn", "lesson": "Аудио 1"}, {"id": "离", "hz": "离", "ru": "от (о расстоянии)", "py": "lí", "lesson": "Аудио 1"}, {"id": "远", "hz": "远", "ru": "далеко", "py": "yuǎn", "lesson": "Аудио 1"}, {"id": "近", "hz": "近", "ru": "близко", "py": "jìn", "lesson": "Аудио 1"}, {"id": "公里", "hz": "公里", "ru": "километр", "py": "gōnglǐ", "lesson": "Аудио 1"}, {"id": "米", "hz": "米", "ru": "метр", "py": "mǐ", "lesson": "16 июня 2026"}, {"id": "办公室", "hz": "办公室", "ru": "кабинет, офис", "py": "bàngōngshì", "lesson": "16 июня 2026"}, {"id": "右边", "hz": "右边", "ru": "справа, правая сторона", "py": "yòubiān", "lesson": "Аудио 2"}, {"id": "现在", "hz": "现在", "ru": "сейчас", "py": "xiànzài", "lesson": "20 июня 2026"}, {"id": "什么时候", "hz": "什么时候", "ru": "когда", "py": "shénmeshíhòu", "lesson": "11 августа 2026"}, {"id": "时间", "hz": "时间", "ru": "время (отрезок)", "py": "shíjiān", "lesson": "Аудио 2"}, {"id": "忙", "hz": "忙", "ru": "занятый", "py": "máng", "lesson": "23 июня 2026"}, {"id": "马上", "hz": "马上", "ru": "сейчас же, немедленно", "py": "mǎshàng", "lesson": "Аудио 5"}, {"id": "一会儿", "hz": "一会儿", "ru": "немного (времени), чуть-чуть", "py": "yíhuìr", "lesson": "Аудио 5"}, {"id": "散步", "hz": "散步", "ru": "гулять, прогуливаться", "py": "sànbù", "lesson": "25 июля 2026"}, {"id": "回家", "hz": "回家", "ru": "возвращаться домой", "py": "huíjiā", "lesson": "20 июня 2026"}, {"id": "咱们", "hz": "咱们", "ru": "мы (с тобой)", "py": "zánmen", "lesson": "20 июня 2026"}, {"id": "一起", "hz": "一起", "ru": "вместе", "py": "yìqǐ", "lesson": "Аудио 1"}, {"id": "宿舍", "hz": "宿舍", "ru": "общежитие", "py": "sùshè", "lesson": "20 июня 2026"}, {"id": "教室", "hz": "教室", "ru": "класс, аудитория", "py": "jiàoshì", "lesson": "20 июня 2026"}, {"id": "洗手间", "hz": "洗手间", "ru": "туалет", "py": "xǐshǒujiān", "lesson": "20 июня 2026"}, {"id": "门口", "hz": "门口", "ru": "у входа, у двери", "py": "ménkǒu", "lesson": "Аудио 3"}, {"id": "里边", "hz": "里边", "ru": "внутри", "py": "lǐbiān", "lesson": "20 июня 2026"}, {"id": "外边", "hz": "外边", "ru": "снаружи", "py": "wàibiān", "lesson": "20 июня 2026"}, {"id": "找", "hz": "找", "ru": "искать", "py": "zhǎo", "lesson": "20 июня 2026"}, {"id": "借", "hz": "借", "ru": "одолжить, взять взаймы", "py": "jiè", "lesson": "20 июня 2026"}, {"id": "好久不见", "hz": "好久不见", "ru": "давно не виделись", "py": "hǎojiǔbújiàn", "lesson": "23 июня 2026"}, {"id": "最近", "hz": "最近", "ru": "недавно, в последнее время", "py": "zuìjìn", "lesson": "Аудио 3"}, {"id": "怎么样", "hz": "怎么样", "ru": "как насчёт…? (предложение)", "py": "zěnmeyàng", "lesson": "15 августа 2026"}, {"id": "挺", "hz": "挺", "ru": "довольно, весьма (挺…的)", "py": "tǐng", "lesson": "23 июня 2026"}, {"id": "课外作业", "hz": "课外作业", "ru": "домашнее задание", "py": "kèwàizuòyè", "lesson": "23 июня 2026"}, {"id": "特别", "hz": "特别", "ru": "особенно, очень", "py": "tèbié", "lesson": "23 июня 2026"}, {"id": "紧张", "hz": "紧张", "ru": "напряжённый", "py": "jǐnzhāng", "lesson": "23 июня 2026"}, {"id": "用功", "hz": "用功", "ru": "усердный, прилежный", "py": "yònggōng", "lesson": "23 июня 2026"}, {"id": "当然", "hz": "当然", "ru": "конечно", "py": "dāngrán", "lesson": "23 июня 2026"}, {"id": "懂", "hz": "懂", "ru": "понимать", "py": "dǒng", "lesson": "23 июня 2026"}, {"id": "几号", "hz": "几号", "ru": "какое число", "py": "jǐhào", "lesson": "23 июня 2026"}, {"id": "星期", "hz": "星期", "ru": "неделя, день недели", "py": "xīngqī", "lesson": "23 июня 2026"}, {"id": "生日", "hz": "生日", "ru": "день рождения", "py": "shēngrì", "lesson": "23 июня 2026"}, {"id": "月", "hz": "月", "ru": "месяц", "py": "yuè", "lesson": "23 июня 2026"}, {"id": "号", "hz": "号", "ru": "число (даты)", "py": "hào", "lesson": "23 июня 2026"}, {"id": "有空", "hz": "有空", "ru": "иметь свободное время", "py": "yǒukòng", "lesson": "25 июля 2026"}, {"id": "做客", "hz": "做客", "ru": "быть в гостях", "py": "zuòkè", "lesson": "21 июля 2026"}, {"id": "会", "hz": "会", "ru": "уметь, мочь (навык)", "py": "huì", "lesson": "27 июня 2026"}, {"id": "开车", "hz": "开车", "ru": "ехать на машине, водить", "py": "kāichē", "lesson": "Аудио 2"}, {"id": "游泳", "hz": "游泳", "ru": "плавать", "py": "yóuyǒng", "lesson": "27 июня 2026"}, {"id": "按摩", "hz": "按摩", "ru": "массаж, делать массаж", "py": "ànmó", "lesson": "27 июня 2026"}, {"id": "做中国菜", "hz": "做中国菜", "ru": "готовить китайскую еду", "py": "zuòzhōngguócài", "lesson": "27 июня 2026"}, {"id": "中医", "hz": "中医", "ru": "китайская медицина", "py": "zhōngyī", "lesson": "27 июня 2026"}, {"id": "当医生", "hz": "当医生", "ru": "быть/работать врачом", "py": "dāngyīshēng", "lesson": "27 июня 2026"}, {"id": "东边", "hz": "东边", "ru": "восточная сторона, на востоке", "py": "dōngbiān", "lesson": "Аудио 1"}, {"id": "西边", "hz": "西边", "ru": "на западе, западнее", "py": "xībiān", "lesson": "Аудио 1"}, {"id": "南边", "hz": "南边", "ru": "на юге, южнее", "py": "nánbiān", "lesson": "Аудио 1"}, {"id": "北边", "hz": "北边", "ru": "на севере, севернее", "py": "běibiān", "lesson": "Аудио 1"}, {"id": "东南", "hz": "东南", "ru": "юго-восток", "py": "dōngnán", "lesson": "27 июня 2026"}, {"id": "西北", "hz": "西北", "ru": "северо-запад", "py": "xīběi", "lesson": "27 июня 2026"}, {"id": "栋", "hz": "栋", "ru": "сч. слово (здания)", "py": "dòng", "lesson": "27 июня 2026"}, {"id": "自行车", "hz": "自行车", "ru": "велосипед", "py": "zìxíngchē", "lesson": "27 июня 2026"}, {"id": "地铁站", "hz": "地铁站", "ru": "станция метро", "py": "dìtiězhàn", "lesson": "Аудио 4"}, {"id": "酒店", "hz": "酒店", "ru": "отель, гостиница", "py": "jiǔdiàn", "lesson": "27 июня 2026"}, {"id": "的时候", "hz": "的时候", "ru": "когда (во время)", "py": "deshíhòu", "lesson": "27 июня 2026"}, {"id": "本地人", "hz": "本地人", "ru": "местный житель", "py": "běndìrén", "lesson": "27 июня 2026"}, {"id": "做生意", "hz": "做生意", "ru": "вести торговлю, торговать", "py": "zuòshēngyì", "lesson": "14 июля 2026"}, {"id": "讲价", "hz": "讲价", "ru": "торговаться", "py": "jiǎngjià", "lesson": "14 июля 2026"}, {"id": "便宜", "hz": "便宜", "ru": "дешёвый", "py": "piányi", "lesson": "Аудио 1"}, {"id": "贵", "hz": "贵", "ru": "дорого, дорогой", "py": "guì", "lesson": "14 июля 2026"}, {"id": "打折", "hz": "打折", "ru": "делать скидку", "py": "dǎzhé", "lesson": "14 июля 2026"}, {"id": "老板", "hz": "老板", "ru": "хозяин, босс", "py": "lǎobǎn", "lesson": "Аудио 2"}, {"id": "老顾客", "hz": "老顾客", "ru": "постоянный клиент", "py": "lǎogùkè", "lesson": "11 августа 2026"}, {"id": "找钱", "hz": "找钱", "ru": "давать сдачу", "py": "zhǎoqián", "lesson": "14 июля 2026"}, {"id": "零钱", "hz": "零钱", "ru": "мелочь", "py": "língqián", "lesson": "14 июля 2026"}, {"id": "现金", "hz": "现金", "ru": "наличные", "py": "xiànjīn", "lesson": "14 июля 2026"}, {"id": "扫码", "hz": "扫码", "ru": "оплата по QR-коду", "py": "sǎomǎ", "lesson": "14 июля 2026"}, {"id": "付", "hz": "付", "ru": "платить", "py": "fù", "lesson": "14 июля 2026"}, {"id": "新鲜", "hz": "新鲜", "ru": "свежий", "py": "xīnxiān", "lesson": "12 сентября 2026"}, {"id": "质量", "hz": "质量", "ru": "качество", "py": "zhìliàng", "lesson": "Аудио 3"}, {"id": "结实", "hz": "结实", "ru": "прочный, крепкий", "py": "jiēshí", "lesson": "14 июля 2026"}, {"id": "坏", "hz": "坏", "ru": "испортиться, сломаться", "py": "huài", "lesson": "28 июля 2026"}, {"id": "换", "hz": "换", "ru": "поменять", "py": "huàn", "lesson": "Аудио 5"}, {"id": "退", "hz": "退", "ru": "вернуть (деньги)", "py": "tuì", "lesson": "14 июля 2026"}, {"id": "一斤", "hz": "一斤", "ru": "цзинь (0,5 кг)", "py": "yījīn", "lesson": "14 июля 2026"}, {"id": "半斤", "hz": "半斤", "ru": "полцзиня (0,25 кг)", "py": "bànjīn", "lesson": "14 июля 2026"}, {"id": "一箱", "hz": "一箱", "ru": "ящик, коробка (чего-то)", "py": "yīxiāng", "lesson": "28 июля 2026"}, {"id": "一盒", "hz": "一盒", "ru": "коробочка, пачка", "py": "yīhé", "lesson": "14 июля 2026"}, {"id": "一双", "hz": "一双", "ru": "одна пара", "py": "yīshuāng", "lesson": "Аудио 5"}, {"id": "批发", "hz": "批发", "ru": "опт, оптом", "py": "pīfā", "lesson": "14 июля 2026"}, {"id": "零售", "hz": "零售", "ru": "розница", "py": "língshòu", "lesson": "14 июля 2026"}, {"id": "比", "hz": "比", "ru": "чем (A 比 B …)", "py": "bǐ", "lesson": "Аудио 1"}, {"id": "要是", "hz": "要是", "ru": "если (разг.)", "py": "yàoshì", "lesson": "Аудио 5"}, {"id": "送货", "hz": "送货", "ru": "доставка товара", "py": "sònghuò", "lesson": "11 августа 2026"}, {"id": "放心", "hz": "放心", "ru": "не волноваться", "py": "fàngxīn", "lesson": "14 июля 2026"}, {"id": "最低价", "hz": "最低价", "ru": "самая низкая цена", "py": "zuìdījià", "lesson": "14 июля 2026"}, {"id": "苹果", "hz": "苹果", "ru": "яблоко", "py": "píngguǒ", "lesson": "28 июля 2026"}, {"id": "鞋子", "hz": "鞋子", "ru": "обувь, туфли", "py": "xiézi", "lesson": "14 июля 2026"}, {"id": "请客", "hz": "请客", "ru": "угощать", "py": "qǐngkè", "lesson": "12 сентября 2026"}, {"id": "请", "hz": "请", "ru": "угощать; пожалуйста", "py": "qǐng", "lesson": "Аудио 2"}, {"id": "招待", "hz": "招待", "ru": "принимать гостей", "py": "zhāodài", "lesson": "21 июля 2026"}, {"id": "点菜", "hz": "点菜", "ru": "заказывать блюда", "py": "diǎncài", "lesson": "Аудио 2"}, {"id": "菜单", "hz": "菜单", "ru": "меню", "py": "càidān", "lesson": "18 июля 2026"}, {"id": "服务员", "hz": "服务员", "ru": "официант", "py": "fúwùyuán", "lesson": "18 июля 2026"}, {"id": "买单", "hz": "买单", "ru": "расплатиться, счёт!", "py": "mǎidān", "lesson": "Аудио 2"}, {"id": "好吃", "hz": "好吃", "ru": "вкусный", "py": "hǎochī", "lesson": "18 июля 2026"}, {"id": "味道", "hz": "味道", "ru": "вкус", "py": "wèidào", "lesson": "18 июля 2026"}, {"id": "好极了", "hz": "好极了", "ru": "превосходно, отлично", "py": "hǎojíle", "lesson": "18 июля 2026"}, {"id": "辣", "hz": "辣", "ru": "острый", "py": "là", "lesson": "18 июля 2026"}, {"id": "有点", "hz": "有点", "ru": "немного (перед прилагательным, с оттенком «слишком»)", "py": "yǒudiǎn", "lesson": "18 июля 2026"}, {"id": "少放", "hz": "少放", "ru": "положить поменьше", "py": "shǎofàng", "lesson": "18 июля 2026"}, {"id": "够", "hz": "够", "ru": "достаточно, хватит", "py": "gòu", "lesson": "18 июля 2026"}, {"id": "饱", "hz": "饱", "ru": "сытый", "py": "bǎo", "lesson": "Аудио 4"}, {"id": "饿", "hz": "饿", "ru": "голодный", "py": "è", "lesson": "18 июля 2026"}, {"id": "筷子", "hz": "筷子", "ru": "палочки", "py": "kuàizi", "lesson": "12 сентября 2026"}, {"id": "米饭", "hz": "米饭", "ru": "рис (варёный)", "py": "mǐfàn", "lesson": "18 июля 2026"}, {"id": "饺子", "hz": "饺子", "ru": "пельмени, цзяоцзы", "py": "jiǎozi", "lesson": "18 июля 2026"}, {"id": "茶", "hz": "茶", "ru": "чай", "py": "chá", "lesson": "18 июля 2026"}, {"id": "啤酒", "hz": "啤酒", "ru": "пиво", "py": "píjiǔ", "lesson": "Аудио 2"}, {"id": "喝酒", "hz": "喝酒", "ru": "пить алкоголь", "py": "hējiǔ", "lesson": "Аудио 2"}, {"id": "敬", "hz": "敬", "ru": "поднимать тост, чествовать", "py": "jìng", "lesson": "18 июля 2026"}, {"id": "干杯", "hz": "干杯", "ru": "до дна, чокнуться", "py": "gānbēi", "lesson": "21 июля 2026"}, {"id": "祝", "hz": "祝", "ru": "желать (в пожелании)", "py": "zhù", "lesson": "4 августа 2026"}, {"id": "健康", "hz": "健康", "ru": "здоровье, здоровый", "py": "jiànkāng", "lesson": "12 сентября 2026"}, {"id": "合作", "hz": "合作", "ru": "сотрудничество", "py": "hézuò", "lesson": "10 сентября 2026"}, {"id": "能", "hz": "能", "ru": "мочь, можно", "py": "néng", "lesson": "18 июля 2026"}, {"id": "客气", "hz": "客气", "ru": "церемониться, стесняться", "py": "kèqì", "lesson": "21 июля 2026"}, {"id": "不客气", "hz": "不客气", "ru": "не за что", "py": "búkèqì", "lesson": "Аудио 5"}, {"id": "正在", "hz": "正在", "ru": "как раз сейчас (делать)", "py": "zhèngzài", "lesson": "Аудио 2"}, {"id": "过", "hz": "过", "ru": "суффикс опыта (делал что-то раньше)", "py": "guò", "lesson": "21 июля 2026"}, {"id": "得", "hz": "得", "ru": "de — показатель оценки действия (说得好); děi — нужно, должен", "py": "dé", "lesson": "21 июля 2026"}, {"id": "因为", "hz": "因为", "ru": "потому что", "py": "yīnwèi", "lesson": "21 июля 2026"}, {"id": "所以", "hz": "所以", "ru": "поэтому", "py": "suǒyǐ", "lesson": "21 июля 2026"}, {"id": "应该", "hz": "应该", "ru": "следует, должно", "py": "yīnggāi", "lesson": "21 июля 2026"}, {"id": "已经", "hz": "已经", "ru": "уже", "py": "yǐjīng", "lesson": "Аудио 5"}, {"id": "要下雨了", "hz": "要下雨了", "ru": "вот-вот пойдёт дождь (要…了 — скоро)", "py": "yàoxiàyǔle", "lesson": "21 июля 2026"}, {"id": "跑得快", "hz": "跑得快", "ru": "быстро бегает (глагол + 得 + оценка)", "py": "pǎodekuài", "lesson": "21 июля 2026"}, {"id": "敬酒", "hz": "敬酒", "ru": "поднимать тост", "py": "jìngjiǔ", "lesson": "21 июля 2026"}, {"id": "祝合作愉快", "hz": "祝合作愉快", "ru": "за успешное сотрудничество", "py": "zhùhézuòyúkuài", "lesson": "21 июля 2026"}, {"id": "主人", "hz": "主人", "ru": "хозяин (принимающий)", "py": "zhǔrén", "lesson": "21 июля 2026"}, {"id": "客人", "hz": "客人", "ru": "гость", "py": "kèrén", "lesson": "21 июля 2026"}, {"id": "面子", "hz": "面子", "ru": "«лицо», престиж", "py": "miànzi", "lesson": "21 июля 2026"}, {"id": "礼物", "hz": "礼物", "ru": "подарок", "py": "lǐwù", "lesson": "4 августа 2026"}, {"id": "用茶代替酒", "hz": "用茶代替酒", "ru": "заменить вино чаем", "py": "yòngchádàitìjiǔ", "lesson": "21 июля 2026"}, {"id": "麻烦", "hz": "麻烦", "ru": "хлопоты; побеспокоить", "py": "máfán", "lesson": "Аудио 5"}, {"id": "抢着付钱", "hz": "抢着付钱", "ru": "наперебой платить (за счёт)", "py": "qiǎngzhefùqián", "lesson": "21 июля 2026"}, {"id": "饭桌上的文化", "hz": "饭桌上的文化", "ru": "застольная культура", "py": "fànzhuōshàngdewénhuà", "lesson": "21 июля 2026"}, {"id": "周末", "hz": "周末", "ru": "выходные", "py": "zhōumò", "lesson": "Аудио 5"}, {"id": "工作日", "hz": "工作日", "ru": "будний день", "py": "gōngzuòrì", "lesson": "25 июля 2026"}, {"id": "打算", "hz": "打算", "ru": "планировать, собираться; план", "py": "dǎsuàn", "lesson": "Аудио 2"}, {"id": "出去玩", "hz": "出去玩", "ru": "пойти погулять, выйти развлечься", "py": "chūqùwán", "lesson": "25 июля 2026"}, {"id": "上班", "hz": "上班", "ru": "ходить на работу", "py": "shàngbān", "lesson": "Аудио 5"}, {"id": "休息", "hz": "休息", "ru": "отдыхать", "py": "xiūxī", "lesson": "25 июля 2026"}, {"id": "看电影", "hz": "看电影", "ru": "смотреть фильм", "py": "kàndiànyǐng", "lesson": "Аудио 2"}, {"id": "电影院", "hz": "电影院", "ru": "кинотеатр", "py": "diànyǐngyuàn", "lesson": "25 июля 2026"}, {"id": "逛街", "hz": "逛街", "ru": "гулять по магазинам, шопинг", "py": "guàngjiē", "lesson": "25 июля 2026"}, {"id": "商场", "hz": "商场", "ru": "торговый центр", "py": "shāngchǎng", "lesson": "25 июля 2026"}, {"id": "爬山", "hz": "爬山", "ru": "ходить в горы, хайкинг", "py": "páshān", "lesson": "Аудио 5"}, {"id": "咖啡馆", "hz": "咖啡馆", "ru": "кафе", "py": "kāfēiguǎn", "lesson": "25 июля 2026"}, {"id": "聊天", "hz": "聊天", "ru": "болтать, общаться", "py": "liáotiān", "lesson": "25 июля 2026"}, {"id": "见面", "hz": "见面", "ru": "встречаться", "py": "jiànmiàn", "lesson": "Аудио 3"}, {"id": "方便", "hz": "方便", "ru": "удобно (по времени/месту)", "py": "fāngbiàn", "lesson": "Аудио 1"}, {"id": "别迟到", "hz": "别迟到", "ru": "не опаздывай", "py": "biéchídào", "lesson": "25 июля 2026"}, {"id": "说好了", "hz": "说好了", "ru": "договорились", "py": "shuōhǎole", "lesson": "25 июля 2026"}, {"id": "没问题", "hz": "没问题", "ru": "без проблем", "py": "méiwèntí", "lesson": "25 июля 2026"}, {"id": "天气好的话", "hz": "天气好的话", "ru": "если погода хорошая (…的话 — «если»)", "py": "tiānqìhǎodehuà", "lesson": "25 июля 2026"}, {"id": "主意", "hz": "主意", "ru": "идея, задумка", "py": "zhǔyì", "lesson": "25 июля 2026"}, {"id": "记得", "hz": "记得", "ru": "помнить, не забудь", "py": "jìde", "lesson": "25 июля 2026"}, {"id": "感冒", "hz": "感冒", "ru": "простуда, простудиться", "py": "gǎnmào", "lesson": "Аудио 3"}, {"id": "吃药", "hz": "吃药", "ru": "принимать лекарство", "py": "chīyào", "lesson": "Аудио 3"}, {"id": "玩得开心", "hz": "玩得开心", "ru": "хорошо провести время", "py": "wándékāixīn", "lesson": "25 июля 2026"}, {"id": "约", "hz": "约", "ru": "договориться о встрече", "py": "yuē", "lesson": "Аудио 1"}, {"id": "改天", "hz": "改天", "ru": "в другой день, как-нибудь", "py": "gǎitiān", "lesson": "25 июля 2026"}, {"id": "收货", "hz": "收货", "ru": "принимать товар", "py": "shōuhuò", "lesson": "28 июля 2026"}, {"id": "点货", "hz": "点货", "ru": "пересчитывать товар при приёмке", "py": "diǎnhuò", "lesson": "28 июля 2026"}, {"id": "数", "hz": "数", "ru": "считать, пересчитывать", "py": "shù", "lesson": "28 июля 2026"}, {"id": "数量", "hz": "数量", "ru": "количество", "py": "shùliàng", "lesson": "10 сентября 2026"}, {"id": "不对", "hz": "不对", "ru": "неверно, не так", "py": "búduì", "lesson": "28 июля 2026"}, {"id": "少了", "hz": "少了", "ru": "не хватает, стало меньше", "py": "shǎole", "lesson": "28 июля 2026"}, {"id": "多了", "hz": "多了", "ru": "лишнее, стало больше", "py": "duōle", "lesson": "28 июля 2026"}, {"id": "送错", "hz": "送错", "ru": "доставить по ошибке", "py": "sòngcuò", "lesson": "28 июля 2026"}, {"id": "里面", "hz": "里面", "ru": "внутри", "py": "lǐmiàn", "lesson": "Аудио 2"}, {"id": "梨", "hz": "梨", "ru": "груша (в подарок нежелательна: 梨≈离 «разлука»)", "py": "lí", "lesson": "4 августа 2026"}, {"id": "压坏", "hz": "压坏", "ru": "помять, раздавить", "py": "yāhuài", "lesson": "28 июля 2026"}, {"id": "退钱", "hz": "退钱", "ru": "вернуть деньги", "py": "tuìqián", "lesson": "28 июля 2026"}, {"id": "别担心", "hz": "别担心", "ru": "не волнуйтесь", "py": "biédānxīn", "lesson": "28 июля 2026"}, {"id": "解决", "hz": "解决", "ru": "решить (проблему)", "py": "jiějué", "lesson": "28 июля 2026"}, {"id": "问题", "hz": "问题", "ru": "проблема, вопрос", "py": "wèntí", "lesson": "28 июля 2026"}, {"id": "出问题了", "hz": "出问题了", "ru": "возникла проблема, что-то пошло не так", "py": "chūwèntíle", "lesson": "28 июля 2026"}, {"id": "说错", "hz": "说错", "ru": "оговориться (сказать неверно)", "py": "shuōcuò", "lesson": "28 июля 2026"}, {"id": "写错", "hz": "写错", "ru": "написать с ошибкой", "py": "xiěcuò", "lesson": "28 июля 2026"}, {"id": "算错", "hz": "算错", "ru": "просчитаться", "py": "suàncuò", "lesson": "28 июля 2026"}, {"id": "过生日", "hz": "过生日", "ru": "праздновать день рождения", "py": "guòshēngrì", "lesson": "4 августа 2026"}, {"id": "生日快乐", "hz": "生日快乐", "ru": "с днём рождения", "py": "shēngrìkuàilè", "lesson": "4 августа 2026"}, {"id": "送礼物", "hz": "送礼物", "ru": "дарить подарок", "py": "sònglǐwù", "lesson": "4 августа 2026"}, {"id": "收到", "hz": "收到", "ru": "получить", "py": "shōudào", "lesson": "Аудио 4"}, {"id": "红包", "hz": "红包", "ru": "«красный конверт» (деньги в подарок)", "py": "hóngbāo", "lesson": "4 августа 2026"}, {"id": "蛋糕", "hz": "蛋糕", "ru": "торт", "py": "dàngāo", "lesson": "4 августа 2026"}, {"id": "蜡烛", "hz": "蜡烛", "ru": "свеча", "py": "làzhú", "lesson": "4 августа 2026"}, {"id": "吹蜡烛", "hz": "吹蜡烛", "ru": "задувать свечи", "py": "chuīlàzhú", "lesson": "4 августа 2026"}, {"id": "许愿", "hz": "许愿", "ru": "загадывать желание", "py": "xǔyuàn", "lesson": "4 августа 2026"}, {"id": "惊喜", "hz": "惊喜", "ru": "сюрприз", "py": "jīngxǐ", "lesson": "4 августа 2026"}, {"id": "身体健康", "hz": "身体健康", "ru": "крепкого здоровья", "py": "shēntǐjiànkāng", "lesson": "4 августа 2026"}, {"id": "工作顺利", "hz": "工作顺利", "ru": "успехов в работе", "py": "gōngzuòshùnlì", "lesson": "4 августа 2026"}, {"id": "顺利", "hz": "顺利", "ru": "гладко, успешно", "py": "shùnlì", "lesson": "4 августа 2026"}, {"id": "快要到了", "hz": "快要到了", "ru": "вот-вот наступит (快要…了 — скоро)", "py": "kuàiyàodàole", "lesson": "4 августа 2026"}, {"id": "一瓶酒", "hz": "一瓶酒", "ru": "бутылка вина", "py": "yīpíngjiǔ", "lesson": "4 августа 2026"}, {"id": "不能送", "hz": "不能送", "ru": "нельзя дарить (табу на подарки)", "py": "bùnéngsòng", "lesson": "4 августа 2026"}, {"id": "发微信", "hz": "发微信", "ru": "написать в WeChat", "py": "fāwēixìn", "lesson": "Аудио 4"}, {"id": "微信", "hz": "微信", "ru": "WeChat (мессенджер)", "py": "wēixìn", "lesson": "8 августа 2026"}, {"id": "号码", "hz": "号码", "ru": "номер", "py": "hàomǎ", "lesson": "11 августа 2026"}, {"id": "接电话", "hz": "接电话", "ru": "ответить на звонок", "py": "jiēdiànhuà", "lesson": "Аудио 1"}, {"id": "回电话", "hz": "回电话", "ru": "перезвонить", "py": "huídiànhuà", "lesson": "11 августа 2026"}, {"id": "留言", "hz": "留言", "ru": "оставить сообщение", "py": "liúyán", "lesson": "11 августа 2026"}, {"id": "打错了", "hz": "打错了", "ru": "ошибся номером", "py": "dǎcuòle", "lesson": "11 августа 2026"}, {"id": "加微信", "hz": "加微信", "ru": "добавиться в WeChat", "py": "jiāwēixìn", "lesson": "Аудио 4"}, {"id": "二维码", "hz": "二维码", "ru": "QR-код", "py": "èrwéimǎ", "lesson": "11 августа 2026"}, {"id": "发信息", "hz": "发信息", "ru": "отправить сообщение", "py": "fāxìnxī", "lesson": "Аудио 2"}, {"id": "发语音", "hz": "发语音", "ru": "отправить голосовое", "py": "fāyǔyīn", "lesson": "8 августа 2026"}, {"id": "发照片", "hz": "发照片", "ru": "отправить фото", "py": "fāzhàopiān", "lesson": "8 августа 2026"}, {"id": "联系", "hz": "联系", "ru": "связаться", "py": "liánxì", "lesson": "8 августа 2026"}, {"id": "跟", "hz": "跟", "ru": "с (кем-то)", "py": "gēn", "lesson": "8 августа 2026"}, {"id": "有点事情", "hz": "有点事情", "ru": "есть дела", "py": "yǒudiǎnshìqíng", "lesson": "8 августа 2026"}, {"id": "开会", "hz": "开会", "ru": "проводить собрание, быть на встрече", "py": "kāihuì", "lesson": "Аудио 3"}, {"id": "让", "hz": "让", "ru": "велеть, заставлять (кого-то делать)", "py": "ràng", "lesson": "8 августа 2026"}, {"id": "帮", "hz": "帮", "ru": "помогать (кому-то)", "py": "bāng", "lesson": "Аудио 3"}, {"id": "告诉", "hz": "告诉", "ru": "сообщить, сказать (кому-то)", "py": "gàosù", "lesson": "Аудио 3"}, {"id": "只要", "hz": "只要", "ru": "как только; при условии (只要…就…)", "py": "zhǐyào", "lesson": "8 августа 2026"}, {"id": "这是谁的", "hz": "这是谁的", "ru": "это чьё", "py": "zhèshìshéide", "lesson": "8 августа 2026"}, {"id": "粉色", "hz": "粉色", "ru": "розовый", "py": "fěnsè", "lesson": "8 августа 2026"}, {"id": "喂", "hz": "喂", "ru": "алло (по телефону)", "py": "wèi", "lesson": "11 августа 2026"}, {"id": "请问…在吗", "hz": "请问…在吗", "ru": "скажите, … на месте?", "py": "qǐngwènzàima", "lesson": "11 августа 2026"}, {"id": "您是哪位", "hz": "您是哪位", "ru": "кто вы? (вежливо, по телефону)", "py": "nínshìnǎwèi", "lesson": "11 августа 2026"}, {"id": "正在开会", "hz": "正在开会", "ru": "сейчас на совещании", "py": "zhèngzàikāihuì", "lesson": "11 августа 2026"}, {"id": "有件事情", "hz": "有件事情", "ru": "есть одно дело", "py": "yǒujiànshìqíng", "lesson": "11 августа 2026"}, {"id": "麻烦您", "hz": "麻烦您", "ru": "будьте добры (букв. побеспокою вас)", "py": "máfánnín", "lesson": "11 августа 2026"}, {"id": "一…就…", "hz": "一…就…", "ru": "как только…, сразу…", "py": "yījiù", "lesson": "11 августа 2026"}, {"id": "这里没有", "hz": "这里没有", "ru": "здесь нет (такого)", "py": "zhèlǐméiyǒu", "lesson": "11 августа 2026"}, {"id": "打扰", "hz": "打扰", "ru": "беспокоить, мешать", "py": "dǎrǎo", "lesson": "11 августа 2026"}, {"id": "扫", "hz": "扫", "ru": "сканировать (QR-код)", "py": "sǎo", "lesson": "11 августа 2026"}, {"id": "加上了", "hz": "加上了", "ru": "добавил(ся) (в контакты)", "py": "jiāshàngle", "lesson": "11 августа 2026"}, {"id": "直接找我", "hz": "直接找我", "ru": "обращайся прямо ко мне", "py": "zhíjiēzhǎowǒ", "lesson": "11 августа 2026"}, {"id": "送到", "hz": "送到", "ru": "доставить (до места)", "py": "sòngdào", "lesson": "11 августа 2026"}, {"id": "几乎", "hz": "几乎", "ru": "почти", "py": "jīhū", "lesson": "11 августа 2026"}, {"id": "不只是…还…", "hz": "不只是…还…", "ru": "не только…, но и…", "py": "bùzhǐshìhái", "lesson": "11 августа 2026"}, {"id": "付钱", "hz": "付钱", "ru": "платить", "py": "fùqián", "lesson": "11 августа 2026"}, {"id": "打车", "hz": "打车", "ru": "вызывать такси", "py": "dǎchē", "lesson": "11 августа 2026"}, {"id": "点外卖", "hz": "点外卖", "ru": "заказывать доставку еды", "py": "diǎnwàimài", "lesson": "11 августа 2026"}, {"id": "谈生意", "hz": "谈生意", "ru": "вести переговоры о делах", "py": "tánshēngyì", "lesson": "11 августа 2026"}, {"id": "一定要", "hz": "一定要", "ru": "обязательно нужно", "py": "yídìngyào", "lesson": "11 августа 2026"}, {"id": "约个时间", "hz": "约个时间", "ru": "договориться о времени (встречи)", "py": "yuēgèshíjiān", "lesson": "15 августа 2026"}, {"id": "什么时候方便", "hz": "什么时候方便", "ru": "когда вам удобно?", "py": "shénmeshíhòufāngbiàn", "lesson": "15 августа 2026"}, {"id": "行吗", "hz": "行吗", "ru": "можно? пойдёт?", "py": "xíngma", "lesson": "Аудио 5"}, {"id": "有事", "hz": "有事", "ru": "занят, есть дела", "py": "yǒushì", "lesson": "15 августа 2026"}, {"id": "急事", "hz": "急事", "ru": "срочное дело", "py": "jíshì", "lesson": "Аудио 5"}, {"id": "改到", "hz": "改到", "ru": "перенести на (дату/время)", "py": "gǎidào", "lesson": "15 августа 2026"}, {"id": "后天", "hz": "后天", "ru": "послезавтра", "py": "hòutiān", "lesson": "Аудио 1"}, {"id": "老地方", "hz": "老地方", "ru": "то же место, «как обычно»", "py": "lǎodìfāng", "lesson": "15 августа 2026"}, {"id": "不见不散", "hz": "不见不散", "ru": "не уйду, пока не встретимся (обязательно увидимся)", "py": "bújiànbúsàn", "lesson": "15 августа 2026"}, {"id": "东门", "hz": "东门", "ru": "восточные ворота", "py": "dōngmén", "lesson": "15 августа 2026"}, {"id": "把…发到微信上", "hz": "把…发到微信上", "ru": "отправить … в WeChat", "py": "bǎfādàowēixìnshàng", "lesson": "15 августа 2026"}, {"id": "新货", "hz": "新货", "ru": "новый товар", "py": "xīnhuò", "lesson": "15 августа 2026"}, {"id": "迟到", "hz": "迟到", "ru": "опоздать", "py": "chídào", "lesson": "Аудио 5"}, {"id": "堵车", "hz": "堵车", "ru": "пробка", "py": "dǔchē", "lesson": "Аудио 5"}, {"id": "出差", "hz": "出差", "ru": "командировка", "py": "chūchāi", "lesson": "15 августа 2026"}, {"id": "火车站", "hz": "火车站", "ru": "вокзал", "py": "huǒchēzhàn", "lesson": "15 августа 2026"}, {"id": "机场", "hz": "机场", "ru": "аэропорт", "py": "jīchǎng", "lesson": "Аудио 5"}, {"id": "票", "hz": "票", "ru": "билет", "py": "piào", "lesson": "Аудио 2"}, {"id": "上午还是下午", "hz": "上午还是下午", "ru": "утром или днём?", "py": "shàngwǔháishìxiàwǔ", "lesson": "15 августа 2026"}, {"id": "订房间", "hz": "订房间", "ru": "забронировать номер", "py": "dìngfángjiān", "lesson": "15 августа 2026"}, {"id": "住三天", "hz": "住三天", "ru": "жить (останавливаться) три дня", "py": "zhùsāntiān", "lesson": "15 августа 2026"}, {"id": "护照", "hz": "护照", "ru": "паспорт", "py": "hùzhào", "lesson": "Аудио 5"}, {"id": "早饭", "hz": "早饭", "ru": "завтрак", "py": "zǎofàn", "lesson": "12 сентября 2026"}, {"id": "红绿灯", "hz": "红绿灯", "ru": "светофор", "py": "hónglǜdēng", "lesson": "Аудио 1"}, {"id": "要多长时间", "hz": "要多长时间", "ru": "сколько времени займёт", "py": "yàoduōzhǎngshíjiān", "lesson": "15 августа 2026"}, {"id": "左右", "hz": "左右", "ru": "примерно, около", "py": "zuǒyòu", "lesson": "15 августа 2026"}, {"id": "坐地铁", "hz": "坐地铁", "ru": "ехать на метро", "py": "zuòdìtiě", "lesson": "Аудио 2"}, {"id": "请再说一遍", "hz": "请再说一遍", "ru": "повторите, пожалуйста", "py": "qǐngzàishuōyībiàn", "lesson": "15 августа 2026"}, {"id": "一路顺风", "hz": "一路顺风", "ru": "счастливого пути", "py": "yīlùshùnfēng", "lesson": "15 августа 2026"}, {"id": "展会", "hz": "展会", "ru": "выставка", "py": "zhǎnhuì", "lesson": "Аудио 3"}, {"id": "欢迎光临", "hz": "欢迎光临", "ru": "добро пожаловать!", "py": "huānyíngguānglín", "lesson": "Аудио 5"}, {"id": "请进", "hz": "请进", "ru": "проходите, пожалуйста", "py": "qǐngjìn", "lesson": "10 сентября 2026"}, {"id": "名片", "hz": "名片", "ru": "визитная карточка", "py": "míngpiàn", "lesson": "10 сентября 2026"}, {"id": "怎么称呼", "hz": "怎么称呼", "ru": "как к вам обращаться?", "py": "zěnmechēnghū", "lesson": "10 сентября 2026"}, {"id": "来自", "hz": "来自", "ru": "быть родом из, из", "py": "láizì", "lesson": "10 сентября 2026"}, {"id": "哪个公司的", "hz": "哪个公司的", "ru": "из какой компании?", "py": "nǎgegōngsīde", "lesson": "10 сентября 2026"}, {"id": "公司", "hz": "公司", "ru": "компания", "py": "gōngsī", "lesson": "Аудио 1"}, {"id": "产品", "hz": "产品", "ru": "продукция, товар", "py": "chǎnpǐn", "lesson": "10 сентября 2026"}, {"id": "介绍产品", "hz": "介绍产品", "ru": "представлять продукцию", "py": "jièshàochǎnpǐn", "lesson": "10 сентября 2026"}, {"id": "样品", "hz": "样品", "ru": "образец", "py": "yàngpǐn", "lesson": "Аудио 4"}, {"id": "目录", "hz": "目录", "ru": "каталог", "py": "mùlù", "lesson": "Аудио 2"}, {"id": "最受欢迎", "hz": "最受欢迎", "ru": "самый популярный", "py": "zuìshòuhuānyíng", "lesson": "10 сентября 2026"}, {"id": "工厂", "hz": "工厂", "ru": "фабрика", "py": "gōngchǎng", "lesson": "Аудио 1"}, {"id": "价格", "hz": "价格", "ru": "цена", "py": "jiàgé", "lesson": "Аудио 3"}, {"id": "最少", "hz": "最少", "ru": "минимум, не меньше", "py": "zuìshǎo", "lesson": "10 сентября 2026"}, {"id": "发货", "hz": "发货", "ru": "отгружать товар", "py": "fāhuò", "lesson": "Аудио 4"}, {"id": "报价单", "hz": "报价单", "ru": "прайс, коммерческое предложение", "py": "bàojiàdān", "lesson": "Аудио 2"}, {"id": "资料", "hz": "资料", "ru": "материалы, документы", "py": "zīliào", "lesson": "10 сентября 2026"}, {"id": "一份", "hz": "一份", "ru": "один экземпляр (сч. слово для документов)", "py": "yīfèn", "lesson": "10 сентября 2026"}, {"id": "客户", "hz": "客户", "ru": "клиент, заказчик", "py": "kèhù", "lesson": "10 сентября 2026"}, {"id": "商量", "hz": "商量", "ru": "обсудить, посоветоваться", "py": "shāngliáng", "lesson": "10 сентября 2026"}, {"id": "希望", "hz": "希望", "ru": "надеяться", "py": "xīwàng", "lesson": "Аудио 4"}, {"id": "机会", "hz": "机会", "ru": "возможность, шанс", "py": "jīhuì", "lesson": "10 сентября 2026"}, {"id": "再联系", "hz": "再联系", "ru": "свяжемся снова", "py": "zàiliánxì", "lesson": "10 сентября 2026"}, {"id": "待多久", "hz": "待多久", "ru": "сколько (времени) пробудете", "py": "dàiduōjiǔ", "lesson": "10 сентября 2026"}, {"id": "之后", "hz": "之后", "ru": "после (того как)", "py": "zhīhòu", "lesson": "Аудио 3"}, {"id": "饮食习惯", "hz": "饮食习惯", "ru": "пищевые привычки", "py": "yǐnshíxíguàn", "lesson": "12 сентября 2026"}, {"id": "自己做饭", "hz": "自己做饭", "ru": "готовить самому", "py": "zìjǐzuòfàn", "lesson": "12 сентября 2026"}, {"id": "最喜欢的菜", "hz": "最喜欢的菜", "ru": "любимое блюдо", "py": "zuìxǐhuāndecài", "lesson": "12 сентября 2026"}, {"id": "吃过", "hz": "吃过", "ru": "пробовал (есть) раньше", "py": "chīguò", "lesson": "12 сентября 2026"}, {"id": "广东菜", "hz": "广东菜", "ru": "кантонская кухня", "py": "guǎngdōngcài", "lesson": "12 сентября 2026"}, {"id": "有名", "hz": "有名", "ru": "известный", "py": "yǒumíng", "lesson": "12 сентября 2026"}, {"id": "一天三顿饭", "hz": "一天三顿饭", "ru": "три приёма пищи в день", "py": "yītiānsāndùnfàn", "lesson": "12 сентября 2026"}, {"id": "午饭", "hz": "午饭", "ru": "обед", "py": "wǔfàn", "lesson": "Аудио 3"}, {"id": "晚饭", "hz": "晚饭", "ru": "ужин", "py": "wǎnfàn", "lesson": "12 сентября 2026"}, {"id": "油腻", "hz": "油腻", "ru": "жирный (о еде)", "py": "yóunì", "lesson": "12 сентября 2026"}, {"id": "味道不错", "hz": "味道不错", "ru": "вкус неплохой", "py": "wèidàobùcuò", "lesson": "12 сентября 2026"}, {"id": "口味", "hz": "口味", "ru": "вкус (предпочтения)", "py": "kǒuwèi", "lesson": "12 сентября 2026"}, {"id": "叉子", "hz": "叉子", "ru": "вилка", "py": "chāzi", "lesson": "12 сентября 2026"}, {"id": "碗", "hz": "碗", "ru": "миска, пиала", "py": "wǎn", "lesson": "12 сентября 2026"}, {"id": "盘子", "hz": "盘子", "ru": "тарелка", "py": "pánzi", "lesson": "12 сентября 2026"}, {"id": "吃不习惯", "hz": "吃不习惯", "ru": "не привык к (такой) еде", "py": "chībùxíguàn", "lesson": "12 сентября 2026"}, {"id": "减肥", "hz": "减肥", "ru": "худеть, быть на диете", "py": "jiǎnféi", "lesson": "12 сентября 2026"}, {"id": "尝一尝", "hz": "尝一尝", "ru": "попробовать (на вкус)", "py": "chángyīcháng", "lesson": "12 сентября 2026"}, {"id": "饿了", "hz": "饿了", "ru": "проголодался", "py": "èle", "lesson": "12 сентября 2026"}, {"id": "吃饱了", "hz": "吃饱了", "ru": "наелся", "py": "chībǎole", "lesson": "12 сентября 2026"}, {"id": "一边…一边…", "hz": "一边…一边…", "ru": "одновременно … и …", "py": "yībiānyībiān", "lesson": "Аудио 3"}, {"id": "最少订多少", "hz": "最少订多少", "ru": "минимальный заказ — сколько?", "py": "zuìshǎodìngduōshǎo", "lesson": "12 сентября 2026"}, {"id": "折扣", "hz": "折扣", "ru": "скидка (процентом)", "py": "zhékòu", "lesson": "Аудио 4"}, {"id": "美元", "hz": "美元", "ru": "доллар США", "py": "měiyuán", "lesson": "12 сентября 2026"}, {"id": "人民币", "hz": "人民币", "ru": "юань", "py": "rénmínbì", "lesson": "Аудио 4"}, {"id": "运费", "hz": "运费", "ru": "стоимость доставки (грузовой)", "py": "yùnfèi", "lesson": "12 сентября 2026"}, {"id": "含", "hz": "含", "ru": "включать (в цену)", "py": "hán", "lesson": "12 сентября 2026"}, {"id": "您怎么称呼", "hz": "您怎么称呼", "ru": "как к вам обращаться?", "py": "nínzěnmechēnghū", "lesson": "12 сентября 2026"}, {"id": "称呼我", "hz": "称呼我", "ru": "называйте меня…", "py": "chēnghūwǒ", "lesson": "12 сентября 2026"}, {"id": "主要做什么产品", "hz": "主要做什么产品", "ru": "какую продукцию в основном делаете?", "py": "zhǔyàozuòshénmechǎnpǐn", "lesson": "12 сентября 2026"}, {"id": "主要", "hz": "主要", "ru": "в основном, главным образом", "py": "zhǔyào", "lesson": "12 сентября 2026"}, {"id": "电子产品", "hz": "电子产品", "ru": "электроника", "py": "diànzichǎnpǐn", "lesson": "12 сентября 2026"}, {"id": "植物灯", "hz": "植物灯", "ru": "фитолампа (лампа для растений)", "py": "zhíwùdēng", "lesson": "12 сентября 2026"}, {"id": "价格可以谈", "hz": "价格可以谈", "ru": "цена обсуждаема", "py": "jiàgékěyǐtán", "lesson": "12 сентября 2026"}, {"id": "有点贵", "hz": "有点贵", "ru": "дороговато", "py": "yǒudiǎnguì", "lesson": "12 сентября 2026"}, {"id": "一个月", "hz": "一个月", "ru": "один месяц (срок)", "py": "yígèyuè", "lesson": "12 сентября 2026"}, {"id": "一百万", "hz": "一百万", "ru": "миллион", "py": "yìbǎiwàn", "lesson": "12 сентября 2026"}, {"id": "别打扰", "hz": "别打扰", "ru": "не мешай(те)", "py": "biédǎrǎo", "lesson": "12 сентября 2026"}, {"id": "这是给您的", "hz": "这是给您的", "ru": "это вам (для вас)", "py": "zhèshìgěinínde", "lesson": "Аудио 1"}, {"id": "您太客气了", "hz": "您太客气了", "ru": "вы так любезны (не стоило)", "py": "níntàikèqìle", "lesson": "Аудио 1"}, {"id": "欢迎", "hz": "欢迎", "ru": "добро пожаловать; приветствовать", "py": "huānyíng", "lesson": "Аудио 1"}, {"id": "吃个饭吧", "hz": "吃个饭吧", "ru": "давай перекусим (непринуждённо)", "py": "chīgèfànba", "lesson": "Аудио 1"}, {"id": "喝个咖啡吧", "hz": "喝个咖啡吧", "ru": "давай выпьем кофе", "py": "hēgèkāfēiba", "lesson": "Аудио 1"}, {"id": "我请你们", "hz": "我请你们", "ru": "я вас угощаю / приглашаю", "py": "wǒqǐngnǐmen", "lesson": "Аудио 1"}, {"id": "中午", "hz": "中午", "ru": "полдень, обед", "py": "zhōngwǔ", "lesson": "Аудио 5"}, {"id": "吧", "hz": "吧", "ru": "частица «давай…», мягкое предложение", "py": "ba", "lesson": "Аудио 1"}, {"id": "一些", "hz": "一些", "ru": "немного, несколько", "py": "yīxiē", "lesson": "Аудио 1"}, {"id": "给了", "hz": "给了", "ru": "дал(а)", "py": "gěile", "lesson": "Аудио 1"}, {"id": "中文书", "hz": "中文书", "ru": "книга на китайском", "py": "zhōngwénshū", "lesson": "Аудио 1"}, {"id": "不好意思", "hz": "不好意思", "ru": "извините (мягко, разговорно)", "py": "bùhǎoyìsī", "lesson": "Аудио 1"}, {"id": "麻烦你", "hz": "麻烦你", "ru": "будьте добры (букв. побеспокою вас)", "py": "máfánnǐ", "lesson": "Аудио 1"}, {"id": "饭馆", "hz": "饭馆", "ru": "ресторан, кафе", "py": "fànguǎn", "lesson": "Аудио 1"}, {"id": "餐厅", "hz": "餐厅", "ru": "ресторан, столовая", "py": "cāntīng", "lesson": "Аудио 1"}, {"id": "你们想吃什么", "hz": "你们想吃什么", "ru": "что вы хотите заказать?", "py": "nǐmenxiǎngchīshénme", "lesson": "Аудио 1"}, {"id": "最好吃的菜", "hz": "最好吃的菜", "ru": "самое вкусное блюдо", "py": "zuìhǎochīdecài", "lesson": "Аудио 1"}, {"id": "介绍一下", "hz": "介绍一下", "ru": "расскажите / порекомендуйте", "py": "jièshàoyīxià", "lesson": "Аудио 1"}, {"id": "鱼", "hz": "鱼", "ru": "рыба", "py": "yú", "lesson": "Аудио 1"}, {"id": "羊肉", "hz": "羊肉", "ru": "баранина", "py": "yángròu", "lesson": "Аудио 2"}, {"id": "牛肉", "hz": "牛肉", "ru": "говядина", "py": "niúròu", "lesson": "Аудио 2"}, {"id": "请给我一杯茶", "hz": "请给我一杯茶", "ru": "дайте, пожалуйста, чашку чая", "py": "qǐnggěiwǒyībēichá", "lesson": "Аудио 1"}, {"id": "座位", "hz": "座位", "ru": "место", "py": "zuòwèi", "lesson": "Аудио 4"}, {"id": "室内", "hz": "室内", "ru": "в помещении, внутри", "py": "shìnèi", "lesson": "Аудио 1"}, {"id": "室外", "hz": "室外", "ru": "снаружи, на улице", "py": "shìwài", "lesson": "Аудио 1"}, {"id": "有优惠吗", "hz": "有优惠吗", "ru": "есть скидки/акции?", "py": "yǒuyōuhuìma", "lesson": "Аудио 1"}, {"id": "买一送一", "hz": "买一送一", "ru": "купи один — второй в подарок", "py": "mǎiyīsòngyī", "lesson": "Аудио 1"}, {"id": "便利店", "hz": "便利店", "ru": "магазин у дома (24/7)", "py": "biànlìdiàn", "lesson": "Аудио 1"}, {"id": "星巴克", "hz": "星巴克", "ru": "Starbucks", "py": "xīngbākè", "lesson": "Аудио 1"}, {"id": "麦当劳", "hz": "麦当劳", "ru": "McDonald's", "py": "màidāngláo", "lesson": "Аудио 1"}, {"id": "肯德基", "hz": "肯德基", "ru": "KFC", "py": "kěndéjī", "lesson": "Аудио 1"}, {"id": "家乐福", "hz": "家乐福", "ru": "Carrefour (супермаркет)", "py": "jiālèfú", "lesson": "Аудио 1"}, {"id": "沃尔玛", "hz": "沃尔玛", "ru": "Walmart", "py": "wòěrmǎ", "lesson": "Аудио 1"}, {"id": "全家", "hz": "全家", "ru": "FamilyMart (магазин у дома)", "py": "quánjiā", "lesson": "Аудио 1"}, {"id": "一家", "hz": "一家", "ru": "одно (заведение) — сч. слово 家", "py": "yījiā", "lesson": "Аудио 1"}, {"id": "收银台", "hz": "收银台", "ru": "касса", "py": "shōuyíntái", "lesson": "Аудио 3"}, {"id": "这儿", "hz": "这儿", "ru": "здесь", "py": "zhèr", "lesson": "Аудио 1"}, {"id": "哪儿", "hz": "哪儿", "ru": "где", "py": "nǎr", "lesson": "Аудио 1"}, {"id": "没有", "hz": "没有", "ru": "нет (не имеется)", "py": "méiyǒu", "lesson": "Аудио 1"}, {"id": "东南西北", "hz": "东南西北", "ru": "восток, юг, запад, север (стороны света)", "py": "dōngnánxīběi", "lesson": "Аудио 1"}, {"id": "前后", "hz": "前后", "ru": "спереди и сзади", "py": "qiánhòu", "lesson": "Аудио 1"}, {"id": "外面", "hz": "外面", "ru": "снаружи, на улице", "py": "wàimiàn", "lesson": "Аудио 2"}, {"id": "东西", "hz": "东西", "ru": "вещь, товар (букв. «восток-запад»)", "py": "dōngxī", "lesson": "Аудио 1"}, {"id": "一直往前走", "hz": "一直往前走", "ru": "идите всё время прямо", "py": "yìzhíwǎngqiánzǒu", "lesson": "Аудио 1"}, {"id": "十字路口", "hz": "十字路口", "ru": "перекрёсток (крестообразный)", "py": "shízìlùkǒu", "lesson": "Аудио 1"}, {"id": "过马路", "hz": "过马路", "ru": "переходить дорогу", "py": "guòmǎlù", "lesson": "Аудио 1"}, {"id": "就到了", "hz": "就到了", "ru": "и вы на месте", "py": "jiùdàole", "lesson": "Аудио 1"}, {"id": "走路", "hz": "走路", "ru": "идти пешком", "py": "zǒulù", "lesson": "Аудио 2"}, {"id": "走错了", "hz": "走错了", "ru": "пошёл не туда", "py": "zǒucuòle", "lesson": "Аудио 1"}, {"id": "往", "hz": "往", "ru": "в направлении, к", "py": "wǎng", "lesson": "Аудио 1"}, {"id": "更", "hz": "更", "ru": "ещё более", "py": "gèng", "lesson": "Аудио 1"}, {"id": "更近", "hz": "更近", "ru": "ближе", "py": "gèngjìn", "lesson": "Аудио 1"}, {"id": "更好", "hz": "更好", "ru": "лучше", "py": "gènghǎo", "lesson": "Аудио 1"}, {"id": "我更喜欢", "hz": "我更喜欢", "ru": "мне больше нравится", "py": "wǒgèngxǐhuān", "lesson": "Аудио 1"}, {"id": "说得很好", "hz": "说得很好", "ru": "хорошо говорит", "py": "shuōdehěnhǎo", "lesson": "Аудио 1"}, {"id": "说完", "hz": "说完", "ru": "договорить", "py": "shuōwán", "lesson": "Аудио 1"}, {"id": "吃完", "hz": "吃完", "ru": "доесть", "py": "chīwán", "lesson": "Аудио 1"}, {"id": "做完", "hz": "做完", "ru": "доделать", "py": "zuòwán", "lesson": "Аудио 1"}, {"id": "洗完澡", "hz": "洗完澡", "ru": "помывшись (после душа)", "py": "xǐwánzǎo", "lesson": "Аудио 1"}, {"id": "就", "hz": "就", "ru": "сразу (же), тогда", "py": "jiù", "lesson": "Аудио 1"}, {"id": "上课", "hz": "上课", "ru": "быть на уроке, заниматься", "py": "shàngkè", "lesson": "Аудио 1"}, {"id": "送", "hz": "送", "ru": "провожать; доставлять; дарить", "py": "sòng", "lesson": "Аудио 1"}, {"id": "车站", "hz": "车站", "ru": "вокзал, остановка", "py": "chēzhàn", "lesson": "Аудио 1"}, {"id": "以前", "hz": "以前", "ru": "до, прежде", "py": "yǐqián", "lesson": "Аудио 3"}, {"id": "以后", "hz": "以后", "ru": "после", "py": "yǐhòu", "lesson": "Аудио 3"}, {"id": "我终于做完了", "hz": "我终于做完了", "ru": "я наконец-то закончил", "py": "wǒzhōngyúzuòwánle", "lesson": "Аудио 1"}, {"id": "外卖", "hz": "外卖", "ru": "доставка еды", "py": "wàimài", "lesson": "Аудио 1"}, {"id": "放在门口", "hz": "放在门口", "ru": "оставить у двери", "py": "fàngzàiménkǒu", "lesson": "Аудио 1"}, {"id": "前台", "hz": "前台", "ru": "ресепшен", "py": "qiántái", "lesson": "Аудио 1"}, {"id": "地址", "hz": "地址", "ru": "адрес", "py": "dìzhǐ", "lesson": "Аудио 1"}, {"id": "小区", "hz": "小区", "ru": "жилой комплекс, микрорайон", "py": "xiǎoqū", "lesson": "Аудио 2"}, {"id": "号楼", "hz": "号楼", "ru": "корпус (номер дома)", "py": "hàolóu", "lesson": "Аудио 1"}, {"id": "订单", "hz": "订单", "ru": "заказ", "py": "dìngdān", "lesson": "Аудио 1"}, {"id": "送错了", "hz": "送错了", "ru": "привезли не то", "py": "sòngcuòle", "lesson": "Аудио 1"}, {"id": "奶茶", "hz": "奶茶", "ru": "чай с молоком (бабл-ти)", "py": "nǎichá", "lesson": "Аудио 1"}, {"id": "帮我看一下", "hz": "帮我看一下", "ru": "посмотрите (проверьте), пожалуйста", "py": "bāngwǒkànyīxià", "lesson": "Аудио 1"}, {"id": "我马上下来", "hz": "我马上下来", "ru": "я сейчас спущусь", "py": "wǒmǎshàngxiàlái", "lesson": "Аудио 1"}, {"id": "大门", "hz": "大门", "ru": "главный вход, ворота", "py": "dàmén", "lesson": "Аудио 1"}, {"id": "外套", "hz": "外套", "ru": "куртка, верхняя одежда", "py": "wàitào", "lesson": "Аудио 1"}, {"id": "看到", "hz": "看到", "ru": "увидеть", "py": "kàndào", "lesson": "Аудио 1"}, {"id": "过来", "hz": "过来", "ru": "подойти (сюда)", "py": "guòlái", "lesson": "Аудио 1"}, {"id": "过去", "hz": "过去", "ru": "подойти (туда)", "py": "guòqù", "lesson": "Аудио 1"}, {"id": "上来", "hz": "上来", "ru": "подняться (сюда)", "py": "shànglái", "lesson": "Аудио 1"}, {"id": "下来", "hz": "下来", "ru": "спуститься (сюда)", "py": "xiàlái", "lesson": "Аудио 1"}, {"id": "进来", "hz": "进来", "ru": "войти (сюда)", "py": "jìnlái", "lesson": "Аудио 1"}, {"id": "出去", "hz": "出去", "ru": "выходить (наружу)", "py": "chūqù", "lesson": "Аудио 2"}, {"id": "回来", "hz": "回来", "ru": "вернуться (сюда)", "py": "huílái", "lesson": "Аудио 1"}, {"id": "回去", "hz": "回去", "ru": "вернуться (туда)", "py": "huíqù", "lesson": "Аудио 1"}, {"id": "没接到", "hz": "没接到", "ru": "не смог ответить / не встретил", "py": "méijiēdào", "lesson": "Аудио 1"}, {"id": "接", "hz": "接", "ru": "встречать (кого-то)", "py": "jiē", "lesson": "Аудио 5"}, {"id": "接机", "hz": "接机", "ru": "встречать в аэропорту", "py": "jiējī", "lesson": "Аудио 1"}, {"id": "信息", "hz": "信息", "ru": "информация", "py": "xìnxī", "lesson": "Аудио 1"}, {"id": "联系人", "hz": "联系人", "ru": "контактное лицо", "py": "liánxìrén", "lesson": "Аудио 1"}, {"id": "联系电话", "hz": "联系电话", "ru": "контактный телефон", "py": "liánxìdiànhuà", "lesson": "Аудио 1"}, {"id": "定位", "hz": "定位", "ru": "геолокация, метка на карте", "py": "dìngwèi", "lesson": "Аудио 1"}, {"id": "开门", "hz": "开门", "ru": "открыть дверь / дверь открыта", "py": "kāimén", "lesson": "Аудио 1"}, {"id": "打开", "hz": "打开", "ru": "открыть", "py": "dǎkāi", "lesson": "Аудио 5"}, {"id": "窗户", "hz": "窗户", "ru": "окно", "py": "chuānghù", "lesson": "Аудио 1"}, {"id": "能看见", "hz": "能看见", "ru": "можно увидеть", "py": "néngkànjiàn", "lesson": "Аудио 1"}, {"id": "沙发", "hz": "沙发", "ru": "диван", "py": "shāfā", "lesson": "Аудио 1"}, {"id": "舒服", "hz": "舒服", "ru": "удобный, комфортный", "py": "shūfú", "lesson": "Аудио 1"}, {"id": "推出", "hz": "推出", "ru": "выпускать (на рынок)", "py": "tuīchū", "lesson": "Аудио 2"}, {"id": "新产品", "hz": "新产品", "ru": "новый продукт", "py": "xīnchǎnpǐn", "lesson": "Аудио 1"}, {"id": "新款", "hz": "新款", "ru": "новые модели", "py": "xīnkuǎn", "lesson": "Аудио 4"}, {"id": "广交会", "hz": "广交会", "ru": "Кантонская ярмарка", "py": "guǎngjiāohuì", "lesson": "Аудио 2"}, {"id": "展位", "hz": "展位", "ru": "стенд (на выставке)", "py": "zhǎnwèi", "lesson": "Аудио 3"}, {"id": "大订单", "hz": "大订单", "ru": "крупный заказ", "py": "dàdìngdān", "lesson": "Аудио 1"}, {"id": "特别优惠", "hz": "特别优惠", "ru": "специальное предложение, спецскидка", "py": "tèbiéyōuhuì", "lesson": "Аудио 1"}, {"id": "为", "hz": "为", "ru": "для (книжн.)", "py": "wèi", "lesson": "Аудио 1"}, {"id": "将", "hz": "将", "ru": "будет (книжн. будущее)", "py": "jiāng", "lesson": "Аудио 1"}, {"id": "牌子", "hz": "牌子", "ru": "марка, бренд", "py": "páizi", "lesson": "Аудио 2"}, {"id": "品牌", "hz": "品牌", "ru": "бренд (офиц.)", "py": "pǐnpái", "lesson": "Аудио 2"}, {"id": "设计", "hz": "设计", "ru": "дизайн", "py": "shèjì", "lesson": "Аудио 1"}, {"id": "国产", "hz": "国产", "ru": "отечественный (китайского пр-ва)", "py": "guóchǎn", "lesson": "Аудио 2"}, {"id": "中国制造", "hz": "中国制造", "ru": "сделано в Китае", "py": "zhōngguózhìzào", "lesson": "Аудио 1"}, {"id": "前天", "hz": "前天", "ru": "позавчера", "py": "qiántiān", "lesson": "Аудио 1"}, {"id": "昨天", "hz": "昨天", "ru": "вчера", "py": "zuótiān", "lesson": "Аудио 1"}, {"id": "明天", "hz": "明天", "ru": "завтра", "py": "míngtiān", "lesson": "Аудио 1"}, {"id": "上个月", "hz": "上个月", "ru": "в прошлом месяце", "py": "shànggèyuè", "lesson": "Аудио 1"}, {"id": "这个月", "hz": "这个月", "ru": "в этом месяце", "py": "zhègeyuè", "lesson": "Аудио 1"}, {"id": "下个月", "hz": "下个月", "ru": "в следующем месяце", "py": "xiàgèyuè", "lesson": "Аудио 1"}, {"id": "去年", "hz": "去年", "ru": "в прошлом году", "py": "qùnián", "lesson": "Аудио 2"}, {"id": "今年", "hz": "今年", "ru": "в этом году", "py": "jīnnián", "lesson": "Аудио 1"}, {"id": "明年", "hz": "明年", "ru": "в следующем году", "py": "míngnián", "lesson": "Аудио 1"}, {"id": "前年", "hz": "前年", "ru": "позапрошлый год", "py": "qiánnián", "lesson": "Аудио 1"}, {"id": "不久以前", "hz": "不久以前", "ru": "недавно", "py": "bùjiǔyǐqián", "lesson": "Аудио 1"}, {"id": "位置", "hz": "位置", "ru": "место (вообще), столик", "py": "wèizhì", "lesson": "Аудио 2"}, {"id": "还有", "hz": "还有", "ru": "ещё есть; ещё осталось", "py": "háiyǒu", "lesson": "Аудио 2"}, {"id": "排队", "hz": "排队", "ru": "стоять в очереди", "py": "páiduì", "lesson": "Аудио 4"}, {"id": "只能", "hz": "只能", "ru": "можно только; остаётся только", "py": "zhǐnéng", "lesson": "Аудио 2"}, {"id": "等", "hz": "等", "ru": "ждать", "py": "děng", "lesson": "Аудио 2"}, {"id": "等一下", "hz": "等一下", "ru": "подождите минутку", "py": "děngyíxià", "lesson": "Аудио 2"}, {"id": "需要", "hz": "需要", "ru": "нужно, требуется", "py": "xūyào", "lesson": "Аудио 2"}, {"id": "不需要", "hz": "不需要", "ru": "не нужно", "py": "bùxūyào", "lesson": "Аудио 2"}, {"id": "算了", "hz": "算了", "ru": "ладно, забудь; ну и не надо", "py": "suànle", "lesson": "Аудио 2"}, {"id": "别的", "hz": "别的", "ru": "другой, иной", "py": "biéde", "lesson": "Аудио 2"}, {"id": "地方", "hz": "地方", "ru": "место (локация)", "py": "dìfāng", "lesson": "Аудио 2"}, {"id": "别人", "hz": "别人", "ru": "другие люди, чужие", "py": "biérén", "lesson": "Аудио 2"}, {"id": "多久", "hz": "多久", "ru": "как долго", "py": "duōjiǔ", "lesson": "Аудио 4"}, {"id": "多长时间", "hz": "多长时间", "ru": "сколько времени", "py": "duōzhǎngshíjiān", "lesson": "Аудио 4"}, {"id": "时候", "hz": "时候", "ru": "момент, когда", "py": "shíhòu", "lesson": "Аудио 2"}, {"id": "长时间", "hz": "长时间", "ru": "долгое время", "py": "zhǎngshíjiān", "lesson": "Аудио 2"}, {"id": "多大", "hz": "多大", "ru": "какого размера; сколько лет", "py": "duōdà", "lesson": "Аудио 4"}, {"id": "多高", "hz": "多高", "ru": "какого роста, насколько высокий", "py": "duōgāo", "lesson": "Аудио 2"}, {"id": "一节课", "hz": "一节课", "ru": "один урок (занятие)", "py": "yījiékè", "lesson": "Аудио 2"}, {"id": "大概", "hz": "大概", "ru": "примерно", "py": "dàgài", "lesson": "Аудио 4"}, {"id": "分钟", "hz": "分钟", "ru": "минута", "py": "fēnzhōng", "lesson": "Аудио 2"}, {"id": "一个小时", "hz": "一个小时", "ru": "один час", "py": "yígèxiǎoshí", "lesson": "Аудио 2"}, {"id": "从…到…", "hz": "从…到…", "ru": "от … до …", "py": "cóngdào", "lesson": "Аудио 2"}, {"id": "跑步", "hz": "跑步", "ru": "бегать, бег", "py": "pǎobù", "lesson": "Аудио 2"}, {"id": "预订", "hz": "预订", "ru": "бронировать, заказывать заранее", "py": "yùdìng", "lesson": "Аудио 2"}, {"id": "订", "hz": "订", "ru": "заказать, забронировать (коротко)", "py": "dìng", "lesson": "Аудио 2"}, {"id": "机票", "hz": "机票", "ru": "авиабилет", "py": "jīpiào", "lesson": "Аудио 2"}, {"id": "火车票", "hz": "火车票", "ru": "билет на поезд", "py": "huǒchēpiào", "lesson": "Аудио 2"}, {"id": "电影票", "hz": "电影票", "ru": "билет в кино", "py": "diànyǐngpiào", "lesson": "Аудио 2"}, {"id": "门票", "hz": "门票", "ru": "входной билет", "py": "ménpiào", "lesson": "Аудио 2"}, {"id": "飞机", "hz": "飞机", "ru": "самолёт", "py": "fēijī", "lesson": "Аудио 2"}, {"id": "起飞", "hz": "起飞", "ru": "взлетать", "py": "qǐfēi", "lesson": "Аудио 2"}, {"id": "降落", "hz": "降落", "ru": "приземляться", "py": "jiàngluò", "lesson": "Аудио 2"}, {"id": "住", "hz": "住", "ru": "жить, проживать", "py": "zhù", "lesson": "Аудио 2"}, {"id": "长城", "hz": "长城", "ru": "Великая Китайская стена", "py": "chángchéng", "lesson": "Аудио 2"}, {"id": "请排队", "hz": "请排队", "ru": "пожалуйста, встаньте в очередь", "py": "qǐngpáiduì", "lesson": "Аудио 2"}, {"id": "点餐", "hz": "点餐", "ru": "заказывать еду", "py": "diǎncān", "lesson": "Аудио 2"}, {"id": "早餐", "hz": "早餐", "ru": "завтрак", "py": "zǎocān", "lesson": "Аудио 2"}, {"id": "付款", "hz": "付款", "ru": "оплачивать, оплата", "py": "fùkuǎn", "lesson": "Аудио 2"}, {"id": "登机", "hz": "登机", "ru": "посадка в самолёт", "py": "dēngjī", "lesson": "Аудио 2"}, {"id": "上飞机", "hz": "上飞机", "ru": "садиться в самолёт", "py": "shàngfēijī", "lesson": "Аудио 2"}, {"id": "下飞机", "hz": "下飞机", "ru": "выходить из самолёта", "py": "xiàfēijī", "lesson": "Аудио 2"}, {"id": "去过", "hz": "去过", "ru": "бывал (где-то)", "py": "qùguò", "lesson": "Аудио 2"}, {"id": "从来没", "hz": "从来没", "ru": "никогда не (в прошлом)", "py": "cóngláiméi", "lesson": "Аудио 2"}, {"id": "一次", "hz": "一次", "ru": "один раз", "py": "yīcì", "lesson": "Аудио 2"}, {"id": "几年前", "hz": "几年前", "ru": "несколько лет назад", "py": "jǐniánqián", "lesson": "Аудио 2"}, {"id": "派对", "hz": "派对", "ru": "вечеринка", "py": "pàiduì", "lesson": "Аудио 2"}, {"id": "电梯", "hz": "电梯", "ru": "лифт, эскалатор", "py": "diàntī", "lesson": "Аудио 2"}, {"id": "左边", "hz": "左边", "ru": "слева, левая сторона", "py": "zuǒbiān", "lesson": "Аудио 2"}, {"id": "馅", "hz": "馅", "ru": "начинка", "py": "xiàn", "lesson": "Аудио 2"}, {"id": "鸡肉", "hz": "鸡肉", "ru": "курица (мясо)", "py": "jīròu", "lesson": "Аудио 2"}, {"id": "烤肉", "hz": "烤肉", "ru": "мясо на гриле, барбекю", "py": "kǎoròu", "lesson": "Аудио 2"}, {"id": "狗", "hz": "狗", "ru": "собака", "py": "gǒu", "lesson": "Аудио 2"}, {"id": "猫", "hz": "猫", "ru": "кошка", "py": "māo", "lesson": "Аудио 2"}, {"id": "养", "hz": "养", "ru": "держать (животное), растить", "py": "yǎng", "lesson": "Аудио 2"}, {"id": "下雨", "hz": "下雨", "ru": "идёт дождь", "py": "xiàyǔ", "lesson": "Аудио 2"}, {"id": "晴天", "hz": "晴天", "ru": "ясный день", "py": "qíngtiān", "lesson": "Аудио 2"}, {"id": "阴天", "hz": "阴天", "ru": "пасмурный день", "py": "yīntiān", "lesson": "Аудио 2"}, {"id": "太阳", "hz": "太阳", "ru": "солнце", "py": "tàiyáng", "lesson": "Аудио 2"}, {"id": "可能", "hz": "可能", "ru": "возможно, может быть", "py": "kěnéng", "lesson": "Аудио 2"}, {"id": "是不是要下雨了", "hz": "是不是要下雨了", "ru": "не собирается ли дождь?", "py": "shìbúshìyàoxiàyǔle", "lesson": "Аудио 2"}, {"id": "踢足球", "hz": "踢足球", "ru": "играть в футбол", "py": "tīzúqiú", "lesson": "Аудио 2"}, {"id": "打篮球", "hz": "打篮球", "ru": "играть в баскетбол", "py": "dǎlánqiú", "lesson": "Аудио 2"}, {"id": "电脑", "hz": "电脑", "ru": "компьютер", "py": "diànnǎo", "lesson": "Аудио 2"}, {"id": "电视", "hz": "电视", "ru": "телевизор", "py": "diànshì", "lesson": "Аудио 2"}, {"id": "眼睛", "hz": "眼睛", "ru": "глаза", "py": "yǎnjīng", "lesson": "Аудио 2"}, {"id": "红红的", "hz": "红红的", "ru": "красненький, покрасневший", "py": "hónghóngde", "lesson": "Аудио 2"}, {"id": "怎么", "hz": "怎么", "ru": "почему это? (удивление)", "py": "zěnme", "lesson": "Аудио 2"}, {"id": "一晚上", "hz": "一晚上", "ru": "весь вечер, всю ночь", "py": "yīwǎnshàng", "lesson": "Аудио 2"}, {"id": "不是吧", "hz": "不是吧", "ru": "да ладно! не может быть", "py": "búshìba", "lesson": "Аудио 2"}, {"id": "我觉得", "hz": "我觉得", "ru": "мне кажется, я считаю", "py": "wǒjuéde", "lesson": "Аудио 2"}, {"id": "要走了", "hz": "要走了", "ru": "скоро уходит/уезжает", "py": "yàozǒule", "lesson": "Аудио 2"}, {"id": "离开", "hz": "离开", "ru": "уезжать, покидать", "py": "líkāi", "lesson": "Аудио 2"}, {"id": "你说的没错", "hz": "你说的没错", "ru": "ты прав", "py": "nǐshuōdeméicuò", "lesson": "Аудио 2"}, {"id": "想妈妈", "hz": "想妈妈", "ru": "скучать по маме", "py": "xiǎngmāmā", "lesson": "Аудио 2"}, {"id": "准备", "hz": "准备", "ru": "готовиться, готовить", "py": "zhǔnbèi", "lesson": "Аудио 2"}, {"id": "准备好了吗", "hz": "准备好了吗", "ru": "готов?", "py": "zhǔnbèihǎolema", "lesson": "Аудио 2"}, {"id": "头发", "hz": "头发", "ru": "волосы", "py": "tóufà", "lesson": "Аудио 2"}, {"id": "进口", "hz": "进口", "ru": "импортный", "py": "jìnkǒu", "lesson": "Аудио 2"}, {"id": "物美价廉", "hz": "物美价廉", "ru": "хорошее качество по низкой цене", "py": "wùměijiàlián", "lesson": "Аудио 4"}, {"id": "商品", "hz": "商品", "ru": "товар", "py": "shāngpǐn", "lesson": "Аудио 4"}, {"id": "找到", "hz": "找到", "ru": "найти", "py": "zhǎodào", "lesson": "Аудио 4"}, {"id": "采购商", "hz": "采购商", "ru": "закупщик, байер", "py": "cǎigòushāng", "lesson": "Аудио 4"}, {"id": "顾客", "hz": "顾客", "ru": "покупатель, клиент", "py": "gùkè", "lesson": "Аудио 4"}, {"id": "订一些", "hz": "订一些", "ru": "заказать немного", "py": "dìngyīxiē", "lesson": "Аудио 2"}, {"id": "寄", "hz": "寄", "ru": "отправлять (почтой)", "py": "jì", "lesson": "Аудио 2"}, {"id": "不用", "hz": "不用", "ru": "не нужно, не надо", "py": "bùyòng", "lesson": "Аудио 2"}, {"id": "微信发给我", "hz": "微信发给我", "ru": "пришли в WeChat", "py": "wēixìnfāgěiwǒ", "lesson": "Аудио 2"}, {"id": "支付宝", "hz": "支付宝", "ru": "Alipay", "py": "zhīfùbǎo", "lesson": "Аудио 4"}, {"id": "或者", "hz": "或者", "ru": "или (в утверждении)", "py": "huòzhě", "lesson": "Аудио 2"}, {"id": "还是", "hz": "还是", "ru": "или (в вопросе)", "py": "háishì", "lesson": "Аудио 2"}, {"id": "交钱", "hz": "交钱", "ru": "платить, вносить деньги", "py": "jiāoqián", "lesson": "Аудио 2"}, {"id": "交作业", "hz": "交作业", "ru": "сдавать домашнее задание", "py": "jiāozuòyè", "lesson": "Аудио 2"}, {"id": "楼下", "hz": "楼下", "ru": "внизу (этажом ниже)", "py": "lóuxià", "lesson": "Аудио 4"}, {"id": "你明白我的意思吗", "hz": "你明白我的意思吗", "ru": "ты понимаешь, что я имею в виду?", "py": "nǐmíngbáiwǒdeyìsima", "lesson": "Аудио 2"}, {"id": "意思", "hz": "意思", "ru": "смысл, значение", "py": "yìsi", "lesson": "Аудио 2"}, {"id": "正…呢", "hz": "正…呢", "ru": "как раз … (разг.)", "py": "zhèngne", "lesson": "Аудио 2"}, {"id": "吃着饭", "hz": "吃着饭", "ru": "(в процессе) ем", "py": "chīzhefàn", "lesson": "Аудио 2"}, {"id": "跑着步", "hz": "跑着步", "ru": "(в процессе) бегу", "py": "pǎozhebù", "lesson": "Аудио 2"}, {"id": "又…又…", "hz": "又…又…", "ru": "и …, и …", "py": "yòuyòu", "lesson": "Аудио 3"}, {"id": "廉价", "hz": "廉价", "ru": "дешёвый (о товаре)", "py": "liánjià", "lesson": "Аудио 3"}, {"id": "红酒", "hz": "红酒", "ru": "красное вино", "py": "hóngjiǔ", "lesson": "Аудио 3"}, {"id": "法国", "hz": "法国", "ru": "Франция", "py": "fǎguó", "lesson": "Аудио 3"}, {"id": "一款", "hz": "一款", "ru": "одна модель/вид (сч. слово)", "py": "yīkuǎn", "lesson": "Аудио 3"}, {"id": "尝尝", "hz": "尝尝", "ru": "попробуйте (на вкус)", "py": "chángcháng", "lesson": "Аудио 3"}, {"id": "试试", "hz": "试试", "ru": "попробовать, примерить", "py": "shìshì", "lesson": "Аудио 3"}, {"id": "衣服", "hz": "衣服", "ru": "одежда", "py": "yīfú", "lesson": "Аудио 3"}, {"id": "手机", "hz": "手机", "ru": "мобильный телефон", "py": "shǒujī", "lesson": "Аудио 3"}, {"id": "电器", "hz": "电器", "ru": "электроприборы, техника", "py": "diànqì", "lesson": "Аудио 3"}, {"id": "货架", "hz": "货架", "ru": "полка, стеллаж", "py": "huòjià", "lesson": "Аудио 4"}, {"id": "就在前面", "hz": "就在前面", "ru": "прямо впереди", "py": "jiùzàiqiánmiàn", "lesson": "Аудио 3"}, {"id": "要在这儿交钱", "hz": "要在这儿交钱", "ru": "платить нужно здесь", "py": "yàozàizhèrjiāoqián", "lesson": "Аудио 3"}, {"id": "知道了", "hz": "知道了", "ru": "понял(а), ясно", "py": "zhīdàole", "lesson": "Аудио 3"}, {"id": "有您要的牌子吗", "hz": "有您要的牌子吗", "ru": "есть нужная вам марка?", "py": "yǒunínyàodepáizima", "lesson": "Аудио 3"}, {"id": "您有事叫我", "hz": "您有事叫我", "ru": "если что — зовите меня", "py": "nínyǒushìjiàowǒ", "lesson": "Аудио 3"}, {"id": "不用找了", "hz": "不用找了", "ru": "сдачи не надо", "py": "bùyòngzhǎole", "lesson": "Аудио 3"}, {"id": "加", "hz": "加", "ru": "добавлять", "py": "jiā", "lesson": "Аудио 3"}, {"id": "牛奶", "hz": "牛奶", "ru": "молоко", "py": "niúnǎi", "lesson": "Аудио 4"}, {"id": "我正找着呢", "hz": "我正找着呢", "ru": "я как раз ищу", "py": "wǒzhèngzhǎozháone", "lesson": "Аудио 3"}, {"id": "开着车", "hz": "开着车", "ru": "за рулём (в процессе)", "py": "kāizhechē", "lesson": "Аудио 3"}, {"id": "听歌", "hz": "听歌", "ru": "слушать песни", "py": "tīnggē", "lesson": "Аудио 3"}, {"id": "音乐", "hz": "音乐", "ru": "музыка", "py": "yīnyuè", "lesson": "Аудио 3"}, {"id": "唱歌", "hz": "唱歌", "ru": "петь", "py": "chànggē", "lesson": "Аудио 3"}, {"id": "跳舞", "hz": "跳舞", "ru": "танцевать", "py": "tiàowǔ", "lesson": "Аудио 3"}, {"id": "唱着跳着", "hz": "唱着跳着", "ru": "поют и пляшут", "py": "chàngzhetiàozhe", "lesson": "Аудио 3"}, {"id": "朋友们", "hz": "朋友们", "ru": "друзья (мн.)", "py": "péngyǒumen", "lesson": "Аудио 3"}, {"id": "帮忙", "hz": "帮忙", "ru": "помочь (без дополнения)", "py": "bāngmáng", "lesson": "Аудио 3"}, {"id": "帮助", "hz": "帮助", "ru": "помогать, помощь", "py": "bāngzhù", "lesson": "Аудио 3"}, {"id": "要我帮你吗", "hz": "要我帮你吗", "ru": "тебе помочь?", "py": "yàowǒbāngnǐma", "lesson": "Аудио 3"}, {"id": "离合词", "hz": "离合词", "ru": "«разделимое» слово (глагол+объект)", "py": "líhécí", "lesson": "Аудио 3"}, {"id": "孩子们", "hz": "孩子们", "ru": "дети", "py": "háizimen", "lesson": "Аудио 3"}, {"id": "小女孩", "hz": "小女孩", "ru": "маленькая девочка", "py": "xiǎonǚhái", "lesson": "Аудио 3"}, {"id": "小男孩", "hz": "小男孩", "ru": "маленький мальчик", "py": "xiǎonánhái", "lesson": "Аудио 3"}, {"id": "自己", "hz": "自己", "ru": "сам", "py": "zìjǐ", "lesson": "Аудио 4"}, {"id": "自己的事情自己做", "hz": "自己的事情自己做", "ru": "свои дела делай сам", "py": "zìjǐdeshìqíngzìjǐzuò", "lesson": "Аудио 3"}, {"id": "事情", "hz": "事情", "ru": "дело, дела", "py": "shìqíng", "lesson": "Аудио 3"}, {"id": "检查", "hz": "检查", "ru": "проверять", "py": "jiǎnchá", "lesson": "Аудио 4"}, {"id": "自己过去", "hz": "自己过去", "ru": "дойти/подойти самому", "py": "zìjǐguòqù", "lesson": "Аудио 3"}, {"id": "自动", "hz": "自动", "ru": "автоматически", "py": "zìdòng", "lesson": "Аудио 4"}, {"id": "关机", "hz": "关机", "ru": "выключиться (об устройстве)", "py": "guānjī", "lesson": "Аудио 3"}, {"id": "灯", "hz": "灯", "ru": "лампа, свет", "py": "dēng", "lesson": "Аудио 3"}, {"id": "亮", "hz": "亮", "ru": "светиться, светлый", "py": "liàng", "lesson": "Аудио 3"}, {"id": "常常", "hz": "常常", "ru": "часто", "py": "chángcháng", "lesson": "Аудио 3"}, {"id": "这种", "hz": "这种", "ru": "такой вид, этот сорт", "py": "zhèzhǒng", "lesson": "Аудио 3"}, {"id": "哪种", "hz": "哪种", "ru": "какой вид?", "py": "nǎzhǒng", "lesson": "Аудио 3"}, {"id": "两种", "hz": "两种", "ru": "два вида", "py": "liǎngzhǒng", "lesson": "Аудио 3"}, {"id": "冰淇淋", "hz": "冰淇淋", "ru": "мороженое", "py": "bīngqílín", "lesson": "Аудио 3"}, {"id": "发烧", "hz": "发烧", "ru": "температура, жар", "py": "fāshāo", "lesson": "Аудио 3"}, {"id": "一个星期", "hz": "一个星期", "ru": "одна неделя", "py": "yígèxīngqī", "lesson": "Аудио 3"}, {"id": "桌子上", "hz": "桌子上", "ru": "на столе", "py": "zhuōzishàng", "lesson": "Аудио 3"}, {"id": "床上", "hz": "床上", "ru": "на кровати", "py": "chuángshàng", "lesson": "Аудио 3"}, {"id": "教室里", "hz": "教室里", "ru": "в классе", "py": "jiàoshìlǐ", "lesson": "Аудио 3"}, {"id": "家里", "hz": "家里", "ru": "дома, в доме", "py": "jiālǐ", "lesson": "Аудио 3"}, {"id": "服务台", "hz": "服务台", "ru": "стойка информации, ресепшен", "py": "fúwùtái", "lesson": "Аудио 4"}, {"id": "楼上", "hz": "楼上", "ru": "наверху (этажом выше)", "py": "lóushàng", "lesson": "Аудио 3"}, {"id": "里头", "hz": "里头", "ru": "внутри (сев. разг.)", "py": "lǐtou", "lesson": "Аудио 3"}, {"id": "公寓", "hz": "公寓", "ru": "квартира, апартаменты", "py": "gōngyù", "lesson": "Аудио 3"}, {"id": "学校外面", "hz": "学校外面", "ru": "снаружи школы", "py": "xuéxiàowàimiàn", "lesson": "Аудио 3"}, {"id": "包", "hz": "包", "ru": "сумка", "py": "bāo", "lesson": "Аудио 3"}, {"id": "之前", "hz": "之前", "ru": "перед, до", "py": "zhīqián", "lesson": "Аудио 3"}, {"id": "考试", "hz": "考试", "ru": "экзамен", "py": "kǎoshì", "lesson": "Аудио 3"}, {"id": "大厅", "hz": "大厅", "ru": "холл, зал", "py": "dàtīng", "lesson": "Аудио 4"}, {"id": "进站", "hz": "进站", "ru": "войти на вокзал (на посадку)", "py": "jìnzhàn", "lesson": "Аудио 4"}, {"id": "进站口", "hz": "进站口", "ru": "вход на вокзал", "py": "jìnzhànkǒu", "lesson": "Аудио 4"}, {"id": "出站口", "hz": "出站口", "ru": "выход с вокзала", "py": "chūzhànkǒu", "lesson": "Аудио 4"}, {"id": "安检", "hz": "安检", "ru": "досмотр (контроль безопасности)", "py": "ānjiǎn", "lesson": "Аудио 4"}, {"id": "候车室", "hz": "候车室", "ru": "зал ожидания", "py": "hòuchēshì", "lesson": "Аудио 4"}, {"id": "车厢", "hz": "车厢", "ru": "вагон", "py": "chēxiāng", "lesson": "Аудио 4"}, {"id": "换座位", "hz": "换座位", "ru": "поменяться местами", "py": "huànzuòwèi", "lesson": "Аудио 4"}, {"id": "检票", "hz": "检票", "ru": "проверка билетов, посадка", "py": "jiǎnpiào", "lesson": "Аудио 5"}, {"id": "检票口", "hz": "检票口", "ru": "выход на посадку, турникет", "py": "jiǎnpiàokǒu", "lesson": "Аудио 5"}, {"id": "站台", "hz": "站台", "ru": "платформа", "py": "zhàntái", "lesson": "Аудио 5"}, {"id": "人工通道", "hz": "人工通道", "ru": "проход с контролёром (не автомат)", "py": "réngōngtōngdào", "lesson": "Аудио 5"}, {"id": "出示护照", "hz": "出示护照", "ru": "предъявить паспорт", "py": "chūshìhùzhào", "lesson": "Аудио 4"}, {"id": "高铁", "hz": "高铁", "ru": "скоростной поезд", "py": "gāotiě", "lesson": "Аудио 5"}, {"id": "晚点", "hz": "晚点", "ru": "опаздывать (о транспорте)", "py": "wǎndiǎn", "lesson": "Аудио 5"}, {"id": "航班", "hz": "航班", "ru": "рейс", "py": "hángbān", "lesson": "Аудио 5"}, {"id": "就要……了", "hz": "就要……了", "ru": "вот-вот, скоро (произойдёт)", "py": "jiùyàole", "lesson": "Аудио 4"}, {"id": "换成", "hz": "换成", "ru": "поменять на (что-то)", "py": "huànchéng", "lesson": "Аудио 4"}, {"id": "换钱", "hz": "换钱", "ru": "менять деньги", "py": "huànqián", "lesson": "Аудио 4"}, {"id": "美金", "hz": "美金", "ru": "доллары США", "py": "měijīn", "lesson": "Аудио 4"}, {"id": "几折", "hz": "几折", "ru": "какая скидка? (букв. «сколько десятых цены»)", "py": "jǐzhé", "lesson": "Аудио 4"}, {"id": "优惠", "hz": "优惠", "ru": "выгодное предложение, акция (любая)", "py": "yōuhuì", "lesson": "Аудио 4"}, {"id": "更多的优惠", "hz": "更多的优惠", "ru": "больше скидок", "py": "gèngduōdeyōuhuì", "lesson": "Аудио 4"}, {"id": "新品", "hz": "新品", "ru": "новинка", "py": "xīnpǐn", "lesson": "Аудио 4"}, {"id": "刚才", "hz": "刚才", "ru": "только что", "py": "gāngcái", "lesson": "Аудио 4"}, {"id": "很久不见", "hz": "很久不见", "ru": "давно не виделись", "py": "hěnjiǔbújiàn", "lesson": "Аудио 4"}, {"id": "久", "hz": "久", "ru": "долго (о времени)", "py": "jiǔ", "lesson": "Аудио 4"}, {"id": "不用再寄样品", "hz": "不用再寄样品", "ru": "больше не нужно присылать образцы", "py": "bùyòngzàijìyàngpǐn", "lesson": "Аудио 4"}, {"id": "电子版", "hz": "电子版", "ru": "электронная версия (PDF)", "py": "diànzibǎn", "lesson": "Аудио 4"}, {"id": "纸", "hz": "纸", "ru": "бумага", "py": "zhǐ", "lesson": "Аудио 4"}, {"id": "发邮件", "hz": "发邮件", "ru": "отправить e-mail", "py": "fāyóujiàn", "lesson": "Аудио 4"}, {"id": "展览中心", "hz": "展览中心", "ru": "выставочный центр", "py": "zhǎnlǎnzhōngxīn", "lesson": "Аудио 4"}, {"id": "同事", "hz": "同事", "ru": "коллега", "py": "tóngshì", "lesson": "Аудио 4"}, {"id": "陪", "hz": "陪", "ru": "сопровождать, составлять компанию", "py": "péi", "lesson": "Аудио 4"}, {"id": "机器", "hz": "机器", "ru": "машина, аппарат", "py": "jīqì", "lesson": "Аудио 4"}, {"id": "机器人", "hz": "机器人", "ru": "робот", "py": "jīqìrén", "lesson": "Аудио 4"}, {"id": "再", "hz": "再", "ru": "ещё раз (в будущем)", "py": "zài", "lesson": "Аудио 4"}, {"id": "不用再", "hz": "不用再", "ru": "больше не нужно", "py": "bùyòngzài", "lesson": "Аудио 4"}, {"id": "又", "hz": "又", "ru": "снова (уже произошло)", "py": "yòu", "lesson": "Аудио 4"}, {"id": "多远", "hz": "多远", "ru": "как далеко", "py": "duōyuǎn", "lesson": "Аудио 4"}, {"id": "如果", "hz": "如果", "ru": "если", "py": "rúguǒ", "lesson": "Аудио 4"}, {"id": "的话", "hz": "的话", "ru": "если (в конце условия)", "py": "dehuà", "lesson": "Аудио 4"}, {"id": "下单", "hz": "下单", "ru": "оформить заказ", "py": "xiàdān", "lesson": "Аудио 4"}, {"id": "合适", "hz": "合适", "ru": "подходящий", "py": "héshì", "lesson": "Аудио 4"}, {"id": "就能到", "hz": "就能到", "ru": "сможем добраться (уже)", "py": "jiùnéngdào", "lesson": "Аудио 4"}, {"id": "告诉我", "hz": "告诉我", "ru": "скажи(те) мне", "py": "gàosùwǒ", "lesson": "Аудио 4"}, {"id": "离……远吗", "hz": "离……远吗", "ru": "далеко ли от…?", "py": "líyuǎnma", "lesson": "Аудио 4"}, {"id": "挺远的", "hz": "挺远的", "ru": "довольно далеко", "py": "tǐngyuǎnde", "lesson": "Аудио 4"}, {"id": "挺好吃的", "hz": "挺好吃的", "ru": "довольно вкусно", "py": "tǐnghǎochīde", "lesson": "Аудио 4"}, {"id": "差不多", "hz": "差不多", "ru": "примерно, почти", "py": "chàbuduō", "lesson": "Аудио 5"}, {"id": "不急", "hz": "不急", "ru": "не торопитесь", "py": "bùjí", "lesson": "Аудио 4"}, {"id": "来得及", "hz": "来得及", "ru": "успеть", "py": "láidejí", "lesson": "Аудио 5"}, {"id": "航站楼", "hz": "航站楼", "ru": "терминал (аэропорта)", "py": "hángzhànlóu", "lesson": "Аудио 4"}, {"id": "接飞机", "hz": "接飞机", "ru": "встречать самолёт (человека в аэропорту)", "py": "jiēfēijī", "lesson": "Аудио 4"}, {"id": "飞机场", "hz": "飞机场", "ru": "аэропорт", "py": "fēijīchǎng", "lesson": "Аудио 4"}, {"id": "高速公路", "hz": "高速公路", "ru": "скоростная трасса", "py": "gāosùgōnglù", "lesson": "Аудио 4"}, {"id": "行李", "hz": "行李", "ru": "багаж", "py": "xínglǐ", "lesson": "Аудио 4"}, {"id": "发票", "hz": "发票", "ru": "официальный чек (фапяо)", "py": "fāpiào", "lesson": "Аудио 5"}, {"id": "忘了", "hz": "忘了", "ru": "забыл", "py": "wàngle", "lesson": "Аудио 4"}, {"id": "时差", "hz": "时差", "ru": "разница во времени", "py": "shíchà", "lesson": "Аудио 4"}, {"id": "排很长的队", "hz": "排很长的队", "ru": "стоять в длинной очереди", "py": "páihěnzhǎngdeduì", "lesson": "Аудио 5"}, {"id": "上车", "hz": "上车", "ru": "садиться (в транспорт)", "py": "shàngchē", "lesson": "Аудио 5"}, {"id": "下车", "hz": "下车", "ru": "выходить (из транспорта)", "py": "xiàchē", "lesson": "Аудио 5"}, {"id": "房卡", "hz": "房卡", "ru": "ключ-карта от номера", "py": "fángkǎ", "lesson": "Аудио 5"}, {"id": "丢了", "hz": "丢了", "ru": "потерялся, потерял", "py": "diūle", "lesson": "Аудио 5"}, {"id": "忘了带", "hz": "忘了带", "ru": "забыл взять", "py": "wàngledài", "lesson": "Аудио 5"}, {"id": "迷路", "hz": "迷路", "ru": "заблудиться", "py": "mílù", "lesson": "Аудио 5"}, {"id": "上网", "hz": "上网", "ru": "выходить в интернет", "py": "shàngwǎng", "lesson": "Аудио 5"}, {"id": "对了", "hz": "对了", "ru": "кстати; да, точно", "py": "duìle", "lesson": "Аудио 5"}, {"id": "行李箱", "hz": "行李箱", "ru": "чемодан", "py": "xínglǐxiāng", "lesson": "Аудио 5"}, {"id": "墙上", "hz": "墙上", "ru": "на стене", "py": "qiángshàng", "lesson": "Аудио 5"}, {"id": "照片", "hz": "照片", "ru": "фотография", "py": "zhàopiān", "lesson": "Аудио 5"}, {"id": "密码", "hz": "密码", "ru": "пароль, код", "py": "mìmǎ", "lesson": "Аудио 5"}, {"id": "银行卡", "hz": "银行卡", "ru": "банковская карта", "py": "yínhángkǎ", "lesson": "Аудио 5"}, {"id": "枕头", "hz": "枕头", "ru": "подушка", "py": "zhěntou", "lesson": "Аудио 5"}, {"id": "毛巾", "hz": "毛巾", "ru": "полотенце", "py": "máojīn", "lesson": "Аудио 5"}, {"id": "一条", "hz": "一条", "ru": "одна (длинная вещь: полотенце, простыня)", "py": "yītiáo", "lesson": "Аудио 5"}, {"id": "拖鞋", "hz": "拖鞋", "ru": "тапочки", "py": "tuōxié", "lesson": "Аудио 5"}, {"id": "床单", "hz": "床单", "ru": "простыня", "py": "chuángdān", "lesson": "Аудио 5"}, {"id": "让一下", "hz": "让一下", "ru": "посторониться, дать пройти", "py": "ràngyīxià", "lesson": "Аудио 5"}, {"id": "叫醒", "hz": "叫醒", "ru": "разбудить", "py": "jiàoxǐng", "lesson": "Аудио 5"}, {"id": "叫车", "hz": "叫车", "ru": "вызвать такси", "py": "jiàochē", "lesson": "Аудио 5"}, {"id": "稍等", "hz": "稍等", "ru": "секундочку (вежл.)", "py": "shāoděng", "lesson": "Аудио 5"}, {"id": "拿来", "hz": "拿来", "ru": "принести", "py": "nálái", "lesson": "Аудио 5"}, {"id": "购物", "hz": "购物", "ru": "шопинг, покупки", "py": "gòuwù", "lesson": "Аудио 5"}, {"id": "网购", "hz": "网购", "ru": "покупки онлайн", "py": "wǎnggòu", "lesson": "Аудио 5"}, {"id": "线下门店", "hz": "线下门店", "ru": "офлайн-магазин", "py": "xiànxiàméndiàn", "lesson": "Аудио 5"}, {"id": "怎么卖", "hz": "怎么卖", "ru": "почём? как продаётся?", "py": "zěnmemài", "lesson": "Аудио 5"}, {"id": "太贵了", "hz": "太贵了", "ru": "слишком дорого", "py": "tàiguìle", "lesson": "Аудио 5"}, {"id": "能便宜一点吗", "hz": "能便宜一点吗", "ru": "можно подешевле?", "py": "néngpiányiyìdiǎnma", "lesson": "Аудио 5"}, {"id": "再便宜一点吧", "hz": "再便宜一点吧", "ru": "ещё чуть дешевле!", "py": "zàipiányiyìdiǎnba", "lesson": "Аудио 5"}, {"id": "最低", "hz": "最低", "ru": "минимум, самое низкое", "py": "zuìdī", "lesson": "Аудио 5"}, {"id": "八折", "hz": "八折", "ru": "скидка 20% (80% цены)", "py": "bāzhé", "lesson": "Аудио 5"}, {"id": "还要点别的吗", "hz": "还要点别的吗", "ru": "что-нибудь ещё?", "py": "háiyàodiǎnbiédema", "lesson": "Аудио 5"}, {"id": "杯子", "hz": "杯子", "ru": "чашка, стакан", "py": "bēizi", "lesson": "Аудио 5"}, {"id": "雨伞", "hz": "雨伞", "ru": "зонт", "py": "yǔsǎn", "lesson": "Аудио 5"}, {"id": "饮料", "hz": "饮料", "ru": "напитки", "py": "yǐnliào", "lesson": "Аудио 5"}, {"id": "水果", "hz": "水果", "ru": "фрукты", "py": "shuǐguǒ", "lesson": "Аудио 5"}, {"id": "特产", "hz": "特产", "ru": "местный деликатес, специалитет", "py": "tèchǎn", "lesson": "Аудио 5"}, {"id": "纪念品", "hz": "纪念品", "ru": "сувенир", "py": "jìniànpǐn", "lesson": "Аудио 5"}, {"id": "蜂蜜", "hz": "蜂蜜", "ru": "мёд", "py": "fēngmì", "lesson": "Аудио 5"}, {"id": "巧克力", "hz": "巧克力", "ru": "шоколад", "py": "qiǎokèlì", "lesson": "Аудио 5"}, {"id": "流行", "hz": "流行", "ru": "популярный, модный", "py": "liúxíng", "lesson": "Аудио 5"}, {"id": "感兴趣", "hz": "感兴趣", "ru": "интересоваться", "py": "gǎnxìngqù", "lesson": "Аудио 5"}, {"id": "不感兴趣", "hz": "不感兴趣", "ru": "не интересоваться", "py": "bùgǎnxìngqù", "lesson": "Аудио 5"}, {"id": "文化", "hz": "文化", "ru": "культура", "py": "wénhuà", "lesson": "Аудио 5"}, {"id": "建筑", "hz": "建筑", "ru": "архитектура, здания", "py": "jiànzhù", "lesson": "Аудио 5"}, {"id": "书画", "hz": "书画", "ru": "каллиграфия и живопись", "py": "shūhuà", "lesson": "Аудио 5"}, {"id": "画画", "hz": "画画", "ru": "рисовать", "py": "huàhuà", "lesson": "Аудио 5"}, {"id": "食物", "hz": "食物", "ru": "еда", "py": "shíwù", "lesson": "Аудио 5"}, {"id": "旅游", "hz": "旅游", "ru": "путешествовать, туризм", "py": "lǚyóu", "lesson": "Аудио 5"}, {"id": "古城", "hz": "古城", "ru": "старый город", "py": "gǔchéng", "lesson": "Аудио 5"}, {"id": "真漂亮啊", "hz": "真漂亮啊", "ru": "как красиво!", "py": "zhēnpiàoliànga", "lesson": "Аудио 5"}, {"id": "故宫", "hz": "故宫", "ru": "Запретный город (Гугун)", "py": "gùgōng", "lesson": "Аудио 5"}, {"id": "别", "hz": "别", "ru": "не (делай)!", "py": "bié", "lesson": "Аудио 5"}, {"id": "别再…了", "hz": "别再…了", "ru": "хватит уже …", "py": "biézàile", "lesson": "Аудио 5"}, {"id": "别说了", "hz": "别说了", "ru": "не говори, хватит", "py": "biéshuōle", "lesson": "Аудио 5"}, {"id": "哭", "hz": "哭", "ru": "плакать", "py": "kū", "lesson": "Аудио 5"}, {"id": "这些", "hz": "这些", "ru": "эти", "py": "zhèxiē", "lesson": "Аудио 5"}, {"id": "那些", "hz": "那些", "ru": "те", "py": "nàxiē", "lesson": "Аудио 5"}, {"id": "对身体好", "hz": "对身体好", "ru": "полезно для здоровья", "py": "duìshēntǐhǎo", "lesson": "Аудио 5"}, {"id": "身体", "hz": "身体", "ru": "тело, здоровье", "py": "shēntǐ", "lesson": "Аудио 5"}, {"id": "黑黑的", "hz": "黑黑的", "ru": "тёмный (без света)", "py": "hēihēide", "lesson": "Аудио 5"}, {"id": "报纸", "hz": "报纸", "ru": "газета", "py": "bàozhǐ", "lesson": "Аудио 5"}, {"id": "报上说", "hz": "报上说", "ru": "в газете пишут", "py": "bàoshàngshuō", "lesson": "Аудио 5"}, {"id": "天天", "hz": "天天", "ru": "каждый день", "py": "tiāntiān", "lesson": "Аудио 5"}, {"id": "累", "hz": "累", "ru": "уставший", "py": "lèi", "lesson": "Аудио 5"}, {"id": "睡一觉", "hz": "睡一觉", "ru": "поспать (разок)", "py": "shuìyījiào", "lesson": "Аудио 5"}, {"id": "睡午觉", "hz": "睡午觉", "ru": "дневной сон", "py": "shuìwǔjiào", "lesson": "Аудио 5"}, {"id": "有时候", "hz": "有时候", "ru": "иногда", "py": "yǒushíhòu", "lesson": "Аудио 5"}, {"id": "从来不", "hz": "从来不", "ru": "никогда не (привычка)", "py": "cóngláibù", "lesson": "Аудио 5"}, {"id": "大家", "hz": "大家", "ru": "все (люди)", "py": "dàjiā", "lesson": "Аудио 5"}, {"id": "谁说的对", "hz": "谁说的对", "ru": "кто прав", "py": "shuíshuōdeduì", "lesson": "Аудио 5"}, {"id": "睡得太多", "hz": "睡得太多", "ru": "спать слишком много", "py": "shuìdetàiduō", "lesson": "Аудио 5"}, {"id": "是…的", "hz": "是…的", "ru": "(именно) … — выделение детали", "py": "shìde", "lesson": "Аудио 5"}, {"id": "我是在手机上看的", "hz": "我是在手机上看的", "ru": "я читал это в телефоне", "py": "wǒshìzàishǒujīshàngkànde", "lesson": "Аудио 5"}, {"id": "我是十点多吃的饭", "hz": "我是十点多吃的饭", "ru": "я поел в начале одиннадцатого", "py": "wǒshìshídiǎnduōchīdefàn", "lesson": "Аудио 5"}, {"id": "坐飞机", "hz": "坐飞机", "ru": "лететь на самолёте", "py": "zuòfēijī", "lesson": "Аудио 5"}, {"id": "因为…所以…", "hz": "因为…所以…", "ru": "потому что …, поэтому …", "py": "yīnwèisuǒyǐ", "lesson": "Аудио 5"}, {"id": "你给的不是我想要的", "hz": "你给的不是我想要的", "ru": "ты дал не то, что я хотел", "py": "nǐgěidebúshìwǒxiǎngyàode", "lesson": "Аудио 5"}, {"id": "尽快", "hz": "尽快", "ru": "как можно скорее", "py": "jǐnkuài", "lesson": "Аудио 5"}, {"id": "一位", "hz": "一位", "ru": "один (вежл. сч. слово для людей)", "py": "yīwèi", "lesson": "Аудио 5"}, {"id": "来不及", "hz": "来不及", "ru": "не успеть", "py": "láibùjí", "lesson": "Аудио 5"}, {"id": "还得", "hz": "还得", "ru": "ещё нужно", "py": "háiděi", "lesson": "Аудио 5"}, {"id": "就停这儿吧", "hz": "就停这儿吧", "ru": "остановите здесь", "py": "jiùtíngzhèrba", "lesson": "Аудио 5"}, {"id": "出租车", "hz": "出租车", "ru": "такси", "py": "chūzūchē", "lesson": "Аудио 5"}, {"id": "收据", "hz": "收据", "ru": "квитанция, расписка", "py": "shōujù", "lesson": "Аудио 5"}, {"id": "别忘了", "hz": "别忘了", "ru": "не забудьте", "py": "biéwàngle", "lesson": "Аудио 5"}, {"id": "如果…的话", "hz": "如果…的话", "ru": "если …", "py": "rúguǒdehuà", "lesson": "Аудио 5"}, {"id": "几点的火车", "hz": "几点的火车", "ru": "поезд во сколько?", "py": "jǐdiǎndehuǒchē", "lesson": "Аудио 5"}, {"id": "几号的飞机", "hz": "几号的飞机", "ru": "самолёт какого числа?", "py": "jǐhàodefēijī", "lesson": "Аудио 5"}, {"id": "多少钱的样品", "hz": "多少钱的样品", "ru": "образцы на какую сумму", "py": "duōshǎoqiándeyàngpǐn", "lesson": "Аудио 5"}, {"id": "会议", "hz": "会议", "ru": "совещание, конференция", "py": "huìyì", "lesson": "Аудио 5"}, {"id": "多大的展位", "hz": "多大的展位", "ru": "стенд какого размера", "py": "duōdàdezhǎnwèi", "lesson": "Аудио 5"}, {"id": "多大的公司", "hz": "多大的公司", "ru": "компания какого размера", "py": "duōdàdegōngsī", "lesson": "Аудио 5"}, {"id": "准备好了", "hz": "准备好了", "ru": "готово, всё готово", "py": "zhǔnbèihǎole", "lesson": "Аудио 5"}, {"id": "涨了", "hz": "涨了", "ru": "подорожало, выросло", "py": "zhǎngle", "lesson": "Аудио 5"}, {"id": "他的病好了", "hz": "他的病好了", "ru": "он выздоровел", "py": "tādebìnghǎole", "lesson": "Аудио 5"}, {"id": "下课了", "hz": "下课了", "ru": "урок закончился", "py": "xiàkèle", "lesson": "Аудио 5"}, {"id": "天冷了", "hz": "天冷了", "ru": "похолодало", "py": "tiānlěngle", "lesson": "Аудио 5"}, {"id": "三十岁了", "hz": "三十岁了", "ru": "исполнилось тридцать", "py": "sānshísuìle", "lesson": "Аудио 5"}, {"id": "没关系", "hz": "没关系", "ru": "ничего страшного", "py": "méiguānxì", "lesson": "Аудио 5"}, {"id": "不小心", "hz": "不小心", "ru": "нечаянно", "py": "bùxiǎoxīn", "lesson": "Аудио 5"}, {"id": "我得工作", "hz": "我得工作", "ru": "мне надо работать (得 = děi «надо»)", "py": "wǒděigōngzuò", "lesson": "Аудио 5"}, {"id": "早点", "hz": "早点", "ru": "пораньше", "py": "zǎodiǎn", "lesson": "Аудио 5"}, {"id": "努力", "hz": "努力", "ru": "стараться, усердно", "py": "nǔlì", "lesson": "Аудио 5"}, {"id": "不必", "hz": "不必", "ru": "не нужно, необязательно", "py": "bùbì", "lesson": "Аудио 5"}], "lessons": [{"id": "audio-01", "number": 1, "label": "Аудио 1"}, {"id": "audio-02", "number": 2, "label": "Аудио 2"}, {"id": "audio-03", "number": 3, "label": "Аудио 3"}, {"id": "audio-04", "number": 4, "label": "Аудио 4"}, {"id": "audio-05", "number": 5, "label": "Аудио 5"}]};
+(function () {
+'use strict';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* приватный режим */ } }
+function pl(n, a, b, c) { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20) ? b : c); }
+const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+/* ---------- ключ и адрес API ---------- */
+const API_BASE = (lsGet('zh_talk_api') || 'https://rpg.lavanto.ru/zh-api/').replace(/\/*$/, '/');
+let KEY = lsGet('zh_talk_key') || '';
+function takeKey() {
+  const m = /(?:^#|[#&])key=([^&]+)/.exec(location.hash || '');
+  if (!m) return false;
+  try { KEY = decodeURIComponent(m[1]); } catch (e) { KEY = m[1]; }
+  lsSet('zh_talk_key', KEY);
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* нет history */ }
+  return true;
+}
+takeKey();
+
+/* ---------- прогресс zh_srs_v1 — те же правила, что в review.html ---------- */
+const SKEY = 'zh_srs_v1', IV = [0, 1, 2, 4, 7, 15, 30, 60]; // IV — как в review.html; здесь интервалы не сдвигаются
+const today = () => Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
+function loadS() { try { return JSON.parse(localStorage.getItem(SKEY)) || {}; } catch (e) { return {}; } }
+const W = DATA.words || [];
+const byId = {}; W.forEach((w) => { byId[w.id] = w; });
+function progress() {
+  const S = loadS(), t = today();
+  const lessons = [...new Set(W.map((w) => w.lesson))];
+  let sel = null; try { sel = JSON.parse(lsGet('zh_srs_sel') || 'null'); } catch (e) { sel = null; }
+  if (!Array.isArray(sel)) sel = lessons;
+  const ws = W.filter((w) => sel.includes(w.lesson));
+  const due = ws.filter((w) => S[w.id] && S[w.id].d <= t).sort((a, b) => S[a.id].d - S[b.id].d).map((w) => w.id);
+  return { due, done: ws.filter((w) => S[w.id]).length };
+}
+function markNotRecalled(words) {
+  const S = loadS(), t = today(); let n = 0;
+  for (const w of words || []) {
+    const id = w && w.hz; if (!id || !byId[id]) continue;
+    const s = S[id];
+    if (!s) S[id] = { b: 0, d: t, n: 1, l: 1 };        // как grade(id,false) в review.html для нового слова
+    else if (!(s.d <= t)) s.d = t;                      // уже в прогрессе — просто к повторению сегодня
+    n++;
+  }
+  try { localStorage.setItem(SKEY, JSON.stringify(S)); } catch (e) { return -1; }
+  return n;
+}
+
+/* ---------- озвучка ---------- */
+let ZH = null;
+function pickVoice() { try { const v = speechSynthesis.getVoices() || []; ZH = v.find((x) => /zh[-_]CN/i.test(x.lang)) || v.find((x) => /^zh/i.test(x.lang)) || null; } catch (e) { ZH = null; } }
+if ('speechSynthesis' in window) { pickVoice(); try { speechSynthesis.onvoiceschanged = pickVoice; } catch (e) { /* */ } }
+function say(text, rate) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = 'zh-CN'; u.rate = rate || 0.9; if (ZH) u.voice = ZH; speechSynthesis.speak(u); } catch (e) { /* */ }
+}
+function unlockSpeech() { try { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(''); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { /* */ } }
+
+/* ---------- pīnyīn ---------- */
+let PY = lsGet('zh_talk_py') !== '0';
+function applyPy() { document.body.classList.toggle('nopy', !PY); $('#py-toggle').checked = PY; }
+$('#py-toggle').addEventListener('change', (e) => { PY = e.target.checked; lsSet('zh_talk_py', PY ? '1' : '0'); applyPy(); });
+applyPy();
+
+/* ---------- запросы ---------- */
+class ApiErr extends Error { constructor(status, msg) { super(msg); this.status = status; } }
+function errText(st, j) {
+  const e = j && j.error;
+  if (st === 401) return 'Ключ не подошёл. Открой свежую ссылку на разговор из сообщения Драко.';
+  if (st === 422) return 'Не расслышал' + (j && j.heard ? ' («' + j.heard + '»)' : '') + '. Скажи ещё раз, чуть громче.';
+  if (st === 429) return 'Слишком много запросов. Подожди минуту и попробуй снова.';
+  if (st === 502 || st === 503 || st === 504) return 'Собеседник сейчас не ответил. Попробуй ещё раз.';
+  if (st === 404) return 'Разговор закрылся по времени. Вернись к темам и начни заново.';
+  if (st === 409) return e ? e.charAt(0).toUpperCase() + e.slice(1).replace(/[.!]+$/, '') + '.' : 'Предыдущая реплика ещё обрабатывается — подожди пару секунд.';
+  if (st === 415) return 'Этот формат записи сервер не принял — напиши текстом.';
+  if (st === 413 || st === 400) return (e ? e.charAt(0).toUpperCase() + e.slice(1) : 'Запрос не принят') + '.';
+  return 'Ошибка сервера (' + st + '). Попробуй ещё раз.';
+}
+async function api(method, path, body) {
+  const headers = { Authorization: 'Bearer ' + KEY };
+  let payload;
+  if (typeof FormData !== 'undefined' && body instanceof FormData) payload = body;
+  else if (body !== undefined) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
+  let r;
+  try { r = await fetch(API_BASE + path, { method, headers, body: payload }); }
+  catch (e) { throw new ApiErr(0, 'Нет связи с сервером. Проверь интернет и попробуй ещё раз.'); }
+  let j = null; try { j = await r.json(); } catch (e) { j = null; }
+  if (!r.ok) throw new ApiErr(r.status, errText(r.status, j));
+  return j || {};
+}
+function scrollLog() { const l = $('#log'); if (l) l.scrollTop = l.scrollHeight; }
+function setStatus(sel, msg, isErr) { const el = $(sel); el.textContent = msg || ''; el.classList.toggle('err', !!(msg && isErr)); if (sel === '#c-status') scrollLog(); }
+if (typeof ResizeObserver !== 'undefined') { try { new ResizeObserver(scrollLog).observe($('.c-foot')); } catch (e) { /* нет observer */ } }
+
+/* ---------- экраны ---------- */
+const SCREENS = ['nokey', 'topics', 'chat', 'sum'];
+function show(name) { SCREENS.forEach((s) => { $('#s-' + s).hidden = s !== name; }); window.scrollTo && window.scrollTo(0, 0); }
+function showNoKey(msg) { show('nokey'); setStatus('#k-status', msg || '', !!msg); }
+
+/* ---------- экран 1: темы ---------- */
+let TOPICS = null, LESSONS = [], busy = false, SESS = null, LAST_SPEC = null;
+function topicMeta(t, k) {
+  const parts = [t.lesson_number ? 'Урок ' + t.lesson_number : '', t.role_ru || ''].filter(Boolean);
+  if (k) parts.push(k + ' ' + pl(k, 'слово', 'слова', 'слов') + ' к повторению');
+  return parts.join(' · ');
+}
+function renderCounters() {
+  const P = progress();
+  $('#c-due').textContent = 'К повторению сегодня: ' + fmt(P.due.length);
+  $('#c-done').textContent = 'Слов пройдено: ' + fmt(P.done);
+  return P;
+}
+function tileBtn(t, k) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'tile';
+  b.innerHTML = '<span class="tt">' + esc(t.title_ru) + '</span><span class="tm">' + esc(topicMeta(t, k)) + '</span>';
+  b.addEventListener('click', () => startSession({ topic_key: t.key }));
+  return b;
+}
+function renderTopics() {
+  const P = renderCounters();
+  const dueSet = new Set(P.due);
+  const list = (TOPICS || []).map((t, i) => ({ t, i, k: (t.word_ids || []).filter((id) => dueSet.has(id)).length }));
+  const grid = $('#grid'), more = $('#grid-more');
+  grid.innerHTML = ''; more.innerHTML = '';
+  if (!list.length) { $('#pick').hidden = true; $('#grid-h').hidden = true; $('#more').hidden = true; grid.innerHTML = '<div class="empty">Разговорных тем пока нет — можно начать свою тему внизу.</div>'; return; }
+  const best = list.slice().sort((a, b) => b.k - a.k || (b.t.lesson_number || 0) - (a.t.lesson_number || 0) || a.i - b.i)[0];
+  $('#pick').hidden = false;
+  $('#pick-k').textContent = best.k ? 'Подобрано под повторение' : 'С чего начать';
+  $('#pick-t').textContent = best.t.title_ru;
+  $('#pick-m').textContent = topicMeta(best.t, best.k);
+  $('#pick').onclick = () => startSession({ topic_key: best.t.key });
+  const rest = list.filter((x) => x !== best).sort((a, b) => b.k - a.k || (b.t.lesson_number || 0) - (a.t.lesson_number || 0) || a.i - b.i);
+  $('#grid-h').hidden = !rest.length;
+  rest.forEach((x, n) => (n < 6 ? grid : more).appendChild(tileBtn(x.t, x.k)));
+  const nums = (LESSONS.length ? LESSONS.map((l) => l.number) : list.map((x) => x.t.lesson_number)).filter((n) => n != null);
+  const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
+  const label = 'Все темы уроков' + (nums.length ? ' ' + (lo === hi ? lo : lo + '–' + hi) : '');
+  const mb = $('#more');
+  mb.hidden = rest.length <= 6;
+  const open = mb.getAttribute('aria-expanded') === 'true';
+  more.hidden = !open;
+  mb.textContent = open ? 'Свернуть' : label;
+  mb.onclick = () => { const o = mb.getAttribute('aria-expanded') !== 'true'; mb.setAttribute('aria-expanded', String(o)); more.hidden = !o; mb.textContent = o ? 'Свернуть' : label; };
+}
+async function showTopics() {
+  stopAll();
+  show('topics');
+  renderCounters();
+  if (TOPICS) { renderTopics(); return; }
+  setStatus('#t-status', 'Загружаю темы…');
+  try {
+    const j = await api('GET', 'topics');
+    TOPICS = j.topics || []; LESSONS = j.lessons || [];
+    setStatus('#t-status', '');
+    renderTopics();
+  } catch (e) {
+    if (e.status === 401) { showNoKey(e.message); return; }
+    setStatus('#t-status', e.message + ' Темы не загрузились — можно начать свою тему.', true);
+  }
+}
+$('#own-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = $('#own').value.trim();
+  if (!v) { setStatus('#t-status', 'Напиши тему — например, «аренда квартиры».', true); $('#own').focus(); return; }
+  startSession({ custom_topic: v });
+});
+function lockStart(on) { document.querySelectorAll('#s-topics button, #s-sum button').forEach((b) => { b.disabled = on; }); }
+
+/* ---------- экран 2: разговор ---------- */
+async function startSession(spec) {
+  if (busy) return;
+  unlockSpeech();
+  busy = true; lockStart(true);
+  const st = $('#s-sum').hidden ? '#t-status' : '#s-status';
+  setStatus(st, 'Готовлю разговор…');
+  try {
+    const P = progress();
+    const j = await api('POST', 'session', Object.assign({}, spec, { due_word_ids: P.due.slice(0, 60), pinyin: PY }));
+    LAST_SPEC = spec;
+    SESS = { id: j.session_id, weave: j.weave || [], left: (j.weave || []).map((w) => w.hz), tr: new Set(), turns: 0 };
+    setStatus(st, '');
+    $('#c-title').textContent = j.title_ru || spec.custom_topic || 'Разговор';
+    $('#c-sub').textContent = (j.role_ru || 'Своя тема') + (j.lesson_number ? ' · Урок ' + j.lesson_number : '');
+    $('#log').innerHTML = '';
+    setStatus('#c-status', '');
+    renderWeave();
+    show('chat');
+    try { history.pushState({ s: 'chat' }, ''); } catch (e) { /* нет history */ }
+    if (!CAN_REC || MIC_DENIED) showText(true, CAN_REC ? '' : 'Запись голоса в этом браузере недоступна — пиши текстом.');
+    else showText(false);
+    if (j.ai && j.ai.line) addAi(j.ai, true);
+  } catch (e) {
+    if (e.status === 401) { showNoKey(e.message); return; }
+    setStatus(st, e.message, true);
+  } finally { busy = false; lockStart(false); }
+}
+const wparts = (w) => String(w || '').split(/…+/).filter(Boolean);   // «如果…的话» → части, как в zhtalk/server.py weave_in
+function weaveSpans(hz, w) {
+  const ps = wparts(w), out = [];
+  if (!ps.length) return null;
+  if (ps.length === 1) { for (let i = hz.indexOf(ps[0]); i >= 0; i = hz.indexOf(ps[0], i + ps[0].length)) out.push([i, i + ps[0].length]); return out.length ? out : null; }
+  let pos = 0;
+  for (const p of ps) { const i = hz.indexOf(p, pos); if (i < 0) return null; out.push([i, i + p.length]); pos = i + p.length; }
+  return out;
+}
+function weaveIn(hz) { return SESS ? SESS.weave.map((w) => w.hz).filter((x) => x && weaveSpans(hz, x)) : []; }
+function markWeave(hz) {
+  if (!SESS) return esc(hz);
+  let rs = [];
+  SESS.weave.forEach((w) => { const sp = w.hz && weaveSpans(hz, w.hz); if (sp) rs = rs.concat(sp); });
+  if (!rs.length) return esc(hz);
+  rs.sort((a, b) => a[0] - b[0] || b[1] - a[1]);
+  const m = [];
+  rs.forEach((r) => { const l = m[m.length - 1]; if (l && r[0] <= l[1]) l[1] = Math.max(l[1], r[1]); else m.push([r[0], r[1]]); });
+  let h = '', pos = 0;
+  m.forEach((r) => { h += esc(hz.slice(pos, r[0])) + '<span class="wv">' + esc(hz.slice(r[0], r[1])) + '</span>'; pos = r[1]; });
+  return h + esc(hz.slice(pos));
+}
+const SPK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg>';
+function addAi(ai, speak) {
+  const line = ai.line || {};
+  const hz = line.hz || '';
+  const hasWeave = weaveIn(hz).length > 0;
+  const d = document.createElement('div');
+  d.className = 'msg ai';
+  d.innerHTML = '<div class="py">' + esc(line.py) + '</div><div class="hz" lang="zh-CN">' + markWeave(hz) + '</div>' +
+    '<div class="ru"' + (hasWeave ? ' hidden' : '') + '>' + esc(line.ru) + '</div>' +
+    '<div class="acts"><button type="button" class="act ic" data-a="rep" aria-label="Повторить">' + SPK + '</button>' +
+    '<button type="button" class="act" data-a="slow">Медленнее</button>' +
+    (hasWeave ? '<button type="button" class="act" data-a="tr" aria-expanded="false">Перевод</button>' : '') + '</div>';
+  d.querySelector('[data-a=rep]').addEventListener('click', () => say(hz));
+  d.querySelector('[data-a=slow]').addEventListener('click', () => say(hz, 0.6));
+  const tb = d.querySelector('[data-a=tr]');
+  if (tb) tb.addEventListener('click', () => {
+    const ru = d.querySelector('.ru'); const o = ru.hidden; ru.hidden = !o; tb.setAttribute('aria-expanded', String(o));
+    if (o && SESS) weaveIn(hz).forEach((x) => SESS.tr.add(x));
+  });
+  appendLog(d);
+  if (speak) say(hz);
+  return d;
+}
+function boldDiff(was, better) {
+  const a = [...(was || '')], b = [...(better || '')];
+  const n = a.length, m = b.length;
+  if (!n || n * m > 200000) return esc(better);
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const keep = new Array(m).fill(false);
+  for (let i = 0, j = 0; i < n && j < m;) { if (a[i] === b[j]) { keep[j] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++; }
+  let h = '', open = false;
+  b.forEach((c, j) => { const bold = !keep[j] && !/[\s，。！？、,.!?]/.test(c); if (bold && !open) { h += '<b>'; open = true; } if (!bold && open) { h += '</b>'; open = false; } h += esc(c); });
+  return h + (open ? '</b>' : '');
+}
+function addUser(u) {
+  const line = (u && u.line) || {};
+  const d = document.createElement('div');
+  d.className = 'msg me';
+  let h = '<div class="bub"><div class="hz" lang="zh-CN">' + esc(line.hz) + '</div><div class="py">' + esc(line.py) + '</div></div>';
+  const c = u && u.correction;
+  if (c && c.better) {
+    h += '<div class="better">Лучше: <span class="hz" lang="zh-CN">' + boldDiff(line.hz, c.better.hz) + '</span>' +
+      (c.better.py ? '<div class="py">' + esc(c.better.py) + '</div>' : '') + '</div>';
+  }
+  h += '<div class="acts"><button type="button" class="act undo" aria-label="Не то — отменить реплику">Не то</button></div>';
+  d.innerHTML = h;
+  d.querySelector('.undo').addEventListener('click', undoLast);
+  appendLog(d);
+  return d;
+}
+function appendLog(el) { const log = $('#log'); log.appendChild(el); log.scrollTop = log.scrollHeight; }
+function renderWeave() {
+  const box = $('#weave');
+  if (!SESS || !SESS.weave.length) { box.innerHTML = ''; return; }
+  const left = SESS.weave.filter((w) => SESS.left.includes(w.hz));
+  box.innerHTML = '<span class="lb">Вплести:</span>' + (left.length
+    ? left.map((w) => '<span class="wchip" lang="zh-CN" title="' + esc((w.py || '') + ' · ' + (w.ru || '')) + '">' + esc(w.hz) + '</span>').join('')
+    : '<span class="done">все слова вплетены ✓</span>');
+}
+let thinkTimer = null;
+function setBusyUi(on, msg) {
+  $('#mic').disabled = on; $('#txt-go').disabled = on; $('#finish').disabled = on;
+  document.querySelectorAll('#log .undo').forEach((b) => { b.disabled = on; });
+  clearTimeout(thinkTimer);
+  if (on) setStatus('#c-status', msg);
+}
+async function sendTurn(p) {
+  if (busy || !SESS) return false;
+  busy = true;
+  const tr = [...SESS.tr];
+  let body;
+  if (p.audio) {
+    body = new FormData();
+    body.append('audio', p.audio, 'turn.' + p.ext);
+    if (tr.length) body.append('translate_requested', JSON.stringify(tr));
+    setBusyUi(true, 'Распознаю…');
+    thinkTimer = setTimeout(() => setStatus('#c-status', 'Думаю…'), 2500);
+  } else {
+    body = { text: p.text };
+    if (tr.length) body.translate_requested = tr;
+    setBusyUi(true, 'Думаю…');
+  }
+  let ok = false;
+  try {
+    const j = await api('POST', 'session/' + encodeURIComponent(SESS.id) + '/turn', body);
+    tr.forEach((x) => SESS.tr.delete(x));
+    document.querySelectorAll('#log .undo').forEach((b) => b.closest('.acts').remove());  // «Не то» — только у последней реплики
+    const uEl = j.user ? addUser(j.user) : null;
+    const aEl = j.ai && j.ai.line ? addAi(j.ai, true) : null;
+    SESS.last = uEl && aEl ? { user: uEl, ai: aEl, tr } : null;
+    if (!SESS.last && uEl) uEl.querySelector('.acts').remove();
+    if (Array.isArray(j.weave_left)) SESS.left = j.weave_left;
+    SESS.turns = j.turns || SESS.turns + 1;
+    renderWeave();
+    setStatus('#c-status', '');
+    ok = true;
+  } catch (e) {
+    setStatus('#c-status', e.message, true);
+    if (e.status === 401) setTimeout(() => showNoKey(e.message), 0);
+  } finally { busy = false; setBusyUi(false); }
+  return ok;
+}
+async function undoLast() {
+  if (busy || !SESS || !SESS.last) return;
+  busy = true;
+  const last = SESS.last;
+  setBusyUi(true, 'Отменяю…');
+  try {
+    const j = await api('POST', 'session/' + encodeURIComponent(SESS.id) + '/undo');
+    try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* */ }
+    last.user.remove(); last.ai.remove();
+    last.tr.forEach((x) => SESS.tr.add(x));  // «Перевод», нажатый до отменённой реплики, не теряем
+    SESS.last = null;
+    if (Array.isArray(j.weave_left)) SESS.left = j.weave_left;
+    SESS.turns = typeof j.turns === 'number' ? j.turns : Math.max(0, SESS.turns - 1);
+    renderWeave();
+    setStatus('#c-status', 'Реплика отменена.');
+  } catch (e) {
+    if (e.status === 409) { const a = last.user.querySelector('.acts'); if (a) a.remove(); SESS.last = null; }
+    setStatus('#c-status', e.status === 409 ? 'Эту реплику уже нельзя отменить.' : e.message, true);
+    if (e.status === 401) setTimeout(() => showNoKey(e.message), 0);
+  } finally { busy = false; setBusyUi(false); }
+}
+$('#txt-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const inp = $('#txt'); const v = inp.value.trim();
+  if (!v) { inp.focus(); return; }
+  if (await sendTurn({ text: v })) inp.value = '';
+});
+function showText(on, why) {
+  $('#txt-form').hidden = !on;
+  $('#txt-toggle').setAttribute('aria-expanded', String(on));
+  $('#txt-toggle').textContent = on ? (CAN_REC && !MIC_DENIED ? 'говорить голосом' : 'написать текстом') : 'написать текстом';
+  $('#txt-toggle').hidden = on && (!CAN_REC || MIC_DENIED);
+  $('#mic-wrap').hidden = on;
+  if (why) setStatus('#c-status', why, true);
+  if (on) { try { $('#txt').focus(); } catch (e) { /* */ } }
+}
+$('#txt-toggle').addEventListener('click', () => showText($('#txt-form').hidden));
+
+/* ---------- push-to-talk ---------- */
+const CAN_REC = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+let MIC_DENIED = false, STREAM = null;
+const REC = { st: 'idle', mr: null, chunks: [], cancel: false, t0: 0, timer: null };
+function pickMime() {
+  const c = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/ogg', 'audio/wav'];
+  for (const m of c) { try { if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) return m; } catch (e) { /* */ } }
+  return '';
+}
+const extOf = (t) => (/mp4|m4a|aac/.test(t) ? 'm4a' : /webm/.test(t) ? 'webm' : /ogg/.test(t) ? 'ogg' : /wav/.test(t) ? 'wav' : 'bin');
+async function getStream() {
+  if (STREAM && STREAM.getTracks().some((t) => t.readyState !== 'ended')) return STREAM;
+  STREAM = await navigator.mediaDevices.getUserMedia({ audio: true });
+  return STREAM;
+}
+function stopStream() { if (STREAM) { try { STREAM.getTracks().forEach((t) => t.stop()); } catch (e) { /* */ } } STREAM = null; }
+function micUi(state) {
+  const mic = $('#mic'), hint = $('#mic-hint');
+  mic.classList.toggle('rec', state === 'rec');
+  hint.textContent = state === 'rec' ? 'Говорите… отпустите — отправлю' : 'Удерживайте и говорите';
+}
+async function recStart(e) {
+  if (busy || REC.st !== 'idle' || !SESS) return;
+  if (e && e.cancelable) e.preventDefault();
+  try { if (e && e.pointerId != null && $('#mic').hasPointerCapture && $('#mic').hasPointerCapture(e.pointerId)) $('#mic').releasePointerCapture(e.pointerId); } catch (err) { /* */ }
+  try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (err) { /* */ }
+  REC.st = 'starting'; REC.cancel = false; REC.release = false; REC.chunks = [];
+  setStatus('#c-status', '');
+  let stream;
+  try { stream = await getStream(); }
+  catch (err) {
+    REC.st = 'idle'; MIC_DENIED = true;
+    showText(true, 'Микрофон недоступен (нет разрешения) — пиши текстом.');
+    return;
+  }
+  if (REC.cancel || REC.release) { REC.st = 'idle'; if (REC.release) setStatus('#c-status', 'Удерживайте кнопку, пока говорите.'); return; }
+  let mr;
+  try { const mime = pickMime(); mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream); }
+  catch (err) { REC.st = 'idle'; showText(true, 'Запись звука не поддерживается — пиши текстом.'); return; }
+  REC.mr = mr;
+  mr.ondataavailable = (ev) => { if (ev.data && ev.data.size) REC.chunks.push(ev.data); };
+  mr.onstop = () => recDone(mr);
+  try { mr.start(); } catch (err) { REC.st = 'idle'; showText(true, 'Запись не запустилась — пиши текстом.'); return; }
+  REC.st = 'rec'; REC.t0 = Date.now();
+  micUi('rec');
+  clearTimeout(REC.timer);
+  REC.timer = setTimeout(() => { if (REC.st === 'rec') recStop(false); }, 58000);
+}
+function recStop(cancel) {
+  if (REC.st === 'starting') { if (cancel) REC.cancel = true; else REC.release = true; return; }
+  if (REC.st !== 'rec') return;
+  REC.cancel = !!cancel; REC.st = 'stopping';
+  clearTimeout(REC.timer);
+  micUi('idle');
+  try { REC.mr.stop(); } catch (e) { REC.st = 'idle'; }
+}
+function recDone(mr) {
+  REC.st = 'idle';
+  const dur = Date.now() - REC.t0;
+  if (REC.cancel) { setStatus('#c-status', 'Запись отменена.'); return; }
+  if (dur < 400) { setStatus('#c-status', 'Удерживайте кнопку, пока говорите.'); return; }
+  const type = (mr.mimeType || (REC.chunks[0] && REC.chunks[0].type) || 'audio/mp4');
+  const blob = new Blob(REC.chunks, { type: type });
+  if (!blob.size) { setStatus('#c-status', 'Запись пустая — попробуй ещё раз.', true); return; }
+  sendTurn({ audio: blob, ext: extOf(type) });
+}
+(function bindMic() {
+  const mic = $('#mic');
+  if (!CAN_REC) { mic.disabled = true; return; }
+  const outside = (e) => { const r = mic.getBoundingClientRect(); if (!r.width) return false; const s = 16; return e.clientX < r.left - s || e.clientX > r.right + s || e.clientY < r.top - s || e.clientY > r.bottom + s; };
+  mic.addEventListener('pointerdown', (e) => { if (e.button && e.button !== 0) return; recStart(e); });
+  mic.addEventListener('pointerup', () => recStop(false));
+  mic.addEventListener('pointercancel', () => recStop(true));
+  mic.addEventListener('pointerleave', () => { if (REC.st === 'rec' || REC.st === 'starting') recStop(true); });
+  mic.addEventListener('pointermove', (e) => { if ((REC.st === 'rec' || REC.st === 'starting') && outside(e)) recStop(true); });
+  mic.addEventListener('contextmenu', (e) => e.preventDefault());
+  mic.addEventListener('keydown', (e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); recStart(); } });
+  mic.addEventListener('keyup', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); recStop(false); } });
+})();
+function stopAll() {
+  if (REC.st === 'rec' || REC.st === 'starting') recStop(true);
+  stopStream();
+  try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { /* */ }
+}
+async function exitChat(fromPop) {
+  const keep = () => { if (fromPop) { try { history.pushState({ s: 'chat' }, ''); } catch (e) { /* нет history */ } } };
+  if (busy || !SESS) { if (busy) keep(); else { SESS = null; showTopics(); } return; }
+  if (SESS.turns > 0) {
+    const ok = await finishSession();
+    if (!ok) keep();
+    else if (fromPop) { try { history.pushState({ s: 'sum' }, ''); } catch (e) { /* нет history */ } }
+    return;
+  }
+  SESS = null; showTopics();
+}
+$('#back').addEventListener('click', () => {
+  if (history.state && history.state.s === 'chat') history.back(); else exitChat(false);
+});
+window.addEventListener('popstate', () => {
+  if (!$('#s-chat').hidden) exitChat(true);
+  else if (!$('#s-sum').hidden) showTopics();
+});
+window.addEventListener('hashchange', () => {
+  if (!takeKey()) return;
+  stopAll(); SESS = null; TOPICS = null; LESSONS = [];
+  setStatus('#k-status', ''); setStatus('#t-status', '');
+  showTopics();
+});
+
+/* ---------- экран 3: разбор ---------- */
+async function finishSession() {
+  if (busy || !SESS) return false;
+  busy = true; setBusyUi(true, 'Готовлю разбор…');
+  let ok = false;
+  try {
+    const j = await api('POST', 'session/' + encodeURIComponent(SESS.id) + '/finish', { translate_requested: [...SESS.tr] });
+    stopAll();
+    const saved = markNotRecalled(j.not_recalled || []);
+    renderSummary(j, saved);
+    SESS = null;
+    show('sum');
+    try { $('#s-h').focus(); } catch (e) { /* */ }
+    setStatus('#c-status', '');
+    ok = true;
+  } catch (e) {
+    setStatus('#c-status', e.message, true);
+    if (e.status === 401) setTimeout(() => showNoKey(e.message), 0);
+  } finally { busy = false; setBusyUi(false); }
+  return ok;
+}
+$('#finish').addEventListener('click', () => { finishSession(); });
+function renderSummary(j, saved) {
+  const said = j.said || [], corr = j.corrections || [], nr = j.not_recalled || [];
+  const turns = j.turns || 0, min = j.minutes || 0;
+  $('#s-meta').textContent = [j.title_ru || 'Разговор', min + ' мин', turns + ' ' + pl(turns, 'реплика', 'реплики', 'реплик')].join(' · ');
+  $('#n-said').textContent = said.length; $('#l-said').textContent = pl(said.length, 'слово', 'слова', 'слов') + ' сказал';
+  $('#n-corr').textContent = corr.length; $('#l-corr').textContent = pl(corr.length, 'поправка', 'поправки', 'поправок');
+  $('#n-nr').textContent = nr.length;
+  $('#s-corr').innerHTML = corr.length ? corr.map((c) => '<div class="corr"><div class="was hz" lang="zh-CN">' + esc(c.was && c.was.hz) + '</div>' +
+    '<div class="now hz" lang="zh-CN">' + esc(c.better && c.better.hz) + '</div><div class="rule">' + esc(c.rule_ru) + '</div></div>').join('')
+    : '<div class="empty">Поправок нет — чисто.</div>';
+  $('#s-nr').innerHTML = nr.length ? nr.map((w) => '<span class="nrw"><span class="hz" lang="zh-CN">' + esc(w.hz) + '</span><span class="d">' +
+    (w.py ? '<span class="py">' + esc(w.py) + ' · </span>' : '') + esc(w.ru) + '</span></span>').join('')
+    : '<div class="empty">Все слова вспомнил сам.</div>';
+  $('#s-said').innerHTML = said.length ? said.map((w, i) => '<span class="sw">' + esc(w.hz) + (i < said.length - 1 ? ' ·' : '') + '</span>').join(' ') : '—';
+  setStatus('#s-status', saved < 0 ? 'Не удалось сохранить слова в «Повторение»: браузер не даёт писать в память.' : '', saved < 0);
+}
+$('#again').addEventListener('click', () => { if (LAST_SPEC) startSession(LAST_SPEC); else showTopics(); });
+$('#other').addEventListener('click', () => showTopics());
+
+/* ---------- старт ---------- */
+if (!KEY) showNoKey(); else showTopics();
+})();
+</script>
+</body>
+</html>
