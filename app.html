@@ -526,7 +526,8 @@ const DATA = {"mode": "app", "lessons": [{"id": "audio-01", "number": 1, "title_
     box.innerHTML = '<section class="sec"><div class="sec-h"><h2>Синхронизация</h2><span class="sub" id="sync-st" role="status" aria-live="polite"></span></div>' +
       '<form class="sync-f" id="sync-form" autocomplete="off"><label class="vh" for="sync-key">Ключ синхронизации</label>' +
       '<input id="sync-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ключ или ссылка">' +
-      '<button type="submit">Сохранить</button></form></section>';
+      '<button type="submit">Сохранить</button></form>' +
+      '<a href="./talk-check.html" data-href="./talk-check.html" style="min-height:44px;display:inline-flex;align-items:center">Проверка голоса</a></section>';
     syncStatus();
     $('#sync-form').addEventListener('submit', async ev => {
       ev.preventDefault();
