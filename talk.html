@@ -154,6 +154,11 @@
   .s-foot .btn-p{height:48px}
   .nokey{flex:1;padding:0 16px;display:flex;flex-direction:column;gap:14px}
   .nokey a{display:inline-flex;align-items:center;align-self:flex-start;min-height:44px;padding:0 4px}
+  .k-form{display:flex;gap:8px;margin-top:12px}
+  .k-form input{flex:1;min-width:0;height:44px;box-sizing:border-box;padding:0 12px;border:1.5px solid var(--line);border-radius:12px;
+    background:var(--bg);color:var(--ink);font:inherit;font-size:16px}
+  .k-form input:focus-visible,.k-form button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
   .nokey .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;font-size:16px}
 </style>
 </head>
@@ -163,7 +168,11 @@
 <section class="screen" id="s-nokey" hidden>
   <header class="t-head"><div class="h1row"><h1>Разговор</h1><span class="cn" lang="zh-CN">对话</span></div></header>
   <div class="nokey">
-    <div class="card"><b>Нужен ключ:</b> открой ссылку на разговор из сообщения Драко.<div class="status" id="k-status" role="status"></div></div>
+    <div class="card"><b>Нужен ключ:</b> вставь ссылку на разговор из сообщения Драко.
+      <form class="k-form" id="k-form" autocomplete="off"><label class="vh" for="k-input">Ключ или ссылка</label>
+        <input id="k-input" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ключ или ссылка">
+        <button type="submit" class="btn-p">Сохранить</button></form>
+      <div class="status" id="k-status" role="status"></div></div>
     <a href="./index.html">← На главную</a>
   </div>
 </section>
@@ -312,7 +321,7 @@ applyPy();
 class ApiErr extends Error { constructor(status, msg) { super(msg); this.status = status; } }
 function errText(st, j) {
   const e = j && j.error;
-  if (st === 401) return 'Ключ не подошёл. Открой свежую ссылку на разговор из сообщения Драко.';
+  if (st === 401) return 'Ключ не подошёл. Вставь свежую ссылку на разговор из сообщения Драко.';
   if (st === 422) return 'Не расслышал' + (j && j.heard ? ' («' + j.heard + '»)' : '') + '. Скажи ещё раз, чуть громче.';
   if (st === 429) return 'Слишком много запросов. Подожди минуту и попробуй снова.';
   if (st === 502 || st === 503 || st === 504) return 'Собеседник сейчас не ответил. Попробуй ещё раз.';
@@ -709,6 +718,23 @@ $('#back').addEventListener('click', () => {
 window.addEventListener('popstate', () => {
   if (!$('#s-chat').hidden) exitChat(true);
   else if (!$('#s-sum').hidden) showTopics();
+});
+/* ключ вручную: в приложении с экрана «Домой» (iPhone) своё хранилище и нет адресной строки — ссылку вставляют сюда */
+const KEY_RE = /^[A-Za-z0-9_\-.~+\/=]{16,200}$/;
+function parseKey(v) {
+  v = String(v || '').trim();
+  const m = /(?:^|[#&?])key=([^&\s]+)/.exec(v);
+  if (m) { try { v = decodeURIComponent(m[1]); } catch (e) { v = m[1]; } }
+  return v.trim();
+}
+$('#k-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const inp = $('#k-input'), k = parseKey(inp.value);
+  if (!KEY_RE.test(k)) { setStatus('#k-status', k ? 'Это не ключ.' : 'Нужен ключ.', true); return; }
+  KEY = k; lsSet('zh_talk_key', k); inp.value = '';
+  stopAll(); SESS = null; TOPICS = null; LESSONS = [];
+  setStatus('#k-status', '');
+  showTopics();
 });
 window.addEventListener('hashchange', () => {
   if (!takeKey()) {                               // ключ мог забрать ZhSync (sync.js) раньше этого обработчика
