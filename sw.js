@@ -2,8 +2,8 @@
  * HTML/JS/manifest — stale-while-revalidate; иконки и шрифты — cache-first; zh-api и прочие чужие запросы не трогаем.
  * VERSION и PRECACHE подставляет build.py (zhhw/build.py, render_sw). */
 'use strict';
-const VERSION = 'c807ca1596e6'/*VERSION*/;
-const PRECACHE = /*PRECACHE*/["./app.html", "./audio-01.html", "./audio-02.html", "./audio-03.html", "./audio-04.html", "./audio-05.html", "./audio-06.html", "./audio-07.html", "./audio-08.html", "./audio-09.html", "./audio-10.html", "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png", "./index.html", "./manifest.webmanifest", "./progress.js", "./review.html", "./sessions.js", "./sync.js", "./talk.html"]/*END*/;
+const VERSION = '64b70f25061f'/*VERSION*/;
+const PRECACHE = /*PRECACHE*/["./app.html", "./audio-01.html", "./audio-02.html", "./audio-03.html", "./audio-04.html", "./audio-05.html", "./audio-06.html", "./audio-07.html", "./audio-08.html", "./audio-09.html", "./audio-10.html", "./audio-11.html", "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png", "./index.html", "./manifest.webmanifest", "./progress.js", "./review.html", "./sessions.js", "./sync.js", "./talk.html"]/*END*/;
 const CACHE = 'tush-' + VERSION;
 const FONTS = 'tush-fonts';
 
